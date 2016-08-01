@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CPSM_class_diagram.SongControl" Collapsed="true">
+    <Position X="1.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAABAAAAAAAAAAAAAAhAAAAAAAgAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.Measure" Collapsed="true">
+    <Position X="1.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAQAAAAABAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.WhiteNoteBit" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.BlackNoteBit" Collapsed="true">
+    <Position X="2.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.BlackNote" Collapsed="true">
+    <Position X="2.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.WhiteNote" Collapsed="true">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.WhiteNoteHalf" Collapsed="true">
+    <Position X="0.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.BlackNoteHalf" Collapsed="true">
+    <Position X="2.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.GUI" Collapsed="true">
+    <Position X="0.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAIABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.SongCanvas" Collapsed="true">
+    <Position X="2.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAABCAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.FormSongSelect" Collapsed="true">
+    <Position X="4.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.MouseControl" Collapsed="true">
+    <Position X="6" Y="2" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.MouseNoteColour" Collapsed="true">
+    <Position X="6" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.ParentButton" Collapsed="true">
+    <Position X="15.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCQABgAAABQBCAAAgEAITAKAAAAAgEEIgAoABAUIAQE=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomButton" Collapsed="true">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAIAAAAAAACCAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomCheckbox" Collapsed="true">
+    <Position X="17.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAIAAAAAAAAACAAIABAAgAACCCAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomRadioButtonGroup" Collapsed="true">
+    <Position X="13" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAoAABAE=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomRadioButton" Collapsed="true">
+    <Position X="13.25" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAICAEgAIAAAAACAAIABAAgAACCAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.Images.ImageControl" Collapsed="true">
+    <Position X="12.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAIQABDYBgAAEAAEAAAAAAIIAQAAAAAAQAAAgAAACA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.IniSpace.IniFile" Collapsed="true">
+    <Position X="10.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAkAIQAAAAAAAgAACgAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.HotkeyControl" Collapsed="true">
+    <Position X="8" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.SongViewModalCreator" Collapsed="true">
+    <Position X="7" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.MeasureViewModal" Collapsed="true">
+    <Position X="7.25" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.WhiteNoteViewModal" Collapsed="true">
+    <Position X="8.5" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.WhiteNoteHalfViewModal" Collapsed="true">
+    <Position X="8.5" Y="8" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.WhiteNoteBitViewModal" Collapsed="true">
+    <Position X="8.5" Y="8.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.BlackNoteViewModal" Collapsed="true">
+    <Position X="6" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.BlackNoteHalfViewModal" Collapsed="true">
+    <Position X="6" Y="8" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.ViewModals.BlackNoteBitViewModal" Collapsed="true">
+    <Position X="6" Y="8.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongViewModals.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM_class_diagram.Song" Collapsed="true">
+    <Position X="1.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAEAAAAAAAAAQAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="CPSM_class_diagram.MeasureSize" Collapsed="true">
+    <Position X="4.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CommonClasses.CustomButtons.ButtonState" Collapsed="true">
+    <Position X="17.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAABAQAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
