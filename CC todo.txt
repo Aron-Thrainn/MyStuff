@@ -1,0 +1,67 @@
+To do:
+  Working:
+	
+	
+	
+
+
+  backburner:
+	 [bug] today next month counter is wrong
+	purdify the current time display
+	add auto sync with other computers
+	Add support for icelandic characters
+	allow input for month names & days of the week
+	make a sub sort prio when sorting timers with the same target date
+	make the description box auto-linebreak not split words in half
+	 [bug] Annual timers dont update to next year properly
+	 [bug] Tooltips act wierd going between 2 object next to each other
+	"Done" button for finished timers (shortcut for delete timer)
+
+
+
+
+
+  Depth:
+9999 	backround
+0  	initialize(Draw events etc.)
+-1	buttons, timers	
+-2	
+-3	
+-100	menus
+-101	menu objects
+-102
+-103
+-200	tooltips
+
+
+
+
+
+
+
+Done:
+
+
+fix sorting for equal timers
+add more colours
+ [bug]default day will put invalid (ie. day 32) 
+dont show 0 years 0 months ect.
+ [bug] tooltip does not change sie when changing between two objects next to each other.
+ [bug] time input doesnt alllow xx:0x
+ [bug]fix countdown
+fix sorting
+ [bug] doesnt save filter settings
+make the categories renamable & save the custom names
+find the code that moves the tooltips and make it still when active
+add a display that shows the number of timers in each catagory
+make the menus object based not view based
+hotkeys (enter to create timer, tab to go to the next textbox)
+ [bug] timers dont finish
+ [bug]mouseover timers works through menus
+purdify the countdown
+ [bug] edit timer sync isnt always correct
+add feedforward for the delay on timers changing (newtimer & edittimer)
+Remake the time inputbox algorythm
+Scrolling
+Enter hotkey
+Make annual timers

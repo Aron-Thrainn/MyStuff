@@ -1,0 +1,12 @@
+CPSMaker todo:
+
+ctrl-z(Stack i.e. tolh fyrirlestur 14) + redo
+ctrl-c(localized save/load function)
+
+
+
+
+
+
+
+
