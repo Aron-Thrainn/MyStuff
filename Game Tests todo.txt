@@ -1,0 +1,18 @@
+Depth:
+ 
+ ui spell icon  -155
+UI		-150
+
+ Damage numbers	-110
+ player health	-105
+player		-100
+ 
+ enemy health	-55
+spell		-50
+ embers		-49
+
+enemy		0
+
+loot		50
+
+wall		100

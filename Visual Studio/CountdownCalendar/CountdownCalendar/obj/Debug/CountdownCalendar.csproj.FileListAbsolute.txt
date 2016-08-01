@@ -1,0 +1,14 @@
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.csprojResolveAssemblyReference.cache
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\MainWindow.g.cs
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\App.g.cs
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar_MarkupCompile.cache
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar_MarkupCompile.lref
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\bin\Debug\CountdownCalendar.exe.config
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\bin\Debug\CountdownCalendar.exe
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\bin\Debug\CountdownCalendar.pdb
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\MainWindow.baml
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.g.resources
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.Properties.Resources.resources
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.csproj.GenerateResource.Cache
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.exe
+C:\Users\Notandi\Desktop\My Repository\countdown-calendar\Visual Studio\CountdownCalendar\CountdownCalendar\obj\Debug\CountdownCalendar.pdb
