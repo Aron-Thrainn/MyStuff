@@ -7,8 +7,7 @@ using CommonClasses.IniSpace;
 
 namespace CPSM_class_diagram
 {
-    public class SongControl
-    {
+    public class SongControl {
         private IniFile SaveFile { get; set; }
         public Song ActiveSong { get; set; }
 
@@ -25,24 +24,64 @@ namespace CPSM_class_diagram
         public void AddMeasure(MeasureSize f_size) {
             ActiveSong.AddMeasure(f_size);
         }
-
+        public void SetName(string f_name) {
+            ActiveSong.Name = f_name;
+        }
+        public void SetSource(string f_source) {
+            ActiveSong.Source = f_source;
+        }
+        public int GetNewID() {
+            throw new NotImplementedException();
+        }
     }
 
 
 
-
-    public enum MeasureSize
-    {
+    public enum NoteBitPos {
+        a1,
+        a2,
+        a3,
+        a4,
+        a5,
+        a6,
+        a7,
+        a8,
+        b1,
+        b2,
+        b3,
+        b4,
+        b5,
+        b6,
+        b7,
+        b8
+    }
+    public enum OctaveColour {
+        none,
+        Brown,
+        Teal,
+        Blue,
+        Green,
+        Red,
+        Purple,
+        Yellow
+    }
+    public enum Half {
+        Left,
+        Right
+    }
+    public enum MeasureSize {
         four = 4,
         six = 6
     }
-    public class Song
-    {
+
+    public class Song {
+        public int ID { get; set; }
         public Stack<Measure> Measures { get; set; }
         public string Name { get; set; }
         public string Source { get; set; }
 
-        public Song() {
+        public Song(int f_ID) {
+            ID = f_ID;
             Measures = new Stack<Measure>();
             Name = "";
             Source = "";
@@ -54,11 +93,10 @@ namespace CPSM_class_diagram
         }
 
     }
-    
-    public class Measure
-    {
-        public WhiteNote[,] WhiteNotes { get; set; }
-        public BlackNote[,] BlackNotes { get; set; }
+
+    public class Measure {
+        public Note[,] WhiteNotes { get; set; }
+        public Note[,] BlackNotes { get; set; }
         public Song Parent { get; set; }
         public MeasureSize Size { get; set; }
 
@@ -67,93 +105,76 @@ namespace CPSM_class_diagram
             Size = f_size;
 
             var f_sizeint = (int)Size;
-            WhiteNotes = new WhiteNote[7, f_sizeint];
+            WhiteNotes = new Note[7, f_sizeint];
             for (int i = 0; i <= 7; i++) {
                 for (int o = 0; o <= f_sizeint; o++) {
-                    WhiteNotes[i, o] = new WhiteNote(this);
+                    WhiteNotes[i, o] = new Note(this);
                 }
             }
-            BlackNotes = new BlackNote[5, f_sizeint];
+            BlackNotes = new Note[5, f_sizeint];
             for (int i = 0; i <= 5; i++) {
                 for (int o = 0; o <= f_sizeint; o++) {
-                    BlackNotes[i, o] = new BlackNote(this);
+                    BlackNotes[i, o] = new Note(this);
                 }
             }
 
         }
     }
-
-    public class WhiteNote
-    {
-        public Tuple<WhiteNoteHalf, WhiteNoteHalf> WhiteNoteHalves { get; set; }
+    
+    public class Note {
+        public Tuple<NoteHalf, NoteHalf> NoteHalves { get; set; }
         public Measure Parent { get; set; }
 
-        public WhiteNote(Measure f_parent) {
+        public Note(Measure f_parent) {
             Parent = f_parent;
-            for (int i = 0; i <= 12; i++) {
-                WhiteNoteHalves = new Tuple<WhiteNoteHalf, WhiteNoteHalf>(new WhiteNoteHalf(this), new WhiteNoteHalf(this));
+            NoteHalves = new Tuple<NoteHalf, NoteHalf>(new NoteHalf(this), new NoteHalf(this));
+
+        }
+
+        public void SetColour(OctaveColour f_oct) {
+            NoteHalves.Item1.SetColour(f_oct);
+            NoteHalves.Item2.SetColour(f_oct);
+        }
+        public void SetColourHalf(OctaveColour f_oct, Half f_half) {
+            if (f_half == Half.Left) {
+                NoteHalves.Item1.SetColour(f_oct);
+            }
+            else {
+                NoteHalves.Item2.SetColour(f_oct);
             }
         }
     }
 
+    public class NoteHalf {
+        public NoteBit[] NoteBits { get; set; }
+        public Note Parent { get; set; }
 
-    public class WhiteNoteHalf
-    {
-        public WhiteNoteBit[] WhiteNoteBits { get; set; }
-        public WhiteNote Parent { get; set; }
-
-        public WhiteNoteHalf(WhiteNote f_parent) {
+        public NoteHalf(Note f_parent) {
             Parent = f_parent;
-            WhiteNoteBits = new WhiteNoteBit[12];
-            for (int i = 0; i <= 12; i++) {
-                WhiteNoteBits[i] = new WhiteNoteBit(this);
+            NoteBits = new NoteBit[8];
+            for (int i = 0; i <= 8; i++) {
+                NoteBits[i] = new NoteBit(this);
+            }
+        }
+
+        public void SetColour(OctaveColour f_oct) {
+            foreach (var bit in NoteBits) {
+                bit.SetColour(f_oct);
             }
         }
     }
 
-    public class WhiteNoteBit
-    {
-        public WhiteNoteHalf Parent { get; set; }
+    public class NoteBit {
+        public NoteHalf Parent { get; set; }
+        public NoteBitPos pos { get; set; }
+        public OctaveColour Oct { get; set; }
 
-        public WhiteNoteBit(WhiteNoteHalf f_parent) {
+        public NoteBit(NoteHalf f_parent) {
             Parent = f_parent;
         }
-    }
 
-
-    public class BlackNote
-    {
-        public Tuple<BlackNoteHalf, BlackNoteHalf> BlackNoteHalves { get; set; }
-        public Measure Parent { get; set; }
-
-        public BlackNote(Measure f_parent) {
-            Parent = f_parent;
-            for (int i = 0; i <= 12; i++) {
-                BlackNoteHalves = new Tuple<BlackNoteHalf, BlackNoteHalf>(new BlackNoteHalf(this), new BlackNoteHalf(this));
-            }
-        }
-    }
-
-    public class BlackNoteHalf
-    {
-        public BlackNoteBit[] BlackNoteBits { get; set; }
-        public BlackNote Parent { get; set; }
-
-        public BlackNoteHalf(BlackNote f_parent) {
-            Parent = f_parent;
-            BlackNoteBits = new BlackNoteBit[12];
-            for (int i = 0; i <= 12; i++) {
-                BlackNoteBits[i] = new BlackNoteBit(this);
-            }
-        }
-    }
-
-    public class BlackNoteBit
-    {
-        public BlackNoteHalf Parent { get; set; }
-
-        public BlackNoteBit(BlackNoteHalf f_parent) {
-            Parent = f_parent;
+        public void SetColour(OctaveColour f_oct) {
+            Oct = f_oct;
         }
     }
 }

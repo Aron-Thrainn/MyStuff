@@ -15,3 +15,14 @@ C:\Users\Notandi\Documents\Visual Studio 2015\Projects\CPSM\CPSM\obj\Debug\CPSM.
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.exe.config
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.exe
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.pdb
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.exe
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.pdb
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.csprojResolveAssemblyReference.cache
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\MainWindow.g.cs
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\App.g.cs
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM_MarkupCompile.cache
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM_MarkupCompile.lref
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\MainWindow.baml
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.g.resources
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.Properties.Resources.resources
+C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.csproj.GenerateResource.Cache

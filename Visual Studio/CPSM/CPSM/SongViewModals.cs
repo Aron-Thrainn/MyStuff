@@ -35,9 +35,22 @@ namespace CPSM_class_diagram
             }
         }
 
-        public class WhiteNoteViewModal
+        public class NoteViewModal
         {
-            public WhiteNoteViewModal(WhiteNote f_note, Canvas f_measureCan) {
+            public Note CounterPart { get; set; }
+
+            public NoteViewModal(Note f_note, Canvas f_measureCan) {
+                CounterPart = f_note;
+
+            }
+        }
+
+
+        public class WhiteNoteViewModal : NoteViewModal
+        {
+            public Tuple<WhiteNoteHalfViewModal,WhiteNoteHalfViewModal> Halves { get; set; }
+
+            public WhiteNoteViewModal(Note f_note, Canvas f_measureCan) : base(f_note, f_measureCan) {
                 //create note halves
                 //create canvas/stack panel
                 //set position in measure canvas
@@ -46,22 +59,35 @@ namespace CPSM_class_diagram
         }
         public class WhiteNoteHalfViewModal
         {
-
+            public List<WhiteNoteBitViewModal> Bits { get; set; }
         }
-        public class WhiteNoteBitViewModal { }
-
-
-        public class BlackNoteViewModal
+        public class WhiteNoteBitViewModal
         {
-            public BlackNoteViewModal(BlackNote f_note, Canvas f_measureCan) {
+            public OctaveColour Oct { get; set; }
+            public NoteBitPos pos { get; set; }
+        }
+
+
+        public class BlackNoteViewModal : NoteViewModal
+        {
+            public Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal> Halves { get; set; }
+
+            public BlackNoteViewModal(Note f_note, Canvas f_measureCan) : base(f_note, f_measureCan) {
                 //create note halves
                 //create canvas/stack panel
                 //set position in measure canvas
                 throw new NotImplementedException();
             }
         }
-        public class BlackNoteHalfViewModal { }
-        public class BlackNoteBitViewModal { }
+        public class BlackNoteHalfViewModal
+        {
+            public List<BlackNoteBitViewModal> Bits { get; set; }
+        }
+        public class BlackNoteBitViewModal
+        {
+            public OctaveColour Oct { get; set; }
+            public NoteBitPos pos { get; set; }
+        }
 
     }
 
