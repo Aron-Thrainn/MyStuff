@@ -5,15 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using CPSM_class_diagram.ViewModals;
+using CPSM.ViewModals;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Interop;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Windows.Input;
 
-namespace CPSM_class_diagram
+namespace CPSM
 {
 
     public class GUI {
@@ -55,6 +56,26 @@ namespace CPSM_class_diagram
         }
     }
     public class MouseNoteColour { }
+
+    public class MouseNoteControl
+    {
+
+        public void NoteLeftClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            throw new NotImplementedException();
+        }
+        public void NoteLeftClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            throw new NotImplementedException();
+        }
+        public void NoteRightClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            throw new NotImplementedException();
+        }
+        public void NoteRightClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            throw new NotImplementedException();
+        }
+
+
+
+    }
 
     public class HotkeyControl {
         public MainWindow _Window { get; set; }
@@ -100,5 +121,14 @@ namespace CPSM_class_diagram
             
         }
         
+    }
+
+    public class Version
+    {
+        public string CurrentVersion { get; set; }
+
+        public Version() {
+            CurrentVersion = "Pre-Alpha";
+        }
     }
 }

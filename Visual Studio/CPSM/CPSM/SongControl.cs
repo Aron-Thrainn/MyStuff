@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommonClasses.IniSpace;
 
-namespace CPSM_class_diagram
+namespace CPSM
 {
     public class SongControl {
         private IniFile SaveFile { get; set; }
@@ -38,7 +38,7 @@ namespace CPSM_class_diagram
 
 
     public enum NoteBitPos {
-        a1,
+        a1 = 1,
         a2,
         a3,
         a4,
@@ -68,6 +68,11 @@ namespace CPSM_class_diagram
     public enum Half {
         Left,
         Right
+    }
+    public enum NoteType
+    {
+        White,
+        Black
     }
     public enum MeasureSize {
         four = 4,

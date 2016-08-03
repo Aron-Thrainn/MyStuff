@@ -12,10 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CPSM;
 
 namespace CommonClasses
 {
-    using CPSM_class_diagram;
+    using CPSM;
 
     
     namespace CustomButtons
@@ -612,6 +613,7 @@ namespace CommonClasses
             public static readonly BitmapImage IconDelete = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_11.png"));
             public static readonly BitmapImage IconCancel = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_12.png"));
             public static readonly BitmapImage IconAnnual = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_13.png"));
+            public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/img1.png"));
             #endregion
 
             public static BitmapImage IconFrame(ButtonState f_state)
@@ -627,7 +629,11 @@ namespace CommonClasses
                 }
             }
 
-            
+            public static BitmapImage NoteImg(OctaveColour f_oct, NoteType f_type) {
+
+
+                return IconTest;
+            }
         }
     }
     

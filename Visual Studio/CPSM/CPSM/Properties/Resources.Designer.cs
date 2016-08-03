@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CPSM_class_diagram.Properties
+namespace CPSM.Properties
 {
 
 
