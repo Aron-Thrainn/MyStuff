@@ -56,6 +56,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CommonClasses.cs" />
+    <Compile Include="Forms.cs" />
     <Compile Include="SongControl.cs" />
     <Compile Include="SongViewModals.cs" />
     <Compile Include="Window.cs" />
@@ -121,6 +122,33 @@
     <Resource Include="Resources\icons_7.png" />
     <Resource Include="Resources\icons_8.png" />
     <Resource Include="Resources\icons_9.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Note_a1.png" />
+    <Resource Include="Resources\Note_a2.png" />
+    <Resource Include="Resources\Note_a3.png" />
+    <Resource Include="Resources\Note_a4.png" />
+    <Resource Include="Resources\Note_a5.png" />
+    <Resource Include="Resources\Note_a6.png" />
+    <Resource Include="Resources\Note_a7.png" />
+    <Resource Include="Resources\Note_b1.png" />
+    <Resource Include="Resources\Note_b2.png" />
+    <Resource Include="Resources\Note_b3.png" />
+    <Resource Include="Resources\Note_b4.png" />
+    <Resource Include="Resources\Note_b5.png" />
+    <Resource Include="Resources\Note_b6.png" />
+    <Resource Include="Resources\Note_b7.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Note_a0.png" />
+    <Resource Include="Resources\Note_b0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Measure_10.png" />
+    <Resource Include="Resources\Measure_12.png" />
+    <Resource Include="Resources\Measure_4.png" />
+    <Resource Include="Resources\Measure_6.png" />
+    <Resource Include="Resources\Measure_8.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

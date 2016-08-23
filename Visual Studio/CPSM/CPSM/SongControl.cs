@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommonClasses.IniSpace;
+using CPSM.ViewModals;
 
 namespace CPSM
 {
@@ -34,11 +35,11 @@ namespace CPSM
             throw new NotImplementedException();
         }
     }
-
+    
 
 
     public enum NoteBitPos {
-        a1 = 1,
+        a1 = 0,
         a2,
         a3,
         a4,
@@ -56,7 +57,7 @@ namespace CPSM
         b8
     }
     public enum OctaveColour {
-        none,
+        none = 0,
         Brown,
         Teal,
         Blue,
@@ -76,7 +77,10 @@ namespace CPSM
     }
     public enum MeasureSize {
         four = 4,
-        six = 6
+        six = 6,
+        eight = 8,
+        ten = 10,
+        twelve = 12
     }
 
     public class Song {
@@ -110,15 +114,15 @@ namespace CPSM
             Size = f_size;
 
             var f_sizeint = (int)Size;
-            WhiteNotes = new Note[7, f_sizeint];
-            for (int i = 0; i <= 7; i++) {
-                for (int o = 0; o <= f_sizeint; o++) {
+            WhiteNotes = new Note[14, f_sizeint];
+            for (int i = 0; i < 14; i++) {
+                for (int o = 0; o < f_sizeint; o++) {
                     WhiteNotes[i, o] = new Note(this);
                 }
             }
-            BlackNotes = new Note[5, f_sizeint];
-            for (int i = 0; i <= 5; i++) {
-                for (int o = 0; o <= f_sizeint; o++) {
+            BlackNotes = new Note[10, f_sizeint];
+            for (int i = 0; i < 10; i++) {
+                for (int o = 0; o < f_sizeint; o++) {
                     BlackNotes[i, o] = new Note(this);
                 }
             }
@@ -132,7 +136,7 @@ namespace CPSM
 
         public Note(Measure f_parent) {
             Parent = f_parent;
-            NoteHalves = new Tuple<NoteHalf, NoteHalf>(new NoteHalf(this), new NoteHalf(this));
+            NoteHalves = new Tuple<NoteHalf, NoteHalf>(new NoteHalf(this, Half.Left), new NoteHalf(this, Half.Right));
 
         }
 
@@ -148,17 +152,31 @@ namespace CPSM
                 NoteHalves.Item2.SetColour(f_oct);
             }
         }
+        public void SetColour(NoteTemplate f_template) {
+            int count = 0;
+            foreach (var bit in NoteHalves.Item1.NoteBits) {
+                bit.SetColour(f_template.Colours[count], f_template.Positions[count]);
+                count++;
+            }
+            foreach (var bit in NoteHalves.Item2.NoteBits) {
+                bit.SetColour(f_template.Colours[count], f_template.Positions[count]);
+                count++;
+            }
+        }
     }
 
     public class NoteHalf {
         public NoteBit[] NoteBits { get; set; }
         public Note Parent { get; set; }
+        public Half Half { get; set; }
 
-        public NoteHalf(Note f_parent) {
+        public NoteHalf(Note f_parent, Half f_half) {
             Parent = f_parent;
+            Half = f_half;
             NoteBits = new NoteBit[8];
-            for (int i = 0; i <= 8; i++) {
-                NoteBits[i] = new NoteBit(this);
+            for (int i = 0; i < 8; i++) {
+                var poscount = ((int)f_half * 8) + i;
+                NoteBits[i] = new NoteBit(this, (NoteBitPos)poscount);
             }
         }
 
@@ -174,12 +192,22 @@ namespace CPSM
         public NoteBitPos pos { get; set; }
         public OctaveColour Oct { get; set; }
 
-        public NoteBit(NoteHalf f_parent) {
+        public NoteBit(NoteHalf f_parent, NoteBitPos f_pos) {
             Parent = f_parent;
+            SetPosition(f_pos);
+            pos = f_pos;
         }
 
         public void SetColour(OctaveColour f_oct) {
             Oct = f_oct;
+            SetPosition(pos);
+        }
+        public void SetColour(OctaveColour f_oct, NoteBitPos f_pos) {
+            Oct = f_oct;
+            SetPosition(f_pos);
+        }
+        public void SetPosition(NoteBitPos f_pos) {
+            pos = f_pos;
         }
     }
 }

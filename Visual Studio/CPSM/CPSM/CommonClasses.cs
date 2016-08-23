@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CPSM;
 
+
 namespace CommonClasses
 {
     using CPSM;
@@ -135,8 +136,10 @@ namespace CommonClasses
                 Highlight.Opacity = 0;
             }
             #region Set functions
-            public void SetImg(BitmapImage f_img)
-            {
+            public void SetImg(BitmapImage f_img) {
+                Icon.Source = f_img;
+            }
+            public void SetImg(BitmapSource f_img) {
                 Icon.Source = f_img;
             }
             public void setButtonState(ButtonState f_state)
@@ -586,14 +589,12 @@ namespace CommonClasses
             #endregion
         }
     }
-    
 
-   
-    namespace Images
-    {
+
+
+    namespace Images {
         using CustomButtons;
-        public static class ImageControl
-        {
+        public static class ImageControl {
             #region images
             private static readonly BitmapImage DefaultIcon = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_0.png"));
             private static readonly BitmapImage IconFrameIdle = new BitmapImage(new Uri("pack://application:,,,/Resources/frame_0.png"));
@@ -614,12 +615,51 @@ namespace CommonClasses
             public static readonly BitmapImage IconCancel = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_12.png"));
             public static readonly BitmapImage IconAnnual = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_13.png"));
             public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/img1.png"));
+
+
+
+            private static readonly BitmapImage[] WhiteNotes = new BitmapImage[]{
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a0.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a2.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a3.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a4.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a5.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a6.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a7.png"))
+            };
+            private static readonly BitmapImage[] BlackNotes = new BitmapImage[]{
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b0.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b1.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b2.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b3.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b4.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b5.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b6.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Note_b7.png"))
+            };
+
+            private static readonly BitmapImage[] Measures = new BitmapImage[]{
+                new BitmapImage(),   //Empty slots, just to get the measures in the appropriate slots
+                new BitmapImage(),
+                new BitmapImage(),
+                new BitmapImage(),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_4.png")),
+                new BitmapImage(),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_6.png")),
+                new BitmapImage(),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_8.png")),
+                new BitmapImage(),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_10.png")),
+                new BitmapImage(),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_12.png"))
+
+            };
+
             #endregion
 
-            public static BitmapImage IconFrame(ButtonState f_state)
-            {
-                switch (f_state)
-                {
+            public static BitmapImage IconFrame(ButtonState f_state) {
+                switch (f_state) {
                     case ButtonState.Idle: return IconFrameIdle;
                     case ButtonState.Toggled: return IconFrameToggle;
                     case ButtonState.Pressed: return IconFramePressed;
@@ -629,71 +669,82 @@ namespace CommonClasses
                 }
             }
 
-            public static BitmapImage NoteImg(OctaveColour f_oct, NoteType f_type) {
+            public static BitmapSource NoteImg(OctaveColour f_oct, NoteType f_type) {
+                if (f_type == NoteType.White) {
+                    return ConvertBitmapTo96DPI(WhiteNotes[(int)f_oct]);
+                }
+                else {
+                    return ConvertBitmapTo96DPI(BlackNotes[(int)f_oct]);
+                }
+            }
+            public static BitmapSource MeasureImg(MeasureSize f_size) {
+                return ConvertBitmapTo96DPI(Measures[(int)f_size]);
+            }
 
+            public static BitmapSource ConvertBitmapTo96DPI(BitmapImage bitmapImage) {
+                double dpi = 96;
+                int width = bitmapImage.PixelWidth;
+                int height = bitmapImage.PixelHeight;
 
-                return IconTest;
+                int stride = width * bitmapImage.Format.BitsPerPixel;
+                byte[] pixelData = new byte[stride * height];
+                bitmapImage.CopyPixels(pixelData, stride, 0);
+
+                return BitmapSource.Create(width, height, dpi, dpi, bitmapImage.Format, null, pixelData, stride);
             }
         }
     }
-    
 
-    #region Inispace
-    namespace IniSpace
-    {
-        using System.IO;
-        using System.Reflection;
-        using System.Runtime.InteropServices;
-        using System.Text;
-
-        public class IniFile   // revision 10
+        #region Inispace
+        namespace IniSpace
         {
-            string Path;
-            string EXE = Assembly.GetExecutingAssembly().GetName().Name;
+            using System.IO;
+            using System.Reflection;
+            using System.Runtime.InteropServices;
+            using System.Text;
 
-            [DllImport("kernel32")]
-            static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
-
-            [DllImport("kernel32")]
-            static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
-
-            public IniFile(string IniPath = null)
+            public class IniFile   // revision 10
             {
-                Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
-            }
+                string Path;
+                string EXE = Assembly.GetExecutingAssembly().GetName().Name;
 
-            public string Read(string Key, string Section = null)
-            {
-                var RetVal = new StringBuilder(255);
-                GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
-                return RetVal.ToString();
-            }
+                [DllImport("kernel32")]
+                static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
 
-            public void Write(string Key, string Value, string Section = null)
-            {
-                WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
-            }
+                [DllImport("kernel32")]
+                static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
 
-            public void DeleteKey(string Key, string Section = null)
-            {
-                Write(Key, null, Section ?? EXE);
-            }
+                public IniFile(string IniPath = null) {
+                    Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
+                }
 
-            public void DeleteSection(string Section = null)
-            {
-                Write(null, null, Section ?? EXE);
-            }
+                public string Read(string Key, string Section = null) {
+                    var RetVal = new StringBuilder(255);
+                    GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
+                    return RetVal.ToString();
+                }
 
-            public bool KeyExists(string Key, string Section = null)
-            {
-                return Read(Key, Section).Length > 0;
+                public void Write(string Key, string Value, string Section = null) {
+                    WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
+                }
+
+                public void DeleteKey(string Key, string Section = null) {
+                    Write(Key, null, Section ?? EXE);
+                }
+
+                public void DeleteSection(string Section = null) {
+                    Write(null, null, Section ?? EXE);
+                }
+
+                public bool KeyExists(string Key, string Section = null) {
+                    return Read(Key, Section).Length > 0;
+                }
             }
         }
-    }
-    #endregion
+        #endregion
 
 
 
-   
+
     
 }

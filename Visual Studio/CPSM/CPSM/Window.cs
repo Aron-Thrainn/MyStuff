@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using CPSM.ViewModals;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Interop;
@@ -13,10 +12,14 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Input;
+using CPSM.ViewModals;
+using CPSM.Forms;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace CPSM
 {
-
+    #region Main UI Elements
     public class GUI {
         public MainWindow _Window { get; set; }
         public Canvas Can { get; set; }
@@ -26,57 +29,142 @@ namespace CPSM
             _Window = f_wind;
             Can = f_can;
         }
-
+        
     }
+    
     public class SongCanvas {
+        public Canvas SongCan { get; set; }
+        public Canvas MeasuresCan { get; set; }
         public MainWindow _Window { get; set; }
         public List<MeasureViewModal> Measures { get; set; }
         public SongViewModalCreator _Creator { get; set; }
+        public NoteDisplay _NoteDisp { get; set; }
+        public Song ActiveSong { get; set; }
 
-
-        public SongCanvas(MainWindow f_wind) {
+        public SongCanvas(MainWindow f_wind, Canvas f_songcan, Canvas f_measurescan, MouseNoteControl f_mousectrl) {
             _Window = f_wind;
-            _Creator = new SongViewModalCreator();
+            SongCan = f_songcan;
+            _Creator = new SongViewModalCreator(f_measurescan, f_mousectrl);
+        }
+
+        public void LoadSong(Song f_song) {
+            ActiveSong = f_song;
+            _Creator.LoadSong(f_song);
+        }
+        public void CreateNoteDisplay(Canvas f_can) {
+            _NoteDisp = new NoteDisplay(f_can);
+        }
+
+        public class NoteDisplay
+        {
+            public NoteDisplay(Canvas f_candisplay) {
+                throw new NotImplementedException();
+                for (int i = 0; i < 8; i++) {
+                    //create image & set position
+                }
+            }
         }
     }
-
-    public class FormSongSelect {
-        public MainWindow _Window { get; set; }
-
-        public FormSongSelect(MainWindow f_wind) {
-            _Window = f_wind;
-        }
-    }
-
+    #endregion
+    #region Mouse Control
     public class MouseControl {
         public MainWindow _Window { get; set; }
+        public MouseNoteControl _noteCtrl { get; set; }
 
         public MouseControl(MainWindow f_wind) {
             _Window = f_wind;
+            _noteCtrl = new MouseNoteControl();
         }
     }
-    public class MouseNoteColour { }
+    public enum PartialNote
+    {
+        Full,
+        Half,
+        Quarter,
+        Eighth
+    }
+    public class MouseNoteColour
+    {
+        public OctaveColour ActiveColour { get; set; }
+        public PartialNote ActivePatrial { get; set; } 
+
+        public MouseNoteColour() {
+            ActiveColour = OctaveColour.none;
+            ActivePatrial = PartialNote.Full;
+        }
+    }
+    public class MouseNoteCopyTemplate
+    {
+        public NoteTemplate Template { get; set; }
+    }
 
     public class MouseNoteControl
     {
+        public MouseNoteColour _colourctrl { get; set; }
+        public NotePreview _Preview { get; set; }
+        public int Debugvar { get; set; }
 
+        public MouseNoteControl( ) {
+            _colourctrl = new MouseNoteColour();
+            Debugvar = 0;
+        }
+        
         public void NoteLeftClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            throw new NotImplementedException();
+            f_modal.SetColour(_colourctrl.ActiveColour, _colourctrl.ActivePatrial);
         }
         public void NoteLeftClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
             throw new NotImplementedException();
         }
         public void NoteRightClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            throw new NotImplementedException();
+            f_modal.ClearNote();
         }
         public void NoteRightClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            throw new NotImplementedException();
+
         }
-
-
+        public void NoteMouseEnter(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            //leave triggers before enter when going from one to another
+            if (e.RightButton == MouseButtonState.Pressed) {
+               f_modal.ClearNote();
+           }
+           else {
+               var newNote = new NoteTemplate(_colourctrl, f_mousepos);
+               _Preview = new NotePreview(this, f_modal, newNote, false);
+           }
+        }
+        public void NoteMouseLeave(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+            //leave triggers before enter when going from one to another
+            _Preview = null;
+        }
 
     }
 
+    public class NotePreview
+    {
+        public NoteTemplate PreviewTemplate { get; set; }
+        public NoteViewModal Note { get; set; }
+        public bool NoteOverride { get; set; }
+        public MouseNoteControl Parent { get; set; }
+
+        public NotePreview(MouseNoteControl f_parent, NoteViewModal f_note, NoteTemplate f_NewNote, bool f_override) {
+            Parent = f_parent;
+            Note = f_note;
+            var oldnote = new NoteTemplate(f_note as WhiteNoteViewModal);
+
+            PreviewTemplate = CreatePreview(f_override, f_NewNote, oldnote);
+        }
+
+        public void Activate() {
+            Note.SetColour(PreviewTemplate);
+        }
+
+        private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_NewNote, NoteTemplate f_OldNote) {
+            throw new NotImplementedException();
+        }
+
+    }
+    #endregion
+
+    #region Hotkey Control
     public class HotkeyControl {
         public MainWindow _Window { get; set; }
 
@@ -84,7 +172,9 @@ namespace CPSM
             _Window = f_wind;
         }
     }
+    #endregion
 
+    #region Misc
     public class ScreenCapturer {
         public Canvas SongCan { get; set; }
         public string FilePath { get; set; }
@@ -131,4 +221,5 @@ namespace CPSM
             CurrentVersion = "Pre-Alpha";
         }
     }
+    #endregion
 }

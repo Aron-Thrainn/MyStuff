@@ -31,42 +31,35 @@
   <Class Name="CPSM.NoteHalf" Collapsed="true">
     <Position X="6.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAAAAAAAAAAAAQAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAgAAAAIAAAAAAAAAAQAAAABAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>SongControl.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CPSM.NoteBit" Collapsed="true">
     <Position X="6.75" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAQIAAABAAAAAAAAAAAAAAAAE=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQIAAABAAAgAAAAAAAAAAAAE=</HashCode>
       <FileName>SongControl.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CPSM.GUI" Collapsed="true">
     <Position X="0.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAQAAAAAAIABAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Window.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CPSM.SongCanvas" Collapsed="true">
     <Position X="2.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAABCAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Window.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CPSM.FormSongSelect" Collapsed="true">
-    <Position X="0.75" Y="2" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Window.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CPSM.MouseControl" Collapsed="true">
     <Position X="4.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Window.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -80,14 +73,14 @@
   <Class Name="CPSM.HotkeyControl" Collapsed="true">
     <Position X="6.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Window.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CPSM.ScreenCapturer" Collapsed="true">
     <Position X="8.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAACAAAAAEAAAAAAAAABAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Window.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -129,14 +122,7 @@
   <Class Name="CommonClasses.Images.ImageControl" Collapsed="true">
     <Position X="18.25" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>QAAIQABDYBgAAEAAEIAAAAAIIAQAAAAAAQAAAgAAACE=</HashCode>
-      <FileName>CommonClasses.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CommonClasses.IniSpace.IniFile" Collapsed="true">
-    <Position X="16.5" Y="0.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAkAIQAAAAAAAgAACgAAAAAAAAAAEAAAA=</HashCode>
+      <HashCode>QAAIQABDYBgAAEAAEIAAAAAIIBRBAAAIAQAAAkAAACE=</HashCode>
       <FileName>CommonClasses.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -164,7 +150,7 @@
   <Enum Name="CPSM.MeasureSize" Collapsed="true">
     <Position X="5" Y="5.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>CAAAAAAAAAAAAAQAAIAAAAAAAAAAAAAAAQAAAACAAAA=</HashCode>
       <FileName>SongControl.cs</FileName>
     </TypeIdentifier>
   </Enum>
