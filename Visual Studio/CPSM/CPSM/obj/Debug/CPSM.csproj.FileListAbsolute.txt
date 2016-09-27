@@ -26,3 +26,17 @@ C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.g.resources
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.Properties.Resources.resources
 C:\Users\Notandi\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.csproj.GenerateResource.Cache
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.exe.config
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.exe
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.pdb
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.exe
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\bin\Debug\CPSM.pdb
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.csprojResolveAssemblyReference.cache
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\MainWindow.g.cs
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\App.g.cs
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM_MarkupCompile.cache
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM_MarkupCompile.lref
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\MainWindow.baml
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.g.resources
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.Properties.Resources.resources
+C:\Users\Arthas Menethil\Desktop\My Repository\MyStuff\Visual Studio\CPSM\CPSM\obj\Debug\CPSM.csproj.GenerateResource.Cache

@@ -32,13 +32,13 @@ namespace CPSM
                 Measures = new List<MeasureViewModal>();
             }
 
-            public void LoadSong(Song f_song) {
+            public void LoadSong(SongData f_song) {
                 MeasureStack.Children.Clear();
                 foreach (var mes in f_song.Measures) {
                     CreateMeasure(mes);
                 }
             }
-            public void CreateMeasure(Measure f_measure) {
+            public void CreateMeasure(MeasureData f_measure) {
                 var modal = new MeasureViewModal(f_measure, _Mouse);
                 Measures.Add(modal);
                 MeasureStack.Children.Add(modal.Can);
@@ -107,7 +107,7 @@ namespace CPSM
             public Canvas Can { get; set; }
             public Image ModalImg { get; set; }
 
-            public MeasureViewModal(Measure f_measure, MouseNoteControl f_mouse) {
+            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse) {
                 var MeasureSize = f_measure.Size;
                 Can = new Canvas() {
                     Background = Brushes.AliceBlue,
@@ -138,14 +138,14 @@ namespace CPSM
 
         public class NoteViewModal
         {
-            public Note CounterPart { get; set; }
+            public NoteData CounterPart { get; set; }
             public MouseNoteControl _Mouse { get; set; }
             public Canvas NoteCan { get; set; }
             public Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
 
             
 
-            public NoteViewModal(Note f_note, Canvas f_measureCan, MouseNoteControl f_mouse) {
+            public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse) {
                 CounterPart = f_note;
                 _Mouse = f_mouse;
             }
@@ -190,7 +190,7 @@ namespace CPSM
         {
             public new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
 
-            public WhiteNoteViewModal(Note f_note, Canvas f_measureCan, MouseNoteControl f_mouse, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse) {
+            public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse) {
                 NoteCan = new Canvas();
                 Halves = new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal>(new WhiteNoteHalfViewModal(NoteCan, Half.Left, this), new WhiteNoteHalfViewModal(NoteCan, Half.Right, this));
                 f_measureCan.Children.Add(NoteCan);
@@ -435,10 +435,10 @@ namespace CPSM
         {
             public new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal> Halves { get; set; }
 
-            public BlackNoteViewModal(Note f_note, Canvas f_measureCan, MouseNoteControl f_mouse) : base(f_note, f_measureCan, f_mouse) {
+            public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse) : base(f_note, f_measureCan, f_mouse) {
                 //create note halves
                 //create canvas/stack panel
-                //set position in measure canvas
+                //set position in MeasureData canvas
                 //throw new NotImplementedException();
             }
         }
@@ -460,19 +460,12 @@ namespace CPSM
             public NoteTemplate() {
                 Init();
             }
-            public NoteTemplate(Note f_note) {
+            public NoteTemplate(NoteData f_note) {
                 Init();
 
-                int count = 0;
-                foreach (var bit in f_note.NoteHalves.Item1.NoteBits) {
-                    Colours[count] = bit.Oct;
-                    Positions[count] = bit.pos;
-                    count++;
-                }
-                foreach (var bit in f_note.NoteHalves.Item2.NoteBits) {
-                    Colours[count] = bit.Oct;
-                    Positions[count] = bit.pos;
-                    count++;
+                for (int i = 0; i < 16; i++) {
+                    Colours[i] = f_note.Colours[i];
+                    Positions[i] = f_note.Positions[i];
                 }
             }
             public NoteTemplate(WhiteNoteViewModal f_note) {

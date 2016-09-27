@@ -16,6 +16,15 @@ using CPSM;
 using CPSM.ViewModals;
 using CPSM.Forms;
 
+
+/*
+    ToDo:
+    change songdata data structure
+
+*/
+
+
+
 namespace CPSM
 {
     public partial class MainWindow : Window
@@ -67,11 +76,11 @@ namespace CPSM
         }
 
         public void TestModal() {
-            var testsong = new Song(0) {
+            var testsong = new SongData(0) {
 
             };
 
-            var testmeasure = new Measure(testsong,MeasureSize.twelve) {
+            var testmeasure = new MeasureData(testsong,MeasureSize.twelve) {
 
             };
             for (int i = 0; i < 14; i++) {

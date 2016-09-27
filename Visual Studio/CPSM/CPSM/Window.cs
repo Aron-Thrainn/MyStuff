@@ -39,7 +39,7 @@ namespace CPSM
         public List<MeasureViewModal> Measures { get; set; }
         public SongViewModalCreator _Creator { get; set; }
         public NoteDisplay _NoteDisp { get; set; }
-        public Song ActiveSong { get; set; }
+        public SongData ActiveSongData { get; set; }
 
         public SongCanvas(MainWindow f_wind, Canvas f_songcan, Canvas f_measurescan, MouseNoteControl f_mousectrl) {
             _Window = f_wind;
@@ -47,8 +47,8 @@ namespace CPSM
             _Creator = new SongViewModalCreator(f_measurescan, f_mousectrl);
         }
 
-        public void LoadSong(Song f_song) {
-            ActiveSong = f_song;
+        public void LoadSong(SongData f_song) {
+            ActiveSongData = f_song;
             _Creator.LoadSong(f_song);
         }
         public void CreateNoteDisplay(Canvas f_can) {

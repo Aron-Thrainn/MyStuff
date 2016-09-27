@@ -10,9 +10,9 @@ namespace CPSM
 {
     public class SongControl {
         private IniFile SaveFile { get; set; }
-        public Song ActiveSong { get; set; }
+        public SongData ActiveSong { get; set; }
 
-        public Song LoadSong() {
+        public SongData LoadSong() {
             throw new NotImplementedException();
         }
         public void SaveSong() {
@@ -82,6 +82,101 @@ namespace CPSM
         ten = 10,
         twelve = 12
     }
+
+
+
+
+    public class SongData {
+        public int ID { get; set; }
+        public Stack<MeasureData> Measures { get; set; }
+        public string Name { get; set; }
+        public string Source { get; set; }
+
+        public SongData(int f_ID) {
+            ID = f_ID;
+            Measures = new Stack<MeasureData>();
+            Name = "";
+            Source = "";
+        }
+
+        public void AddMeasure(MeasureSize f_size) {
+            var NewMeasure = new MeasureData(this, f_size);
+            Measures.Push(NewMeasure);
+        }
+    }
+    public class MeasureData {
+        public NoteData[,] WhiteNotes { get; set; }
+        public NoteData[,] BlackNotes { get; set; }
+        public SongData Parent { get; set; }
+        public MeasureSize Size { get; set; }
+
+        public MeasureData(SongData f_parent, MeasureSize f_size) {
+            Parent = f_parent;
+            Size = f_size;
+
+            var f_sizeint = (int)Size;
+            WhiteNotes = new NoteData[14, f_sizeint];
+            for (int i = 0; i < 14; i++) {
+                for (int o = 0; o < f_sizeint; o++) {
+                    WhiteNotes[i, o] = new NoteData(this);
+                }
+            }
+            BlackNotes = new NoteData[10, f_sizeint];
+            for (int i = 0; i < 10; i++) {
+                for (int o = 0; o < f_sizeint; o++) {
+                    BlackNotes[i, o] = new NoteData(this);
+                }
+            }
+
+        }
+
+    }
+    
+    public class NoteData {
+        public MeasureData Parent { get; set; }
+        public OctaveColour[] Colours { get; set; }
+        public NoteBitPos[] Positions { get; set; }
+
+        public NoteData(MeasureData f_parent) {
+            Parent = f_parent;
+            Colours = new OctaveColour[16];
+            Positions = new NoteBitPos[16];
+
+            SetColour(OctaveColour.none);
+        }
+
+        public void SetNote(NoteTemplate f_template) {
+            for (int i = 0; i < 16; i++) {
+                Colours[i] = f_template.Colours[i];
+                Positions[i] = f_template.Positions[i];
+            }
+        }
+        public void SetColour(OctaveColour f_oct) {
+            for (int i=0; i<16; i++) {
+                Colours[i] = f_oct;
+            }
+            
+        }
+        public void SetColourHalf(OctaveColour f_oct, Half f_half) {
+            if (f_half == Half.Left) {
+                for (int i = 0; i < 8; i++) {
+                    Colours[i] = f_oct;
+                }
+            }
+            else {
+                for (int i = 8; i < 16; i++) {
+                    Colours[i] = f_oct;
+                }
+            }
+        }
+        public void SetColour(NoteTemplate f_template) {
+            for (int i = 0; i < 16; i++) {
+                Colours[i] = f_template.Colours[i];
+            }
+        }
+
+    }
+    /*
 
     public class Song {
         public int ID { get; set; }
@@ -209,5 +304,5 @@ namespace CPSM
         public void SetPosition(NoteBitPos f_pos) {
             pos = f_pos;
         }
-    }
+    }*/
 }
