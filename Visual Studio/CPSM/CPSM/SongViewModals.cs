@@ -221,14 +221,11 @@ namespace CPSM
                 NoteCan.Margin = new Thickness(xx, yy, 0, 0);
             }
 
-            public override void SetColour(OctaveColour f_oct, PartialNote f_part) {
-                switch(f_part) {
-                    case PartialNote.Full: { SetColourFull(f_oct); break; }
-                        //todo: other noteparts
-                }
-            }
             public override void SetColour(NoteTemplate f_template) {
                 //clear note and paste
+                if (f_template == null) {
+                    return;
+                }
                 int count = 0;
                 foreach (var bit in Halves.Item1.Bits) {
                     bit.setOct(f_template.Colours[count], f_template.Positions[count]);
@@ -238,55 +235,9 @@ namespace CPSM
                     bit.setOct(f_template.Colours[count], f_template.Positions[count]);
                     count++;
                 }
-
-
-                //throw new NotImplementedException();
             }
 
 
-            private void SetColourFull(OctaveColour f_oct) {
-                if (f_oct == OctaveColour.none) {
-                    //do nothing
-                }
-                else {
-                    var template = new NoteTemplate(this);
-                    var tempCol = template.isUsniform();
-
-
-                    if (tempCol != null) {
-                        if (tempCol == OctaveColour.none) {
-                            //note not set
-                            SetColourHelper(f_oct);
-                        }
-                        else {
-                            //note is uniform
-                            if (f_oct == tempCol) {
-                                //do nothing
-                            }
-                            else if ((int)f_oct == (int)tempCol - 1) {// new colour is to the left
-                                SetColourHelperHalf(f_oct, Half.Left);
-                            }
-                            else if ((int)f_oct == (int)tempCol + 1) {// new colour is to the right
-                                SetColourHelperHalf(f_oct, Half.Right);
-                            }
-                            else {
-                                SetColourHelper(f_oct);
-                            }
-                        }
-                    }
-                    else {
-                        //note is dual-octival
-                        if (template.HalfColour(Half.Left) == f_oct) { // making it uniform
-                            SetColourHelperHalf(f_oct, Half.Right);
-                        }
-                        else if (template.HalfColour(Half.Right) == f_oct) { // making it uniform
-                            SetColourHelperHalf(f_oct, Half.Left);
-                        }
-
-                    }
-
-                }
-            }
 
             protected override void SetColourHelper(OctaveColour f_oct) {
                 foreach (var bit in Halves.Item1.Bits) {
@@ -403,7 +354,7 @@ namespace CPSM
                 ParentNote.NoteLeftClickDown(sender, e);
             }
             public void BitLeftClickUp(object sender, MouseButtonEventArgs e) {
-                //throw new NotImplementedException();
+                ParentNote.NoteLeftClickUp(sender, e);
             }
             public void BitRightClickDown(object sender, MouseButtonEventArgs e) {
                 ParentNote.NoteRightClickDown(sender, e);
@@ -547,7 +498,31 @@ namespace CPSM
                 return null;
 
             }
-
+            public void SetHalfColour(Half f_half, OctaveColour f_col) {
+                switch (f_half) {
+                    case Half.Left: {
+                        for (int i = 0; i < 8; i++) {
+                            Colours[i] = f_col;
+                            Positions[i] = (NoteBitPos)i;
+                        }
+                        break;
+                    }
+                    case Half.Right: {
+                        for (int i = 8; i < 16; i++) {
+                            Colours[i] = f_col;
+                            Positions[i] = (NoteBitPos)i;
+                        }
+                        break;
+                    }
+                }
+            }
+            public void SetColour(OctaveColour f_col) {
+                for (int i = 0; i < 16; i++) {
+                    Colours[i] = f_col;
+                    Positions[i] = (NoteBitPos)i;
+                }
+                
+            }
             private void Init() {
                 Colours = new OctaveColour[16];
                 Positions = new NoteBitPos[16];

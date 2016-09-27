@@ -110,16 +110,16 @@ namespace CPSM
         }
         
         public void NoteLeftClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            f_modal.SetColour(_colourctrl.ActiveColour, _colourctrl.ActivePatrial);
+            
         }
         public void NoteLeftClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            throw new NotImplementedException();
+            _Preview.Activate();
         }
         public void NoteRightClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
             f_modal.ClearNote();
         }
         public void NoteRightClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-
+            
         }
         public void NoteMouseEnter(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
             //leave triggers before enter when going from one to another
@@ -127,8 +127,8 @@ namespace CPSM
                f_modal.ClearNote();
            }
            else {
-               var newNote = new NoteTemplate(_colourctrl, f_mousepos);
-               _Preview = new NotePreview(this, f_modal, newNote, false);
+               var HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+               _Preview = new NotePreview(this, f_modal, HeldNote, false);
            }
         }
         public void NoteMouseLeave(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
@@ -145,22 +145,70 @@ namespace CPSM
         public bool NoteOverride { get; set; }
         public MouseNoteControl Parent { get; set; }
 
-        public NotePreview(MouseNoteControl f_parent, NoteViewModal f_note, NoteTemplate f_NewNote, bool f_override) {
+        public NotePreview(MouseNoteControl f_parent, NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override) {
             Parent = f_parent;
             Note = f_note;
-            var oldnote = new NoteTemplate(f_note as WhiteNoteViewModal);
+            var existingnote = new NoteTemplate(f_note as WhiteNoteViewModal);
 
-            PreviewTemplate = CreatePreview(f_override, f_NewNote, oldnote);
+            PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
         }
 
         public void Activate() {
             Note.SetColour(PreviewTemplate);
         }
 
-        private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_NewNote, NoteTemplate f_OldNote) {
-            throw new NotImplementedException();
-        }
+        private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_HeldNote, NoteTemplate f_ExistingNote) {
+            var f_NewNote = new NoteTemplate();
+            var f_overrideNote = f_override;
+            var f_HeldCol = f_HeldNote.isUsniform();
+            if (f_HeldCol == null) {
+                f_overrideNote = true;
+            }
+            if (f_HeldCol == OctaveColour.none) { //do nothing
+                return null;
+            }
 
+            if (f_overrideNote == false) { //Combine notes, heldnote is simple
+                var f_ExistingCol = f_ExistingNote.isUsniform();
+                if (f_ExistingCol == null) { //Existing note is complex
+                    if (f_ExistingNote.HalfColour(Half.Left) != null && f_ExistingNote.HalfColour(Half.Right) != null) { //note is dual-octival
+                        if (f_ExistingNote.HalfColour(Half.Left) == f_HeldCol) { //making it uniform
+                            f_NewNote.SetColour(f_HeldCol.Value);
+                            return f_NewNote;
+                        }
+                        else if (f_ExistingNote.HalfColour(Half.Right) == f_HeldCol) { //making it uniform
+                            f_NewNote.SetColour(f_HeldCol.Value);
+                            return f_NewNote;
+                        }
+                        else { //override existing note
+                            f_NewNote.SetColour(f_HeldCol.Value);
+                            return f_NewNote;
+                        }
+
+                    }
+                }
+                else { //Held note & Existing note are simple
+                    if ((int)f_ExistingCol == (int)f_HeldCol - 1) { //held colour is to the right of existing note
+                        f_NewNote.SetHalfColour(Half.Left, f_ExistingCol.Value);
+                        f_NewNote.SetHalfColour(Half.Right, f_HeldCol.Value);
+                        return f_NewNote;
+                    }
+                    else if ((int)f_ExistingCol == (int)f_HeldCol + 1) { //held colour is to the left of existing note
+                        f_NewNote.SetHalfColour(Half.Left, f_HeldCol.Value);
+                        f_NewNote.SetHalfColour(Half.Right, f_ExistingCol.Value);
+                        return f_NewNote;
+                    }
+                    else {  //held & existing colours are not next to each other
+                        f_NewNote.SetColour(f_HeldCol.Value);
+                        return f_NewNote;
+                    }
+                }
+            }
+            else {
+                return f_HeldNote;
+            }
+            return null;
+        }
     }
     #endregion
 
