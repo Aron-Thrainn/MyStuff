@@ -214,10 +214,3 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-# catagory name
-*.example
-*.suo
-Visual Studio/CPSM/CPSM/bin/*
-Visual Studio/CPSM/CPSM/obj/*
-*.cache
-*.iref
