@@ -98,7 +98,7 @@ namespace CPSM
             testsong.Measures.Push(testmeasure);
 
 
-            _SongCan._Creator.LoadSong(testsong);
+            _SongCan.LoadSong(testsong);
 
         }
         

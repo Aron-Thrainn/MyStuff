@@ -140,8 +140,11 @@ namespace CPSM
         public NoteData(MeasureData f_parent) {
             Parent = f_parent;
             Colours = new OctaveColour[16];
-            Positions = new NoteBitPos[16];
+            Positions = new NoteBitPos[16] {NoteBitPos.a1, NoteBitPos.a2, NoteBitPos.a3, NoteBitPos.a4, NoteBitPos.a5,
+                NoteBitPos.a6, NoteBitPos.a7, NoteBitPos.a8, NoteBitPos.b1, NoteBitPos.b2, NoteBitPos.b3, NoteBitPos.b4,
+                NoteBitPos.b5, NoteBitPos.b6, NoteBitPos.b7, NoteBitPos.b8 };
 
+            
             SetColour(OctaveColour.none);
         }
 

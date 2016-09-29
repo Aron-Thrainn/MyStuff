@@ -109,33 +109,42 @@ namespace CPSM
             Debugvar = 0;
         }
         
-        public void NoteLeftClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+        public void NoteLeftClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             
         }
-        public void NoteLeftClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+        public void NoteLeftClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             _Preview.Activate();
+            MakePreview(sender, f_mousepos);
         }
-        public void NoteRightClickedDown(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
-            f_modal.ClearNote();
+        public void NoteRightClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
+            sender.ClearNote();
         }
-        public void NoteRightClickedUp(object sender, MouseButtonEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+        public void NoteRightClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             
         }
-        public void NoteMouseEnter(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+        public void NoteMouseEnter(NoteViewModal sender, MouseEventArgs e, Point f_mousepos) {
             //leave triggers before enter when going from one to another
             if (e.RightButton == MouseButtonState.Pressed) {
-               f_modal.ClearNote();
+               sender.ClearNote();
            }
            else {
-               var HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
-               _Preview = new NotePreview(this, f_modal, HeldNote, false);
+                MakePreview(sender, f_mousepos);
+                
            }
         }
-        public void NoteMouseLeave(object sender, MouseEventArgs e, Point f_mousepos, NoteViewModal f_modal) {
+        public void NoteMouseLeave(NoteViewModal sender, MouseEventArgs e, Point f_mousepos) {
             //leave triggers before enter when going from one to another
+            sender.ClearPreview();
             _Preview = null;
         }
 
+        public void MakePreview(NoteViewModal sender, Point f_mousepos) {
+            var HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+            _Preview = new NotePreview(this, sender, HeldNote, false);
+            if (_Preview.PreviewTemplate != null) {
+                sender.SetPreview(_Preview.PreviewTemplate);
+            }
+        }
     }
 
     public class NotePreview
@@ -155,6 +164,7 @@ namespace CPSM
 
         public void Activate() {
             Note.SetColour(PreviewTemplate);
+            Note.CounterPart.SetNote(PreviewTemplate);
         }
 
         private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_HeldNote, NoteTemplate f_ExistingNote) {

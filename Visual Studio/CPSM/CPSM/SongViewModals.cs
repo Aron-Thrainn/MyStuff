@@ -152,38 +152,40 @@ namespace CPSM
 
             public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteLeftClickedDown(sender, e, MousePos, this);
+                _Mouse.NoteLeftClickedDown(this, e, MousePos);
             }
             public void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteLeftClickedUp(sender, e, MousePos, this);
+                _Mouse.NoteLeftClickedUp(this, e, MousePos);
             }
             public void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteRightClickedDown(sender, e, MousePos, this);
+                _Mouse.NoteRightClickedDown(this, e, MousePos);
             }
             public void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteRightClickedUp(sender, e, MousePos, this);
+                _Mouse.NoteRightClickedUp(this, e, MousePos);
             }
             public void NoteMouseEnter(object sender, MouseEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteMouseEnter(sender, e, MousePos, this);
+                _Mouse.NoteMouseEnter(this, e, MousePos);
             }
             public void NoteMouseLeave(object sender, MouseEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteMouseLeave(sender, e, MousePos, this);
+                _Mouse.NoteMouseLeave(this, e, MousePos);
             }
             public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
             public virtual void SetColour(NoteTemplate f_template) { }
-
 
             public void ClearNote() {
                 SetColourHelper(OctaveColour.none);
             }
             protected virtual void SetColourHelper(OctaveColour f_oct) { }
             protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
-        }
+
+            public virtual void SetPreview(NoteTemplate f_preview) { }
+            public virtual void ClearPreview() { }
+            }
 
 
         public class WhiteNoteViewModal : NoteViewModal
@@ -236,9 +238,7 @@ namespace CPSM
                     count++;
                 }
             }
-
-
-
+            
             protected override void SetColourHelper(OctaveColour f_oct) {
                 foreach (var bit in Halves.Item1.Bits) {
                     bit.setOct(f_oct);
@@ -261,6 +261,33 @@ namespace CPSM
 
                 var template = new NoteTemplate(this);
                 CounterPart.SetColour(template);
+            }
+
+            public override void SetPreview(NoteTemplate f_preview) {
+                int counter = 0;
+                foreach (var f_bit in Halves.Item1.Bits) {
+                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
+
+                    }
+                    else {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+                    }
+                    counter++;
+                }
+                foreach (var f_bit in Halves.Item2.Bits) {
+                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
+
+                    }
+                    else {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+                    }
+                    counter++;
+                }
+            }
+            public override void ClearPreview() {
+                SetColour(new NoteTemplate(CounterPart));
             }
 
         }
