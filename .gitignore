@@ -220,9 +220,7 @@ pip-log.txt
 *.example
 >>>>>>> origin/master
 *.suo
-Visual Studio/CPSM/CPSM/bin/Debug/CPSM.exe
-Visual Studio/CPSM/CPSM/bin/Debug/CPSM.pdb
-Visual Studio/CPSM/CPSM/obj/Debug/CPSM.exe
-Visual Studio/CPSM/CPSM/obj/Debug/CPSM.pdb
-Visual Studio/CPSM/CPSM/obj/Debug/CPSM_MarkupCompile.cache
+Visual Studio/CPSM/CPSM/bin/*
+Visual Studio/CPSM/CPSM/obj/*
 *.cache
+*.iref
