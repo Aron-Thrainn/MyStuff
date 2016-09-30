@@ -102,7 +102,9 @@ namespace CPSM
     {
         public MouseNoteColour _colourctrl { get; set; }
         public NotePreview _Preview { get; set; }
+        public NoteCreator _Creator { get; set; }
         public int Debugvar { get; set; }
+        public bool Creating { get; set; }
 
         public MouseNoteControl( ) {
             _colourctrl = new MouseNoteColour();
@@ -110,11 +112,20 @@ namespace CPSM
         }
         
         public void NoteLeftClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
-            
+            var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+            _Creator = new NoteCreator(f_HeldNote, sender, false);
+            Creating = true;
         }
         public void NoteLeftClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
-            _Preview.Activate();
-            MakePreview(sender, f_mousepos);
+            if (Creating) {
+                _Creator.Activate();
+                _Creator = null;
+                Creating = false;
+            }
+            else {
+                _Preview.Activate();
+                MakePreview(sender, f_mousepos);
+            }
         }
         public void NoteRightClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             sender.ClearNote();
@@ -124,23 +135,29 @@ namespace CPSM
         }
         public void NoteMouseEnter(NoteViewModal sender, MouseEventArgs e, Point f_mousepos) {
             //leave triggers before enter when going from one to another
-            if (e.RightButton == MouseButtonState.Pressed) {
+            if (Creating) {
+                _Creator.AddNote(sender);
+            }
+            else if (e.RightButton == MouseButtonState.Pressed) {
                sender.ClearNote();
            }
            else {
                 MakePreview(sender, f_mousepos);
-                
            }
         }
         public void NoteMouseLeave(NoteViewModal sender, MouseEventArgs e, Point f_mousepos) {
             //leave triggers before enter when going from one to another
-            sender.ClearPreview();
-            _Preview = null;
+            if (Creating == false) {
+                if (_Preview != null) {
+                    _Preview.Cancel();
+                    _Preview = null;
+                }
+            }
         }
 
         public void MakePreview(NoteViewModal sender, Point f_mousepos) {
-            var HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
-            _Preview = new NotePreview(this, sender, HeldNote, false);
+            var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+            _Preview = new NotePreview(sender, f_HeldNote, false);
             if (_Preview.PreviewTemplate != null) {
                 sender.SetPreview(_Preview.PreviewTemplate);
             }
@@ -152,19 +169,26 @@ namespace CPSM
         public NoteTemplate PreviewTemplate { get; set; }
         public NoteViewModal Note { get; set; }
         public bool NoteOverride { get; set; }
-        public MouseNoteControl Parent { get; set; }
 
-        public NotePreview(MouseNoteControl f_parent, NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override) {
-            Parent = f_parent;
+        public NotePreview(NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override) {
             Note = f_note;
             var existingnote = new NoteTemplate(f_note as WhiteNoteViewModal);
 
             PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
+            Display();
         }
 
+        public void Display() {
+            if (PreviewTemplate != null) {
+                Note.SetPreview(PreviewTemplate);
+            }
+        }
         public void Activate() {
             Note.SetColour(PreviewTemplate);
             Note.CounterPart.SetNote(PreviewTemplate);
+        }
+        public void Cancel() {
+            Note.ClearPreview();
         }
 
         private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_HeldNote, NoteTemplate f_ExistingNote) {
@@ -176,6 +200,9 @@ namespace CPSM
             }
             if (f_HeldCol == OctaveColour.none) { //do nothing
                 return null;
+            }
+            if (f_ExistingNote.isUsniform() == OctaveColour.none) {
+                return f_HeldNote;
             }
 
             if (f_overrideNote == false) { //Combine notes, heldnote is simple
@@ -220,6 +247,65 @@ namespace CPSM
             return null;
         }
     }
+
+    public class NoteCreator
+    {
+        public Stack<NotePreview> NewNotes { get; set; }
+        public NoteTemplate HeldNote { get; set; }
+        public bool Override { get; set; }
+
+        public NoteCreator(NoteTemplate f_heldNote, NoteViewModal f_startingnote, bool f_override) {
+            NewNotes = new Stack<NotePreview>();
+            HeldNote = f_heldNote;
+            Override = f_override;
+
+            PushNote(f_startingnote);
+        }
+
+        public void AddNote(NoteViewModal f_existingnote) {
+            var f_notey = f_existingnote.NoteCan.Margin.Top;
+            var f_notex = f_existingnote.NoteCan.Margin.Left;
+            var f_preview = NewNotes.Peek();
+
+            if (f_preview.Note.NoteCan.Margin.Left == f_notex) {
+                if (f_preview.Note.NoteCan.Margin.Top > f_notey) {
+                    while (true) {
+                        if (NewNotes.Count > 1) {
+                            PopNote();
+                            f_preview = NewNotes.Peek();
+                        }
+                        else break; // only starting note left
+                    }
+                }
+                else if (f_preview.Note.NoteCan.Margin.Top >= f_notey) {
+                    bool exists = false;
+                    foreach (var preview in NewNotes) {
+                        if (preview.Note == f_existingnote) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (exists == false) {
+                        PushNote(f_existingnote);
+                    }
+                }
+            }
+        }
+        public void PushNote(NoteViewModal f_existingnote) {
+            NewNotes.Push(new NotePreview(f_existingnote, HeldNote, Override));
+        }
+        public void PopNote() {
+            var f_preview = NewNotes.Pop();
+            f_preview.Cancel();
+        }
+        public void Activate() {
+            while(NewNotes.Count != 0) {
+                var f_preview = NewNotes.Pop();
+                f_preview.Activate();
+            }
+        }
+    }
+
     #endregion
 
     #region Hotkey Control

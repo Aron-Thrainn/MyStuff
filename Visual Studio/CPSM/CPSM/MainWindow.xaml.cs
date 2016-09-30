@@ -85,7 +85,7 @@ namespace CPSM
             };
             for (int i = 0; i < 14; i++) {
                 for (int o = 0; o < (int)MeasureSize.twelve; o++) {
-                    testmeasure.WhiteNotes[i, o].SetColour(OctaveColour.Blue);
+                    testmeasure.WhiteNotes[i, o].SetColour(OctaveColour.none);
                 }
             }
 

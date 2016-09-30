@@ -106,32 +106,53 @@ namespace CPSM
         {
             public Canvas Can { get; set; }
             public Image ModalImg { get; set; }
+            public WhiteNoteViewModal[][] WhiteNotes { get; set; }
+            public BlackNoteViewModal[][] BlackNotes { get; set; }
+            public MeasureSize Size { get; set; }
 
             public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse) {
-                var MeasureSize = f_measure.Size;
+                Size = f_measure.Size;
                 Can = new Canvas() {
                     Background = Brushes.AliceBlue,
                     Height = 300,
                     Width = 300
                 };
                 ModalImg = new Image() {
-                    Source = ImageControl.MeasureImg(MeasureSize),
+                    Source = ImageControl.MeasureImg(Size),
                     Width = 220,
                     Stretch = Stretch.None
                 };
                 Can.Children.Add(ModalImg);
                 for (int i = 0; i < 14; i++) {
-                    for (int o = 0; o < (int)MeasureSize; o++) {
+                    for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, i, o);
                         var temptemplate = new NoteTemplate(f_measure.WhiteNotes[i, o]);
                         tempNote.SetColour(temptemplate);
+                        WhiteNotes[i][o] = tempNote;
                     }
                 }
                 for (int i = 0; i < 10; i++) {
-                    for (int o = 0; o < (int)MeasureSize; o++) {
+                    for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse);
+                        BlackNotes[i][o] = tempNote;
                     }
                 }
+            }
+
+            public NoteViewModal FindNoteBelow(NoteViewModal f_note) {
+                for (int i = 0; i < 14; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_whitenote = f_note as WhiteNoteViewModal;
+                        if (WhiteNotes[i][o] == f_whitenote) {
+                            var ii = i;
+                            var oo = o + 14;
+                            if (oo > (int)Size) {
+                                //note below is in next measure
+                            }
+                        }
+                    }
+                }
+                throw new NotImplementedException();
             }
         }
 
@@ -185,7 +206,11 @@ namespace CPSM
 
             public virtual void SetPreview(NoteTemplate f_preview) { }
             public virtual void ClearPreview() { }
+
+            public NoteViewModal FindNoteBelow() {
+                throw new NotImplementedException();
             }
+        }
 
 
         public class WhiteNoteViewModal : NoteViewModal
@@ -560,10 +585,5 @@ namespace CPSM
         {
             //probably wont be used
         }
-
-
-
-
-
     }
 }
