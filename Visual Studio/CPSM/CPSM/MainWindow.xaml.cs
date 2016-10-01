@@ -19,9 +19,18 @@ using CPSM.Forms;
 
 /*
     ToDo:
+    global mouse event handler
+
+    Bugs: 
+    long notes dont have show starting point correctly
+*/
+/*
+    Done:
     change songdata data structure
 
+
 */
+
 
 
 

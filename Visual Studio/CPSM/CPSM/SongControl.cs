@@ -158,7 +158,6 @@ namespace CPSM
             for (int i=0; i<16; i++) {
                 Colours[i] = f_oct;
             }
-            
         }
         public void SetColourHalf(OctaveColour f_oct, Half f_half) {
             if (f_half == Half.Left) {

@@ -39,11 +39,37 @@ namespace CPSM
                 }
             }
             public void CreateMeasure(MeasureData f_measure) {
-                var modal = new MeasureViewModal(f_measure, _Mouse);
+                var modal = new MeasureViewModal(f_measure, _Mouse, this);
                 Measures.Add(modal);
                 MeasureStack.Children.Add(modal.Can);
             }
 
+            public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
+                bool f_found = false;
+                foreach (var measure in Measures) {
+                    if (f_found) {
+                        return measure;
+                    }
+                    else {
+                        if (measure == f_measure) {
+                            f_found = true;
+                        }
+                    }
+                }
+                return null; //no next measure exists
+            }
+            public MeasureViewModal GetpreviousMeasure(MeasureViewModal f_measure) {
+                MeasureViewModal f_prev = null;
+                foreach (var measure in Measures) {
+                    if (measure == f_measure) {
+                        return f_prev;
+                    }
+                    else {
+                        f_prev = measure;
+                    }
+                }
+                throw new Exception();
+            }
         }
 
         public static class BitImages
@@ -106,12 +132,16 @@ namespace CPSM
         {
             public Canvas Can { get; set; }
             public Image ModalImg { get; set; }
-            public WhiteNoteViewModal[][] WhiteNotes { get; set; }
-            public BlackNoteViewModal[][] BlackNotes { get; set; }
+            public WhiteNoteViewModal[,] WhiteNotes { get; set; }
+            public BlackNoteViewModal[,] BlackNotes { get; set; }
             public MeasureSize Size { get; set; }
+            public SongViewModalCreator Parent { get; set; }
 
-            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse) {
+            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse, SongViewModalCreator f_parent) {
                 Size = f_measure.Size;
+                WhiteNotes = new WhiteNoteViewModal[14, (int)Size];
+                BlackNotes = new BlackNoteViewModal[10, (int)Size];
+                Parent = f_parent;
                 Can = new Canvas() {
                     Background = Brushes.AliceBlue,
                     Height = 300,
@@ -125,34 +155,119 @@ namespace CPSM
                 Can.Children.Add(ModalImg);
                 for (int i = 0; i < 14; i++) {
                     for (int o = 0; o < (int)Size; o++) {
-                        var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, i, o);
+                        var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, this, i, o);
                         var temptemplate = new NoteTemplate(f_measure.WhiteNotes[i, o]);
                         tempNote.SetColour(temptemplate);
-                        WhiteNotes[i][o] = tempNote;
+                        WhiteNotes[i, o] = tempNote;
                     }
                 }
                 for (int i = 0; i < 10; i++) {
                     for (int o = 0; o < (int)Size; o++) {
-                        var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse);
-                        BlackNotes[i][o] = tempNote;
+                        var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this);
+                        BlackNotes[i, o] = tempNote;
                     }
                 }
             }
 
             public NoteViewModal FindNoteBelow(NoteViewModal f_note) {
+                int ii = 0;
+                int oo = 0;
                 for (int i = 0; i < 14; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var f_whitenote = f_note as WhiteNoteViewModal;
-                        if (WhiteNotes[i][o] == f_whitenote) {
-                            var ii = i;
-                            var oo = o + 14;
-                            if (oo > (int)Size) {
+                        if (WhiteNotes[i, o] == f_whitenote) {
+                            ii = i;
+                            oo = o + 1;
+                            if (oo == (int)Size) {
                                 //note below is in next measure
+                                var f_nextmeasure = Parent.GetNextMeasure(this);
+                                if (f_nextmeasure != null) {
+                                    return f_nextmeasure.WhiteNotes[ii, 1];
+                                }
+                                else {
+                                    return null;
+                                }
+                            }
+                            else {
+                                return WhiteNotes[ii, oo];
                             }
                         }
                     }
                 }
-                throw new NotImplementedException();
+                for (int i = 0; i < 10; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_blacknote = f_note as BlackNoteViewModal;
+                        if (BlackNotes[i, o] == f_blacknote) {
+                            ii = i;
+                            oo = o + 1;
+                            if (oo == (int)Size) {
+                                //note below is in next measure
+                                var f_nextmeasure = Parent.GetNextMeasure(this);
+                                if (f_nextmeasure != null) {
+                                    return f_nextmeasure.BlackNotes[ii, 1];
+                                }
+                                else {
+                                    return null;
+                                }
+                            }
+                            else {
+                                return BlackNotes[ii, oo];
+                            }
+
+                        }
+                    }
+                }
+                return null;
+            }
+            public NoteViewModal FindNoteAbove(NoteViewModal f_note) {
+                int ii = 0;
+                int oo = 0;
+                for (int i = 0; i < 14; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_whitenote = f_note as WhiteNoteViewModal;
+                        if (WhiteNotes[i, o] == f_whitenote) {
+                            ii = i;
+                            oo = o - 1;
+                            if (oo < 0) {
+                                //note below is in previous measure
+                                var f_previousmeasure = Parent.GetpreviousMeasure(this);
+                                if (f_previousmeasure != null) {
+                                    return f_previousmeasure.WhiteNotes[ii, (int)f_previousmeasure.Size];
+                                }
+                                else {
+                                    return null;
+                                }
+                            }
+                            else {
+                                return WhiteNotes[ii, oo];
+                            }
+                        }
+
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_blacknote = f_note as BlackNoteViewModal;
+                        if (BlackNotes[i, o] == f_blacknote) {
+                            ii = i;
+                            oo = o - 1;
+                            if (oo < 0) {
+                                //note below is in previous measure
+                                var f_previousmeasure = Parent.GetpreviousMeasure(this);
+                                if (f_previousmeasure != null) {
+                                    return f_previousmeasure.BlackNotes[ii, (int)f_previousmeasure.Size];
+                                }
+                                else {
+                                    return null;
+                                }
+                            }
+                            else {
+                                return BlackNotes[ii, oo];
+                            }
+                        }
+                    }
+                }
+                throw new Exception();
             }
         }
 
@@ -163,12 +278,12 @@ namespace CPSM
             public MouseNoteControl _Mouse { get; set; }
             public Canvas NoteCan { get; set; }
             public Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
+            public MeasureViewModal Parent { get; set; }
 
-            
-
-            public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse) {
+            public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent) {
                 CounterPart = f_note;
                 _Mouse = f_mouse;
+                Parent = f_parent;
             }
 
             public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
@@ -199,7 +314,8 @@ namespace CPSM
             public virtual void SetColour(NoteTemplate f_template) { }
 
             public void ClearNote() {
-                SetColourHelper(OctaveColour.none);
+                SetColour(new NoteTemplate());
+                CounterPart.SetColour(new NoteTemplate());
             }
             protected virtual void SetColourHelper(OctaveColour f_oct) { }
             protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
@@ -208,7 +324,10 @@ namespace CPSM
             public virtual void ClearPreview() { }
 
             public NoteViewModal FindNoteBelow() {
-                throw new NotImplementedException();
+                return Parent.FindNoteBelow(this);
+            }
+            public NoteViewModal FindNoteAbove() {
+                return Parent.FindNoteAbove(this);
             }
         }
 
@@ -216,12 +335,16 @@ namespace CPSM
         public class WhiteNoteViewModal : NoteViewModal
         {
             public new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
+            public int x { get; set; }
+            public int y { get; set; }
 
-            public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse) {
+            public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent) {
                 NoteCan = new Canvas();
                 Halves = new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal>(new WhiteNoteHalfViewModal(NoteCan, Half.Left, this), new WhiteNoteHalfViewModal(NoteCan, Half.Right, this));
                 f_measureCan.Children.Add(NoteCan);
                 SetPosition(f_xpos, f_ypos);
+                x = f_xpos;
+                y = f_ypos;
             }
 
             public void SetPosition(int f_xpos, int f_ypos) {
@@ -263,7 +386,7 @@ namespace CPSM
                     count++;
                 }
             }
-            
+
             protected override void SetColourHelper(OctaveColour f_oct) {
                 foreach (var bit in Halves.Item1.Bits) {
                     bit.setOct(f_oct);
@@ -271,9 +394,8 @@ namespace CPSM
                 foreach (var bit in Halves.Item2.Bits) {
                     bit.setOct(f_oct);
                 }
-
-                var template = new NoteTemplate(this);
-                CounterPart.SetColour(template);
+                
+                CounterPart.SetColour(f_oct);
             }
             protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
                 WhiteNoteHalfViewModal half;
@@ -292,6 +414,9 @@ namespace CPSM
                 int counter = 0;
                 foreach (var f_bit in Halves.Item1.Bits) {
                     if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+
 
                     }
                     else {
@@ -303,6 +428,8 @@ namespace CPSM
                 foreach (var f_bit in Halves.Item2.Bits) {
                     if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
 
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
                     }
                     else {
                         f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
@@ -437,8 +564,10 @@ namespace CPSM
         public class BlackNoteViewModal : NoteViewModal
         {
             public new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal> Halves { get; set; }
+            public bool Debugvar { get; set; }
 
-            public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse) : base(f_note, f_measureCan, f_mouse) {
+            public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent) : base(f_note, f_measureCan, f_mouse, f_parent) {
+                Debugvar = true;
                 //create note halves
                 //create canvas/stack panel
                 //set position in MeasureData canvas
@@ -462,6 +591,10 @@ namespace CPSM
 
             public NoteTemplate() {
                 Init();
+                for (int i=0; i<16; i++) {
+                    Colours[i] = OctaveColour.none;
+                    Positions[i] = (NoteBitPos)i;
+                }
             }
             public NoteTemplate(NoteData f_note) {
                 Init();
@@ -474,6 +607,12 @@ namespace CPSM
             public NoteTemplate(WhiteNoteViewModal f_note) {
                 Init();
 
+                for (int i = 0; i < 16; i++) {
+                    Colours[i] = f_note.CounterPart.Colours[i];
+                    Positions[i] = f_note.CounterPart.Positions[i];
+                }
+
+                /*
                 int count = 0;
                 foreach (var bit in f_note.Halves.Item1.Bits) {
                     Colours[count] = bit.Oct;
@@ -485,6 +624,7 @@ namespace CPSM
                     Positions[count] = bit.Pos;
                     count++;
                 }
+                */
             }
             public NoteTemplate(BlackNoteViewModal f_note) {
                 Colours = new OctaveColour[16];
@@ -504,10 +644,10 @@ namespace CPSM
             }
             public NoteTemplate(MouseNoteColour f_mousecolour, Point f_mousepoint) {
                 Init();
-                
+
                 switch (f_mousecolour.ActivePatrial) {
                     case PartialNote.Full: {
-                            for (int i=0; i<16; i++) {
+                            for (int i = 0; i < 16; i++) {
                                 Colours[i] = f_mousecolour.ActiveColour;
                                 Positions[i] = (NoteBitPos)i;
 
@@ -553,19 +693,19 @@ namespace CPSM
             public void SetHalfColour(Half f_half, OctaveColour f_col) {
                 switch (f_half) {
                     case Half.Left: {
-                        for (int i = 0; i < 8; i++) {
-                            Colours[i] = f_col;
-                            Positions[i] = (NoteBitPos)i;
+                            for (int i = 0; i < 8; i++) {
+                                Colours[i] = f_col;
+                                Positions[i] = (NoteBitPos)i;
+                            }
+                            break;
                         }
-                        break;
-                    }
                     case Half.Right: {
-                        for (int i = 8; i < 16; i++) {
-                            Colours[i] = f_col;
-                            Positions[i] = (NoteBitPos)i;
+                            for (int i = 8; i < 16; i++) {
+                                Colours[i] = f_col;
+                                Positions[i] = (NoteBitPos)i;
+                            }
+                            break;
                         }
-                        break;
-                    }
                 }
             }
             public void SetColour(OctaveColour f_col) {
@@ -573,17 +713,40 @@ namespace CPSM
                     Colours[i] = f_col;
                     Positions[i] = (NoteBitPos)i;
                 }
-                
+
             }
             private void Init() {
                 Colours = new OctaveColour[16];
                 Positions = new NoteBitPos[16];
 
             }
-        }
-        public static class NoteTemplates
-        {
-            //probably wont be used
+            public void SetAsExtension() {
+                for (int i = 0; i < 8; i++) {
+                    Positions[i] = NoteBitPos.a8;
+                }
+                for (int i = 8; i < 16; i++) {
+                    Positions[i] = NoteBitPos.b8;
+                }
+            }
+            public bool IsExtension() {
+                for (int i = 0; i < 8; i++) {
+                    if (Positions[i] != NoteBitPos.a8) {
+                        return false;
+                    }
+                }
+                for (int i = 8; i < 16; i++) {
+                    if (Positions[i] != NoteBitPos.b8) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+
+            public static class NoteTemplates
+            {
+                //probably wont use
+            }
         }
     }
 }
