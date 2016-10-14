@@ -143,9 +143,8 @@ namespace CPSM
                 BlackNotes = new BlackNoteViewModal[10, (int)Size];
                 Parent = f_parent;
                 Can = new Canvas() {
-                    Background = Brushes.AliceBlue,
-                    Height = 300,
-                    Width = 300
+                    Height = ImageControl.MeasureImg(Size).Height-2, //-2 for the seperator
+                    Width = 220
                 };
                 ModalImg = new Image() {
                     Source = ImageControl.MeasureImg(Size),
@@ -182,7 +181,7 @@ namespace CPSM
                                 //note below is in next measure
                                 var f_nextmeasure = Parent.GetNextMeasure(this);
                                 if (f_nextmeasure != null) {
-                                    return f_nextmeasure.WhiteNotes[ii, 1];
+                                    return f_nextmeasure.WhiteNotes[ii, 0];
                                 }
                                 else {
                                     return null;
@@ -204,7 +203,7 @@ namespace CPSM
                                 //note below is in next measure
                                 var f_nextmeasure = Parent.GetNextMeasure(this);
                                 if (f_nextmeasure != null) {
-                                    return f_nextmeasure.BlackNotes[ii, 1];
+                                    return f_nextmeasure.BlackNotes[ii, 0];
                                 }
                                 else {
                                     return null;
@@ -229,10 +228,10 @@ namespace CPSM
                             ii = i;
                             oo = o - 1;
                             if (oo < 0) {
-                                //note below is in previous measure
+                                //note above is in previous measure
                                 var f_previousmeasure = Parent.GetpreviousMeasure(this);
                                 if (f_previousmeasure != null) {
-                                    return f_previousmeasure.WhiteNotes[ii, (int)f_previousmeasure.Size];
+                                    return f_previousmeasure.WhiteNotes[ii, (int)f_previousmeasure.Size-1];
                                 }
                                 else {
                                     return null;
@@ -252,10 +251,10 @@ namespace CPSM
                             ii = i;
                             oo = o - 1;
                             if (oo < 0) {
-                                //note below is in previous measure
+                                //note above is in previous measure
                                 var f_previousmeasure = Parent.GetpreviousMeasure(this);
                                 if (f_previousmeasure != null) {
-                                    return f_previousmeasure.BlackNotes[ii, (int)f_previousmeasure.Size];
+                                    return f_previousmeasure.BlackNotes[ii, (int)f_previousmeasure.Size-1];
                                 }
                                 else {
                                     return null;
@@ -659,6 +658,14 @@ namespace CPSM
                 }
 
             }
+            public NoteTemplate(NoteTemplate f_note) {
+                Init();
+
+                for (int i = 0; i < 16; i++) {
+                    Colours[i] = f_note.Colours[i];
+                    Positions[i] = f_note.Positions[i];
+                }
+            }
 
             public OctaveColour? isUsniform() {
                 bool colourfound = false;
@@ -679,15 +686,25 @@ namespace CPSM
                 return testcol;
             }
             public OctaveColour? HalfColour(Half f_half) {
+                OctaveColour testcol = OctaveColour.none;
+                bool colourfound = false;
                 int count = (int)f_half * 8;
                 int end = 8 + ((int)f_half * 8);
                 while (count < end) {
-                    if (Colours[count] != OctaveColour.none) {
-                        return Colours[count];
+                    if (!colourfound) {
+                        if (Colours[count] != OctaveColour.none) {
+                            testcol = Colours[count];
+                            colourfound = true;
+                        }
+                    }
+                    else {
+                        if (Colours[count] != testcol && Colours[count] != OctaveColour.none) {
+                            return null;
+                        }
                     }
                     count++;
                 }
-                return null;
+                return testcol;
 
             }
             public void SetHalfColour(Half f_half, OctaveColour f_col) {
@@ -703,6 +720,24 @@ namespace CPSM
                             for (int i = 8; i < 16; i++) {
                                 Colours[i] = f_col;
                                 Positions[i] = (NoteBitPos)i;
+                            }
+                            break;
+                        }
+                }
+            }
+            public void SetHalfColour(Half f_half, NoteTemplate f_note) {
+                switch (f_half) {
+                    case Half.Left: {
+                            for (int i = 0; i < 8; i++) {
+                                Colours[i] = f_note.Colours[i];
+                                Positions[i] = f_note.Positions[i];
+                            }
+                            break;
+                        }
+                    case Half.Right: {
+                            for (int i = 8; i < 16; i++) {
+                                Colours[i] = f_note.Colours[i];
+                                Positions[i] = f_note.Positions[i];
                             }
                             break;
                         }
@@ -727,6 +762,17 @@ namespace CPSM
                 for (int i = 8; i < 16; i++) {
                     Positions[i] = NoteBitPos.b8;
                 }
+            }
+            public NoteTemplate GetAsExtension() {
+                //returns a extension equivalent of this note
+                var f_newnote = new NoteTemplate(this);
+                for (int i = 0; i < 8; i++) {
+                    f_newnote.Positions[i] = NoteBitPos.a8;
+                }
+                for (int i = 8; i < 16; i++) {
+                    f_newnote.Positions[i] = NoteBitPos.b8;
+                }
+                return f_newnote;
             }
             public bool IsExtension() {
                 for (int i = 0; i < 8; i++) {

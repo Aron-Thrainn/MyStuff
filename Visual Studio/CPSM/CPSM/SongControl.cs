@@ -8,6 +8,7 @@ using CPSM.ViewModals;
 
 namespace CPSM
 {
+    /*
     public class SongControl {
         private IniFile SaveFile { get; set; }
         public SongData ActiveSong { get; set; }
@@ -16,7 +17,36 @@ namespace CPSM
             throw new NotImplementedException();
         }
         public void SaveSong() {
-            throw new NotImplementedException();
+
+
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt")) {
+
+                file.Write("N(" + ActiveSong.Name + ")");
+                file.Write("S(" + ActiveSong.Source + ")");
+
+                foreach (var measure in ActiveSong.Measures) {
+                    file.Write('M');
+                    if ((int)measure.Size >= 10) {
+                        file.Write(0);
+                        file.Write(((int)measure.Size));
+                    }
+                    else file.Write((int)measure.Size);
+
+                    file.Write('(');
+                    foreach (var note in measure.WhiteNotes) {
+                        var temp = new NoteTemplate(note);
+                        if (temp.isUsniform() != null) {
+                            file.Write((int)temp.isUsniform().Value);
+                        }
+                    }
+                    foreach (var note in measure.BlackNotes) {
+
+                    }
+                    file.Write(')');
+
+                }
+            }
         }
         public void RemoveSong() {
             throw new NotImplementedException();
@@ -35,7 +65,7 @@ namespace CPSM
             throw new NotImplementedException();
         }
     }
-    
+    */
 
 
     public enum NoteBitPos {
@@ -88,20 +118,20 @@ namespace CPSM
 
     public class SongData {
         public int ID { get; set; }
-        public Stack<MeasureData> Measures { get; set; }
+        public List<MeasureData> Measures { get; set; }
         public string Name { get; set; }
         public string Source { get; set; }
 
         public SongData(int f_ID) {
             ID = f_ID;
-            Measures = new Stack<MeasureData>();
+            Measures = new List<MeasureData>();
             Name = "";
             Source = "";
         }
 
         public void AddMeasure(MeasureSize f_size) {
             var NewMeasure = new MeasureData(this, f_size);
-            Measures.Push(NewMeasure);
+            Measures.Add(NewMeasure);
         }
     }
     public class MeasureData {

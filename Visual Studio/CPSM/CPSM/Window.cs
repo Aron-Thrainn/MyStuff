@@ -51,8 +51,175 @@ namespace CPSM
             ActiveSongData = f_song;
             _Creator.LoadSong(f_song);
         }
+        public void SaveSong() {
+            var saver = new SongSaver(ActiveSongData);
+        }
         public void CreateNoteDisplay(Canvas f_can) {
             _NoteDisp = new NoteDisplay(f_can);
+        }
+
+
+
+        
+
+        public class SongSaver {
+
+            public int i { get; set; }
+            public int o { get; set; }
+            public int count { get; set; }
+            public int currMesSize { get; set; }
+            public int state { get; set; }
+            public NoteTemplate prevNote { get; set; }
+
+
+            public SongSaver(SongData f_Song) {
+                using (StreamWriter file = new StreamWriter(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt")) {
+
+                    file.Write("N" + f_Song.Name + ")");
+                    file.Write("S" + f_Song.Source + ")");
+
+                    foreach (var measure in f_Song.Measures) {
+                        currMesSize = (int)measure.Size;
+                        file.Write('M');
+                        if ((int)measure.Size < 10) {
+                            file.Write(0);
+                            file.Write(currMesSize);
+                        }
+                        else file.Write(currMesSize);
+                        
+                        i = 0;
+                        o = 0;
+                        count = 0;
+                        state = 0;
+                        // 0 = norm, 1 = counting 0s, 2 = counting non-0s
+                        while (true)/* (var note in measure.WhiteNotes)*/ {
+                            if (i >= 14) { // reached end of this measure
+                                file.Write(WriteNote(prevNote, count));
+                                break;
+                            }
+                            var temp = new NoteTemplate(measure.WhiteNotes[i, o]);
+                            var tempcol = temp.isUsniform();
+
+                            switch (state) {
+                                case 0: {
+                                        if (tempcol == OctaveColour.none) { // note is empty
+                                            state = 1;
+                                        }
+                                        else { // note is not empty
+                                            state = 2;
+                                        }
+                                        prevNote = temp;
+                                        count = 1;
+                                        IncrimentNote();
+                                        break;
+                                    }
+                                case 1: { // note is empty
+                                        if (tempcol == OctaveColour.none) {
+                                            count++;
+                                            IncrimentNote();
+                                            break;
+                                        }
+                                        else {
+                                            file.Write(WriteNote(prevNote, count));
+                                            state = 0;
+                                        }
+                                        break;
+                                    }
+                                case 2: { // note is not empty
+                                        if (temp == prevNote.GetAsExtension()) {
+                                            count++;
+                                            IncrimentNote();
+                                            break;
+                                        }
+                                        else {
+                                            file.Write(WriteNote(prevNote, count));
+                                            state = 0;
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+                        file.Write(')');
+
+                    }
+                }
+            }
+
+            private void IncrimentNote() {
+                o++;
+                if (o >= currMesSize) {
+                    o = 0;
+                    i++;
+                }
+            }
+            private string WrittenNote(NoteTemplate f_note) {
+                if (f_note.isUsniform() != null) {
+                    return GetNoteKey(f_note.isUsniform().Value);
+                }
+                else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null) {
+                    return "n" + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + ")";
+                }
+                else {
+                    var tempstring = new StringBuilder();
+                    tempstring.Append("n");
+                    for (int i=0; i<16; i++) {
+
+                        string pos;
+                        string oct = GetNoteKey(f_note.Colours[i]);
+                        int posint = ((int)f_note.Positions[i]);
+                        if (posint < 10) {
+                            pos = "0" + posint.ToString();
+                        }
+                        else {
+                            pos = posint.ToString();
+                        }
+                        tempstring.Append("b" + pos + oct + ")");
+                    }
+                    tempstring.Append(")");
+                    return tempstring.ToString();
+                }
+            }
+            private string WriteNote(NoteTemplate f_note, int f_count) {
+                if (f_count == 1) {
+                    return WrittenNote(f_note);
+                }
+                else if (f_count == 2) {
+                    string f_char = WrittenNote(f_note);
+                    return f_char + f_char;
+                }
+                else {
+                    return WrittenNote(f_note) + count.ToString();
+                }
+            }
+            private string GetNoteKey(OctaveColour f_col) {
+                switch (f_col) {
+                    case OctaveColour.none: {
+                            return "o";
+                        }
+                    case OctaveColour.Brown: {
+                            return "q";
+                        }
+                    case OctaveColour.Teal: {
+                            return "w";
+                        }
+                    case OctaveColour.Blue: {
+                            return "e";
+                        }
+                    case OctaveColour.Green: {
+                            return "r";
+                        }
+                    case OctaveColour.Red: {
+                            return "t";
+                        }
+                    case OctaveColour.Purple: {
+                            return "y";
+                        }
+                    case OctaveColour.Yellow: {
+                            return "u";
+                        }
+                }
+                throw new Exception();
+            }
         }
 
         public class NoteDisplay
@@ -161,7 +328,7 @@ namespace CPSM
 
     public class NotePreview
     {
-        private NoteTemplate PreviewTemplate { get; set; }
+        private NoteTemplate PreviewTemplate { get;  set; }
         public NoteViewModal Note { get; set; }
         public bool NoteOverride { get; set; }
         public bool StartPoint { get; set; }
@@ -211,7 +378,7 @@ namespace CPSM
                 return null;
             }
             if (f_ExistingNote.isUsniform() == OctaveColour.none) {
-                return f_HeldNote;
+                return new NoteTemplate(f_HeldNote);
             }
 
             if (f_ExistingNote.isUsniform() == f_HeldNote.isUsniform()) {
@@ -221,7 +388,7 @@ namespace CPSM
                 else if (f_ExistingNote.IsExtension() && f_HeldNote.IsExtension()) { //both are simple and extensions
                     return null;
                 }
-                else return f_HeldNote;
+                else return new NoteTemplate(f_HeldNote);
                 
             }
 
@@ -230,41 +397,37 @@ namespace CPSM
                 if (f_ExistingCol == null) { //Existing note is complex
                     if (f_ExistingNote.HalfColour(Half.Left) != null && f_ExistingNote.HalfColour(Half.Right) != null) { //note is dual-octival
                         if (f_ExistingNote.HalfColour(Half.Left) == f_HeldCol) { //making it uniform
-                            f_NewNote.SetColour(f_HeldCol.Value);
-                            return f_NewNote;
+                            return new NoteTemplate(f_HeldNote);
                         }
                         else if (f_ExistingNote.HalfColour(Half.Right) == f_HeldCol) { //making it uniform
-                            f_NewNote.SetColour(f_HeldCol.Value);
-                            return f_NewNote;
+                            return new NoteTemplate(f_HeldNote);
                         }
                         else { //override existing note
-                            //f_NewNote.SetColour(f_HeldCol.Value);
-                            //return f_NewNote;
-                            return f_HeldNote;
+                            return new NoteTemplate(f_HeldNote);
                         }
 
                     }
                 }
                 else { //Held note & Existing note are simple
                     if ((int)f_ExistingCol == (int)f_HeldCol - 1) { //held colour is to the right of existing note
-                        f_NewNote.SetHalfColour(Half.Left, f_ExistingCol.Value);
-                        f_NewNote.SetHalfColour(Half.Right, f_HeldCol.Value);
+                        f_NewNote.SetHalfColour(Half.Left, f_ExistingNote);
+                        f_NewNote.SetHalfColour(Half.Right, f_HeldNote);
                         return f_NewNote;
                     }
                     else if ((int)f_ExistingCol == (int)f_HeldCol + 1) { //held colour is to the left of existing note
-                        f_NewNote.SetHalfColour(Half.Left, f_HeldCol.Value);
-                        f_NewNote.SetHalfColour(Half.Right, f_ExistingCol.Value);
+                        f_NewNote.SetHalfColour(Half.Left, f_HeldNote);
+                        f_NewNote.SetHalfColour(Half.Right, f_ExistingNote);
                         return f_NewNote;
                     }
                     else {  //held & existing colours are not next to each other
                         //f_NewNote.SetColour(f_HeldCol.Value);
                         //return f_NewNote;
-                        return f_HeldNote;
+                        return new NoteTemplate(f_HeldNote);
                     }
                 }
             }
             else {
-                return f_HeldNote;
+                return new NoteTemplate(f_HeldNote);
             }
             return null;
         }
@@ -295,36 +458,6 @@ namespace CPSM
             else if (f_preview.Note == f_next){
                 PopNote();
             }
-
-            /*
-            var f_notey = f_existingnote.NoteCan.Margin.Top;
-            var f_notex = f_existingnote.NoteCan.Margin.Left;
-            var f_preview = NewNotes.Peek();
-
-            if (f_preview.Note.NoteCan.Margin.Left == f_notex) {
-                if (f_preview.Note.NoteCan.Margin.Top > f_notey) {
-                    while (true) {
-                        if (NewNotes.Count > 1) {
-                            PopNote();
-                            f_preview = NewNotes.Peek();
-                        }
-                        else break; // only starting note left
-                    }
-                }
-                else if (f_preview.Note.NoteCan.Margin.Top >= f_notey) {
-                    bool exists = false;
-                    foreach (var preview in NewNotes) {
-                        if (preview.Note == f_existingnote) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if (exists == false) {
-                        PushNote(f_existingnote);
-                    }
-                }
-            }
-            */
         }
         public void PushNote(NoteViewModal f_existingnote) {
             var f_startpoint = (NewNotes.Count == 0);
