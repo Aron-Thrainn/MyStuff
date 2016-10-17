@@ -21,8 +21,11 @@ namespace CPSM
             public Canvas MeasuresCan { get; set; }
             public StackPanel MeasureStack { get; set; }
             public List<MeasureViewModal> Measures { get; set; }
+            public Label TitleBox { get; set; }
+            public Label SourceBox { get; set; }
+            public Label VersionBox { get; set; }
 
-            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl) {
+            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox) {
                 //MeasuresCan = f_measurecan;
                 MeasureStack = new StackPanel() {
                     Margin = new Thickness(10, 10, 0, 0)
@@ -30,6 +33,9 @@ namespace CPSM
                 f_measurecan.Children.Add(MeasureStack);
                 _Mouse = f_mousectrl;
                 Measures = new List<MeasureViewModal>();
+
+                TitleBox = f_titlebox;
+                SourceBox = f_sourcebox;
             }
 
             public void LoadSong(SongData f_song) {
@@ -37,6 +43,8 @@ namespace CPSM
                 foreach (var mes in f_song.Measures) {
                     CreateMeasure(mes);
                 }
+                TitleBox.Content = f_song.Name;
+                SourceBox.Content = f_song.Source;
             }
             public void CreateMeasure(MeasureData f_measure) {
                 var modal = new MeasureViewModal(f_measure, _Mouse, this);

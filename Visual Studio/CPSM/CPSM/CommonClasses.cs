@@ -643,7 +643,7 @@ namespace CommonClasses
             public static readonly BitmapImage IconDelete = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_11.png"));
             public static readonly BitmapImage IconCancel = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_12.png"));
             public static readonly BitmapImage IconAnnual = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_13.png"));
-            public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/img1.png"));
+            public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png"));
 
 
 

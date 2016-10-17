@@ -16,6 +16,7 @@ using CPSM.ViewModals;
 using CPSM.Forms;
 using System.Threading;
 using System.Windows.Threading;
+using CommonClasses.Images;
 
 namespace CPSM
 {
@@ -41,10 +42,10 @@ namespace CPSM
         public NoteDisplay _NoteDisp { get; set; }
         public SongData ActiveSongData { get; set; }
 
-        public SongCanvas(MainWindow f_wind, Canvas f_songcan, Canvas f_measurescan, MouseNoteControl f_mousectrl) {
+        public SongCanvas(MainWindow f_wind, Canvas f_songcan, SongViewModalCreator f_creator) {
             _Window = f_wind;
             SongCan = f_songcan;
-            _Creator = new SongViewModalCreator(f_measurescan, f_mousectrl);
+            _Creator = f_creator;
         }
 
         public void LoadSong(SongData f_song) {
@@ -58,7 +59,9 @@ namespace CPSM
             _NoteDisp = new NoteDisplay(f_can);
         }
 
-
+        public void InitializeNoteDisplay(Canvas f_can) {
+            _NoteDisp = new NoteDisplay(f_can);
+        }
 
         
 
@@ -152,9 +155,10 @@ namespace CPSM
                                         break;
                                     }
                                 case 2: { // note is not empty
-                                        if (temp == prevNote.GetAsExtension()) {
+                                        var tempprev = prevNote.GetAsExtension();
+                                        if (CompareNotes(temp, tempprev)) {
                                             count++;
-                                            IncrimentNote();
+                                            IncrimentNote(); 
                                             break;
                                         }
                                         else {
@@ -187,7 +191,7 @@ namespace CPSM
                 }
                 else { // note is complex
                     var tempstring = new StringBuilder();
-                    tempstring.Append(NOTE);
+                    tempstring.Append(NOTE + OPEN);
 
                     OctaveColour f_tempcol = f_note.Colours[0];
                     NoteBitPos f_temppos = f_note.Positions[0];
@@ -229,7 +233,7 @@ namespace CPSM
                     return f_char + f_char;
                 }
                 else {
-                    return WrittenNote(f_note) + count.ToString();
+                    return WrittenNote(f_note) + DUPLICATE + count.ToString();
                 }
             }
             private string GetNoteKey(OctaveColour f_col) {
@@ -267,14 +271,29 @@ namespace CPSM
                 pos = f_pos.ToString();
                 return(BIT + OPEN + pos + oct + CLOSE);
             }
+            private bool CompareNotes(NoteTemplate f_note1, NoteTemplate f_note2) {
+                for (int i=0; i<16; i++) {
+                    if (f_note1.Colours[i] != f_note2.Colours[i] || f_note1.Positions[i] != f_note2.Positions[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
 
         public class NoteDisplay
         {
             public NoteDisplay(Canvas f_candisplay) {
-                throw new NotImplementedException();
-                for (int i = 0; i < 8; i++) {
+                for (int i = 1; i < 8; i++) {
                     //create image & set position
+                    var f_NoteImage = new Image() {
+                        Height = 16,
+                        Width = 12,
+                        Stretch = Stretch.Fill,
+                        Source = ImageControl.NoteImg((OctaveColour)i, NoteType.White),
+                        Margin = new Thickness(2 + i * 14, 2, 0, 0)
+                    };
+                    f_candisplay.Children.Add(f_NoteImage);
                 }
             }
         }
@@ -335,14 +354,7 @@ namespace CPSM
             Creating = true;
         }
         public void NoteLeftClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
-            if (Creating) {
-                _Creator.Activate();
-                _Creator = null;
-                Creating = false;
-                MakePreview(sender, f_mousepos);
-            }
-            else {
-            }
+            MakePreview(sender, f_mousepos);
         }
         public void NoteRightClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             sender.ClearNote();
@@ -388,6 +400,15 @@ namespace CPSM
                 _Preview = null;
             }
             _Preview = new NotePreview(f_tempnote, f_temptemplate, false, true);
+        }
+        public void GlobalMouseUp() {
+            if (Creating) {
+                _Creator.Activate();
+                _Creator = null;
+                Creating = false;
+            }
+            else {
+            }
         }
     }
 
@@ -459,7 +480,7 @@ namespace CPSM
 
             if (f_overrideNote == false) { //Combine notes, heldnote is simple
                 var f_ExistingCol = f_ExistingNote.isUsniform();
-                if (f_ExistingCol == null) { //Existing note is complex
+                if (f_ExistingCol == null) { 
                     if (f_ExistingNote.HalfColour(Half.Left) != null && f_ExistingNote.HalfColour(Half.Right) != null) { //note is dual-octival
                         if (f_ExistingNote.HalfColour(Half.Left) == f_HeldCol) { //making it uniform
                             return new NoteTemplate(f_HeldNote);
@@ -471,6 +492,12 @@ namespace CPSM
                             return new NoteTemplate(f_HeldNote);
                         }
 
+                    }
+                    else { //Existing note is complex
+                        return new NoteTemplate(f_HeldNote);
+
+                        //simply replacing existing note with held note, 
+                        //todo: complex combinations
                     }
                 }
                 else { //Held note & Existing note are simple
@@ -485,8 +512,6 @@ namespace CPSM
                         return f_NewNote;
                     }
                     else {  //held & existing colours are not next to each other
-                        //f_NewNote.SetColour(f_HeldCol.Value);
-                        //return f_NewNote;
                         return new NoteTemplate(f_HeldNote);
                     }
                 }
@@ -494,7 +519,6 @@ namespace CPSM
             else {
                 return new NoteTemplate(f_HeldNote);
             }
-            return null;
         }
     }
 

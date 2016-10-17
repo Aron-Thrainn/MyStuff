@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CPSM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="959" Width="1093">
+        Title="MainWindow" Height="987" Width="1093">
     <Grid>
         <Canvas x:Name="Cnv_GUI" HorizontalAlignment="Left" Height="141" VerticalAlignment="Top" Width="1073" Background="Gainsboro">
             <Image x:Name="image_Copy" Height="121" Canvas.Left="10" Width="157" Source="Resources/img1.png" Canvas.Top="10"/>
@@ -16,14 +16,14 @@
                 <Canvas x:Name="cbtn_NoteColour_Blue" Height="32" Canvas.Left="121" Canvas.Top="10" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
-        <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="787" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="#FFECECEC">
-            <Label x:Name="lbl_SongName" Content="" Canvas.Left="140" Canvas.Top="10" Height="29" Width="369" BorderBrush="Black" BorderThickness="0,2,2,2"/>
-            <Label x:Name="lbl_SongSource" Canvas.Left="509" Canvas.Top="10" Height="29" Width="403" BorderBrush="Black" BorderThickness="0,2,2,2"/>
-            <Label x:Name="lbl_SongVersion" Canvas.Left="912" Canvas.Top="10" Height="29" Width="153" BorderBrush="Black" BorderThickness="0,2,2,2"/>
-            <Canvas x:Name="cnv_Measures" Height="733" Canvas.Left="10" Canvas.Top="39" Width="1055" Background="White">
+        <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="#FFECECEC">
+            <Label x:Name="lbl_SongName" Content="" Canvas.Left="140" Canvas.Top="10" Height="35" Width="369" BorderBrush="Black" BorderThickness="0,2,2,2" FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"/>
+            <Label x:Name="lbl_SongSource" Canvas.Left="509" Canvas.Top="10" Height="35" Width="403" BorderBrush="Black" BorderThickness="0,2,2,2" Margin="0" FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"/>
+            <Label x:Name="lbl_SongVersion" Canvas.Left="912" Canvas.Top="10" Height="35" Width="153" BorderBrush="Black" BorderThickness="0,2,2,2"/>
+            <Canvas x:Name="cnv_Measures" Height="733" Canvas.Left="10" Canvas.Top="55" Width="1055" Background="White">
                 <Image x:Name="image" Height="130" Canvas.Left="544" Width="169" Source="Resources/img1.png" Canvas.Top="28"/>
             </Canvas>
-            <Border BorderBrush="Black" BorderThickness="2" Height="29" Width="130" Canvas.Left="10" Canvas.Top="10">
+            <Border BorderBrush="Black" BorderThickness="2" Height="35" Width="130" Canvas.Left="10" Canvas.Top="10">
                 <Canvas x:Name="cnv_DisplayBox" Margin="-2"/>
             </Border>
         </Canvas>

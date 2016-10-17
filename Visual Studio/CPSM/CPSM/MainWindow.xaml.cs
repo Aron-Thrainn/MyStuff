@@ -58,7 +58,8 @@ namespace CPSM
             InitializeComponent();
 
             _MouseCtrl = new MouseControl(this);
-            _SongCan = new SongCanvas(this, cnv_SongCan, cnv_Measures, _MouseCtrl._noteCtrl);
+            var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion);
+            _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
             _FormSongSelect = new FormSongSelect(this);
             _HotCtrl = new HotkeyControl(this);
@@ -66,12 +67,16 @@ namespace CPSM
             _vers = new Version();
             _keyCtrl = new Hotkeycontrol(this);
 
+            _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
+    
             InitFormNoteColour();
 
             TestModal();
 
             PreviewKeyDown += new KeyEventHandler(HotkeysDown);
             PreviewKeyUp += new KeyEventHandler(HotkeysUp);
+
+            PreviewMouseLeftButtonUp += new MouseButtonEventHandler(MouseButtonUp);
 
             //temp for testing, delays until Loaded
             //enter to take screenshot
@@ -115,6 +120,9 @@ namespace CPSM
                         break;
                     }
             }
+        }
+        private void MouseButtonUp(object sender, MouseEventArgs e) {
+            _MouseCtrl._noteCtrl.GlobalMouseUp();
         }
 
         private void InitFormNoteColour() {
