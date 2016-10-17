@@ -20,7 +20,10 @@ using CPSM.Forms;
 /*
     ToDo:
     global mouse event handler
-    Was working on save song last time
+    Hotkey Control
+
+
+    Was working on save song & hotkeys last time
 
     Bugs: 
     
@@ -37,8 +40,7 @@ using CPSM.Forms;
 
 namespace CPSM
 {
-    public partial class MainWindow : Window
-    {
+    public partial class MainWindow : Window {
         public GUI _GUI { get; set; }
         public SongCanvas _SongCan { get; set; }
         public FormSongSelect _FormSongSelect { get; set; }
@@ -47,7 +49,9 @@ namespace CPSM
         //public SongControl _SongCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
         public Version _vers { get; set; }
-        public NoteColourForm _FomrNoteColour { get; set; }
+        public NoteColourForm _FormNoteColour { get; set; }
+        private Hotkeycontrol _keyCtrl { get; set; }
+    
 
 
         public MainWindow() {
@@ -60,23 +64,61 @@ namespace CPSM
             _HotCtrl = new HotkeyControl(this);
             _ScreenCap = new ScreenCapturer(cnv_SongCan);
             _vers = new Version();
+            _keyCtrl = new Hotkeycontrol(this);
 
             InitFormNoteColour();
 
             TestModal();
 
+            PreviewKeyDown += new KeyEventHandler(HotkeysDown);
+            PreviewKeyUp += new KeyEventHandler(HotkeysUp);
 
-            
             //temp for testing, delays until Loaded
-            Loaded += delegate
+            //enter to take screenshot
+            /*Loaded += delegate
             {
                 _ScreenCap.SaveScreenShot();
-            };
-            
+            };*/
+
         }
-        
+
+        private void HotkeysDown(object sender, KeyEventArgs e) {
+
+            switch (e.Key) {
+                case Key.Q: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Brown);
+                        break;
+                    }
+                case Key.W: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Teal);
+                        break;
+                    }
+                case Key.E: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Blue);
+                        break;
+                    }
+            }
+        }
+        private void HotkeysUp(object sender, KeyEventArgs e) {
+
+            switch (e.Key) {
+                case Key.Q: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Brown);
+                        break;
+                    }
+                case Key.W: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Teal);
+                        break;
+                    }
+                case Key.E: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Blue);
+                        break;
+                    }
+            }
+        }
+
         private void InitFormNoteColour() {
-            _FomrNoteColour = new NoteColourForm(cnv_NoteColourButtons, _MouseCtrl._noteCtrl._colourctrl);
+            _FormNoteColour = new NoteColourForm(cnv_NoteColourButtons, _MouseCtrl._noteCtrl._colourctrl);
 
             var tempList = new List<Canvas>();
             tempList.Add(cbtn_NoteColour_None);
@@ -84,9 +126,9 @@ namespace CPSM
             tempList.Add(cbtn_NoteColour_Teal);
             tempList.Add(cbtn_NoteColour_Blue);
 
-            _FomrNoteColour.Init(tempList);
+            _FormNoteColour.Init(tempList);
         }
-
+        
         public void TestModal() {
             var testsong = new SongData(0) {
                 Name = "We Stand for Everfree",
@@ -117,7 +159,7 @@ namespace CPSM
             testmeasure.WhiteNotes[0, 5].SetColour(OctaveColour.Purple);
             testmeasure.WhiteNotes[0, 6].SetColour(OctaveColour.Yellow);
             testmeasure.WhiteNotes[13, 9].SetColour(OctaveColour.Green);
-            testmeasure.WhiteNotes[8, 2].SetColour(OctaveColour.Yellow);
+            testmeasure.WhiteNotes[8, 11].SetColour(OctaveColour.Yellow);
             testmeasure.WhiteNotes[10, 10].SetColour(OctaveColour.Brown);
 
 
@@ -140,16 +182,156 @@ namespace CPSM
             notetemp2.Positions[15] = NoteBitPos.b4;
             notetemp2.Colours[15] = OctaveColour.Yellow;
 
-            testmeasure.WhiteNotes[3, 5].SetColour(notetemp1);
-            testmeasure.WhiteNotes[3, 6].SetColour(notetemp2);
+            testmeasure.WhiteNotes[10, 5].SetColour(notetemp1);
+            testmeasure.WhiteNotes[10, 6].SetColour(notetemp2);
+
+
+            testmeasure.WhiteNotes[1, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[2, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[3, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[4, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[5, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[6, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[7, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[8, 0].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[1, 1].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[2, 2].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[3, 3].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[4, 4].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[5, 5].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[6, 6].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[7, 7].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[8, 8].SetColour(OctaveColour.Brown);
+
+
 
             testsong.Measures.Add(testmeasure);
             testsong.Measures.Add(testmeasure2);
 
             _SongCan.LoadSong(testsong);
-            _SongCan.SaveSong();
+            //Space to save to .txt
+            //_SongCan.SaveSong();
 
         }
         
+    }
+
+
+    public class Hotkeycontrol
+    {
+        public MainWindow _window { get; set; }
+        
+        #region Command Objects
+        public class SpaceCommand : ICommand
+        {
+            public MainWindow _window { get; set; }
+            public event EventHandler CanExecuteChanged;
+
+            public SpaceCommand(MainWindow f_window) {
+                _window = f_window;
+            }
+
+            public bool CanExecute(object parameter) {
+                return true;
+            }
+
+            public void Execute(object parameter) {
+                //hotkey action
+                _window._SongCan.SaveSong();
+            }
+        }
+
+        public class EnterCommand : ICommand
+        {
+            public MainWindow _window { get; set; }
+            public event EventHandler CanExecuteChanged;
+
+            public EnterCommand(MainWindow f_window) {
+                _window = f_window;
+            }
+            public bool CanExecute(object parameter) {
+                return true;
+            }
+
+            public void Execute(object parameter) {
+                //hotkey action
+                _window._ScreenCap.SaveScreenShot();
+            }
+        }
+
+        public class EscCommand : ICommand
+        {
+            public MainWindow _window { get; set; }
+            public event EventHandler CanExecuteChanged;
+
+            public EscCommand(MainWindow f_window) {
+                _window = f_window;
+            }
+            public bool CanExecute(object parameter) {
+                return true;
+            }
+
+            public void Execute(object parameter) {
+                //hotkey action
+                _window.Close();
+                
+            }
+        }
+
+       
+        #endregion
+        /*  Uses
+         * escape to close app
+         */
+
+        public Hotkeycontrol(MainWindow f_wind) {
+            _window = f_wind;
+            SpaceFunc();
+            EnterFunc();
+            EscFunc();
+
+
+            
+        }
+        
+        private void SpaceFunc() {
+            SpaceCommand Testcommand = new SpaceCommand(_window);
+
+            KeyGesture OpenKeyGesture = new KeyGesture(
+                Key.Space,
+                ModifierKeys.None);
+
+            KeyBinding OpenCmdKeybinding = new KeyBinding(
+                Testcommand,
+                OpenKeyGesture);
+
+            _window.InputBindings.Add(OpenCmdKeybinding);
+        }
+        private void EscFunc() {
+            EscCommand Testcommand = new EscCommand(_window);
+
+            KeyGesture OpenKeyGesture = new KeyGesture(
+                Key.Escape,
+                ModifierKeys.None);
+
+            KeyBinding OpenCmdKeybinding = new KeyBinding(
+                Testcommand,
+                OpenKeyGesture);
+
+            _window.InputBindings.Add(OpenCmdKeybinding);
+        }
+        private void EnterFunc() {
+            EnterCommand Testcommand = new EnterCommand(_window);
+
+            KeyGesture OpenKeyGesture = new KeyGesture(
+                Key.Enter,
+                ModifierKeys.None);
+
+            KeyBinding OpenCmdKeybinding = new KeyBinding(
+                Testcommand,
+                OpenKeyGesture);
+
+            _window.InputBindings.Add(OpenCmdKeybinding);
+        }
     }
 }

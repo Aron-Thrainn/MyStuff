@@ -135,6 +135,9 @@ namespace CommonClasses
             {
                 Highlight.Opacity = 0;
             }
+            public virtual void SimulateButtonDown() { }
+            public virtual void SimulateButtonUp() { }
+
             #region Set functions
             public void SetImg(BitmapImage f_img) {
                 Icon.Source = f_img;
@@ -585,6 +588,32 @@ namespace CommonClasses
                     setButtonState(ButtonState.Toggled);
                 }
                 MouseLock = false;
+            }
+            public override void SimulateButtonDown() {
+                switch (State) {
+                    case ButtonState.Idle: {
+                            setButtonState(ButtonState.PressedFromIdle);
+                            break;
+                        }
+                    case ButtonState.Toggled: {
+                            setButtonState(ButtonState.Pressed);
+                            break;
+                        }
+                }
+            }
+            public override void SimulateButtonUp() {
+                switch (State) {
+                    case ButtonState.PressedFromIdle: {
+                            Check();
+                            ButtonEvent(this, null);
+                            break;
+                        }
+                    case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Toggled);
+                            ButtonEvent(this, null);
+                            break;
+                        }
+                }
             }
             #endregion
         }

@@ -117,10 +117,14 @@ namespace CPSM
 
 
     public class SongData {
-        public int ID { get; set; }
+        public int ID { get; set; } // might use name as unique primary key
         public List<MeasureData> Measures { get; set; }
         public string Name { get; set; }
         public string Source { get; set; }
+
+        //meta data about the song
+        public int PageCount { get; set; }
+        public List<int> MeasuresPerPage { get; set; }
 
         public SongData(int f_ID) {
             ID = f_ID;

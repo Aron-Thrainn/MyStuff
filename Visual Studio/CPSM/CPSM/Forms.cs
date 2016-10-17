@@ -45,6 +45,35 @@ namespace CPSM
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
                 _MouseCtrl.ActiveColour = (OctaveColour)btn.Tag;
+                _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
+            }
+
+            public void SimulateClickDown(OctaveColour f_col) {
+                CustomRadioButton tempbtn = null;
+                foreach (var btn in RadioButtons) {
+                    if ((OctaveColour)btn.Tag  == f_col) {
+                        tempbtn = btn;
+                        break;
+                    }
+                }
+
+                tempbtn.SimulateButtonDown();
+
+
+            }
+
+            public void SimulateClickUp(OctaveColour f_col) {
+                CustomRadioButton tempbtn = null;
+                foreach (var btn in RadioButtons) {
+                    if ((OctaveColour)btn.Tag == f_col) {
+                        tempbtn = btn;
+                        break;
+                    }
+                }
+
+                tempbtn.SimulateButtonUp();
+
+
             }
         }
 

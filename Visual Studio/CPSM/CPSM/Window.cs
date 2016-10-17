@@ -71,28 +71,54 @@ namespace CPSM
             public int state { get; set; }
             public NoteTemplate prevNote { get; set; }
 
+            #region static chars
+            private static string TITLE = "T";
+            private static string SOURCE = "S";
+            private static string MEASURE = "M";
+            private static string NOTE = "N";
+            private static string BIT = "B";
+            private static string DUPLICATE = "X";
+            private static string OPEN = "(";
+            private static string CLOSE = ")";
+
+
+            private static string O = "o";
+            private static string Q = "q";
+            private static string W = "w";
+            private static string E = "e";
+            private static string R = "r";
+            private static string T = "t";
+            private static string Y = "y";
+            private static string U = "u";
+
+            //a & b reserved for note bit pos
+
+
+            #endregion
+
+
 
             public SongSaver(SongData f_Song) {
                 using (StreamWriter file = new StreamWriter(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt")) {
 
-                    file.Write("N" + f_Song.Name + ")");
-                    file.Write("S" + f_Song.Source + ")");
+                    file.Write(TITLE + OPEN + f_Song.Name + CLOSE);
+                    file.Write(SOURCE + OPEN + f_Song.Source + CLOSE);
 
                     foreach (var measure in f_Song.Measures) {
                         currMesSize = (int)measure.Size;
-                        file.Write('M');
+                        file.Write(MEASURE);
                         if ((int)measure.Size < 10) {
                             file.Write(0);
-                            file.Write(currMesSize);
+                            file.Write(currMesSize + OPEN);
                         }
-                        else file.Write(currMesSize);
+                        else file.Write(currMesSize + OPEN);
                         
                         i = 0;
                         o = 0;
                         count = 0;
                         state = 0;
                         // 0 = norm, 1 = counting 0s, 2 = counting non-0s
-                        while (true)/* (var note in measure.WhiteNotes)*/ {
+                        while (true) {
                             if (i >= 14) { // reached end of this measure
                                 file.Write(WriteNote(prevNote, count));
                                 break;
@@ -139,7 +165,7 @@ namespace CPSM
                                     }
                             }
                         }
-                        file.Write(')');
+                        file.Write(CLOSE);
 
                     }
                 }
@@ -153,30 +179,45 @@ namespace CPSM
                 }
             }
             private string WrittenNote(NoteTemplate f_note) {
-                if (f_note.isUsniform() != null) {
+                if (f_note.isUsniform() != null) { // note is simple
                     return GetNoteKey(f_note.isUsniform().Value);
                 }
-                else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null) {
-                    return "n" + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + ")";
+                else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null) { // note is Dual-octival
+                    return NOTE + OPEN + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + CLOSE;
                 }
-                else {
+                else { // note is complex
                     var tempstring = new StringBuilder();
-                    tempstring.Append("n");
-                    for (int i=0; i<16; i++) {
+                    tempstring.Append(NOTE);
 
-                        string pos;
-                        string oct = GetNoteKey(f_note.Colours[i]);
-                        int posint = ((int)f_note.Positions[i]);
-                        if (posint < 10) {
-                            pos = "0" + posint.ToString();
+                    OctaveColour f_tempcol = f_note.Colours[0];
+                    NoteBitPos f_temppos = f_note.Positions[0];
+                    tempstring.Append(AppendBit(f_tempcol,f_temppos));
+                    int count = 1;
+
+
+
+                    for (int i = 1; i < 16; i++) {
+
+                        if (f_note.Colours[i] == f_tempcol && f_note.Positions[i] == (NoteBitPos)((int)f_temppos + 1)) {
+                            //note bit is a continuation of previous one
+                            count++;
                         }
                         else {
-                            pos = posint.ToString();
+                            if (count != 0) {
+                                // writing the duplicate notes
+                                tempstring.Append(DUPLICATE + count);
+                                count = 1;
+                            }
+                            //note bit is not a continuation of previous one
+                            tempstring.Append(AppendBit(f_note.Colours[i], f_note.Positions[i]));
                         }
-                        tempstring.Append("b" + pos + oct + ")");
+                        f_temppos = f_note.Positions[i];
+                        f_tempcol = f_note.Colours[i];
                     }
-                    tempstring.Append(")");
+
+                    tempstring.Append(CLOSE);
                     return tempstring.ToString();
+
                 }
             }
             private string WriteNote(NoteTemplate f_note, int f_count) {
@@ -194,31 +235,37 @@ namespace CPSM
             private string GetNoteKey(OctaveColour f_col) {
                 switch (f_col) {
                     case OctaveColour.none: {
-                            return "o";
+                            return O;
                         }
                     case OctaveColour.Brown: {
-                            return "q";
+                            return Q;
                         }
                     case OctaveColour.Teal: {
-                            return "w";
+                            return W;
                         }
                     case OctaveColour.Blue: {
-                            return "e";
+                            return E;
                         }
                     case OctaveColour.Green: {
-                            return "r";
+                            return R;
                         }
                     case OctaveColour.Red: {
-                            return "t";
+                            return T;
                         }
                     case OctaveColour.Purple: {
-                            return "y";
+                            return Y;
                         }
                     case OctaveColour.Yellow: {
-                            return "u";
+                            return U;
                         }
                 }
                 throw new Exception();
+            }
+            private string AppendBit(OctaveColour f_oct, NoteBitPos f_pos) {
+                string pos;
+                string oct = GetNoteKey(f_oct);
+                pos = f_pos.ToString();
+                return(BIT + OPEN + pos + oct + CLOSE);
             }
         }
 
@@ -253,11 +300,17 @@ namespace CPSM
     public class MouseNoteColour
     {
         public OctaveColour ActiveColour { get; set; }
-        public PartialNote ActivePatrial { get; set; } 
+        public PartialNote ActivePatrial { get; set; }
+        public MouseNoteControl _Parent { get; set; }
 
-        public MouseNoteColour() {
+        public MouseNoteColour(MouseNoteControl f_parent) {
+            _Parent = f_parent;
             ActiveColour = OctaveColour.none;
             ActivePatrial = PartialNote.Full;
+        }
+
+        public void UpdatePreview(OctaveColour f_oct) {
+            _Parent.UpdatePreview(f_oct);
         }
     }
     public class MouseNoteCopyTemplate
@@ -273,7 +326,7 @@ namespace CPSM
         public bool Creating { get; set; }
 
         public MouseNoteControl( ) {
-            _colourctrl = new MouseNoteColour();
+            _colourctrl = new MouseNoteColour(this);
         }
         
         public void NoteLeftClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
@@ -323,6 +376,18 @@ namespace CPSM
         public void MakePreview(NoteViewModal sender, Point f_mousepos) {
             var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
             _Preview = new NotePreview(sender, f_HeldNote, false, true);
+        }
+        public void UpdatePreview(OctaveColour f_oct) {
+            var f_tempnote = _Preview.Note;
+            var f_temptemplate = new NoteTemplate();
+            f_temptemplate.SetColour(f_oct); 
+            // sets the heldnote to f_oct colour full note, does not currently work for partial notes
+
+            if (_Preview != null) {
+                _Preview.Cancel();
+                _Preview = null;
+            }
+            _Preview = new NotePreview(f_tempnote, f_temptemplate, false, true);
         }
     }
 
