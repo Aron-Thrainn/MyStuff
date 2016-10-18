@@ -45,7 +45,6 @@ namespace CPSM
         public SongCanvas _SongCan { get; set; }
         public FormSongSelect _FormSongSelect { get; set; }
         public MouseControl _MouseCtrl { get; set; }
-        public HotkeyControl _HotCtrl { get; set; }
         //public SongControl _SongCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
         public Version _vers { get; set; }
@@ -62,7 +61,6 @@ namespace CPSM
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
             _FormSongSelect = new FormSongSelect(this);
-            _HotCtrl = new HotkeyControl(this);
             _ScreenCap = new ScreenCapturer(cnv_SongCan);
             _vers = new Version();
             _keyCtrl = new Hotkeycontrol(this);
@@ -102,6 +100,22 @@ namespace CPSM
                         _FormNoteColour.SimulateClickDown(OctaveColour.Blue);
                         break;
                     }
+                case Key.R: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Green);
+                        break;
+                    }
+                case Key.T: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Red);
+                        break;
+                    }
+                case Key.Y: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Purple);
+                        break;
+                    }
+                case Key.U: {
+                        _FormNoteColour.SimulateClickDown(OctaveColour.Yellow);
+                        break;
+                    }
             }
         }
         private void HotkeysUp(object sender, KeyEventArgs e) {
@@ -119,6 +133,22 @@ namespace CPSM
                         _FormNoteColour.SimulateClickUp(OctaveColour.Blue);
                         break;
                     }
+                case Key.R: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Green);
+                        break;
+                    }
+                case Key.T: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Red);
+                        break;
+                    }
+                case Key.Y: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Purple);
+                        break;
+                    }
+                case Key.U: {
+                        _FormNoteColour.SimulateClickUp(OctaveColour.Yellow);
+                        break;
+                    }
             }
         }
         private void MouseButtonUp(object sender, MouseEventArgs e) {
@@ -133,6 +163,10 @@ namespace CPSM
             tempList.Add(cbtn_NoteColour_Brown);
             tempList.Add(cbtn_NoteColour_Teal);
             tempList.Add(cbtn_NoteColour_Blue);
+            tempList.Add(cbtn_NoteColour_Green);
+            tempList.Add(cbtn_NoteColour_Red);
+            tempList.Add(cbtn_NoteColour_Purple);
+            tempList.Add(cbtn_NoteColour_Yellow);
 
             _FormNoteColour.Init(tempList);
         }

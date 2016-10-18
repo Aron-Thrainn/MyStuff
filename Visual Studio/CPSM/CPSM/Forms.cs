@@ -32,7 +32,7 @@ namespace CPSM
                 foreach (var can in f_buttoncans) {
                     var tempbtn = new CustomRadioButton(can, RadioGroup);
                     tempbtn.SetButtonClickEvent(ClickEvent);
-                    tempbtn.SetImg(ImageControl.NoteImg((OctaveColour)count,NoteType.White));
+                    tempbtn.SetImg(ImageControl.noteIcons((OctaveColour)count));
                     tempbtn.Tag = count;
                     count++;
 

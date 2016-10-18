@@ -294,6 +294,7 @@ namespace CPSM
                         Margin = new Thickness(2 + i * 14, 2, 0, 0)
                     };
                     f_candisplay.Children.Add(f_NoteImage);
+                    
                 }
             }
         }
@@ -567,17 +568,7 @@ namespace CPSM
     }
 
     #endregion
-
-    #region Hotkey Control
-    public class HotkeyControl {
-        public MainWindow _Window { get; set; }
-
-        public HotkeyControl(MainWindow f_wind) {
-            _Window = f_wind;
-        }
-    }
-    #endregion
-
+    
     #region Misc
     public class ScreenCapturer {
         public Canvas SongCan { get; set; }

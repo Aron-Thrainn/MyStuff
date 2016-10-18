@@ -9,11 +9,15 @@
     <Grid>
         <Canvas x:Name="Cnv_GUI" HorizontalAlignment="Left" Height="141" VerticalAlignment="Top" Width="1073" Background="Gainsboro">
             <Image x:Name="image_Copy" Height="121" Canvas.Left="10" Width="157" Source="Resources/img1.png" Canvas.Top="10"/>
-            <Canvas x:Name="cnv_NoteColourButtons" Height="63" Canvas.Left="403" Canvas.Top="10" Width="220" Background="White">
+            <Canvas x:Name="cnv_NoteColourButtons" Height="55" Canvas.Left="403" Canvas.Top="10" Width="370" Background="White">
                 <Canvas x:Name="cbtn_NoteColour_None" Height="32" Canvas.Left="10" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_NoteColour_Brown" Height="32" Canvas.Left="47" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_NoteColour_Teal" Height="32" Canvas.Left="84" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_NoteColour_Blue" Height="32" Canvas.Left="121" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Brown" Height="32" Canvas.Left="55" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Teal" Height="32" Canvas.Left="100" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Blue" Height="32" Canvas.Left="145" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Green" Height="32" Canvas.Left="190" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Red" Height="32" Canvas.Left="235" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Purple" Height="32" Canvas.Left="280" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_NoteColour_Yellow" Height="32" Canvas.Left="325" Canvas.Top="10" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
         <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="#FFECECEC">

@@ -79,12 +79,17 @@ namespace CommonClasses
                 Frame = new Image();
                 TagLabel = new Label();
                 Highlight = new Canvas();
-                Icon.Stretch = Stretch.Fill;
+                Icon.Stretch = Stretch.Uniform;
                 Frame.Stretch = Stretch.Fill;
                 Icon.Tag = this;
                 Frame.Tag = this;
                 Highlight.Tag = this;
                 TagLabel.FontWeight = FontWeights.DemiBold;
+
+                Icon.Height = SizeIcon;
+                Icon.Width = SizeIcon;
+
+
 
                 Highlight.Height = SizeIcon;
                 Highlight.Width = SizeIcon;
@@ -684,7 +689,18 @@ namespace CommonClasses
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_12.png"))
 
             };
-
+            
+            private static readonly BitmapImage[] NoteIcons = new BitmapImage[]{
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_0.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_1.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_2.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_3.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_4.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_5.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_6.png")),
+                new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_7.png"))
+            };
+            
             #endregion
 
             public static BitmapImage IconFrame(ButtonState f_state) {
@@ -708,6 +724,10 @@ namespace CommonClasses
             }
             public static BitmapSource MeasureImg(MeasureSize f_size) {
                 return ConvertBitmapTo96DPI(Measures[(int)f_size]);
+            }
+
+            public static BitmapSource noteIcons(OctaveColour f_oct) {
+                return NoteIcons[(int)f_oct];
             }
 
             public static BitmapSource ConvertBitmapTo96DPI(BitmapImage bitmapImage) {
