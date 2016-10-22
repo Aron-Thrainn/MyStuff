@@ -19,6 +19,9 @@ using CPSM.Forms;
 
 /*
     ToDo:
+    Make measures fill out multiple columns
+    add numbers to measures
+
     global mouse event handler
     Hotkey Control
 
@@ -48,9 +51,8 @@ namespace CPSM
         //public SongControl _SongCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
         public Version _vers { get; set; }
-        public NoteColourForm _FormNoteColour { get; set; }
         private Hotkeycontrol _keyCtrl { get; set; }
-    
+
 
 
         public MainWindow() {
@@ -68,6 +70,7 @@ namespace CPSM
             _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
     
             InitFormNoteColour();
+            InitFormMeasureCreator();
 
             TestModal();
 
@@ -89,31 +92,31 @@ namespace CPSM
 
             switch (e.Key) {
                 case Key.Q: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Brown);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Brown);
                         break;
                     }
                 case Key.W: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Teal);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Teal);
                         break;
                     }
                 case Key.E: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Blue);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Blue);
                         break;
                     }
                 case Key.R: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Green);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Green);
                         break;
                     }
                 case Key.T: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Red);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Red);
                         break;
                     }
                 case Key.Y: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Purple);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Purple);
                         break;
                     }
                 case Key.U: {
-                        _FormNoteColour.SimulateClickDown(OctaveColour.Yellow);
+                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Yellow);
                         break;
                     }
             }
@@ -122,31 +125,31 @@ namespace CPSM
 
             switch (e.Key) {
                 case Key.Q: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Brown);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Brown);
                         break;
                     }
                 case Key.W: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Teal);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Teal);
                         break;
                     }
                 case Key.E: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Blue);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Blue);
                         break;
                     }
                 case Key.R: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Green);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Green);
                         break;
                     }
                 case Key.T: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Red);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Red);
                         break;
                     }
                 case Key.Y: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Purple);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Purple);
                         break;
                     }
                 case Key.U: {
-                        _FormNoteColour.SimulateClickUp(OctaveColour.Yellow);
+                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Yellow);
                         break;
                     }
             }
@@ -156,21 +159,24 @@ namespace CPSM
         }
 
         private void InitFormNoteColour() {
-            _FormNoteColour = new NoteColourForm(cnv_NoteColourButtons, _MouseCtrl._noteCtrl._colourctrl);
+            var f_FormNoteColour = new NoteColourForm(cnv_NoteColourButtons, _MouseCtrl._noteCtrl._colourctrl);
 
-            var tempList = new List<Canvas>();
-            tempList.Add(cbtn_NoteColour_None);
-            tempList.Add(cbtn_NoteColour_Brown);
-            tempList.Add(cbtn_NoteColour_Teal);
-            tempList.Add(cbtn_NoteColour_Blue);
-            tempList.Add(cbtn_NoteColour_Green);
-            tempList.Add(cbtn_NoteColour_Red);
-            tempList.Add(cbtn_NoteColour_Purple);
-            tempList.Add(cbtn_NoteColour_Yellow);
+            var f_tempList = new List<Canvas>();
+            f_tempList.Add(cbtn_NoteColour_None);
+            f_tempList.Add(cbtn_NoteColour_Brown);
+            f_tempList.Add(cbtn_NoteColour_Teal);
+            f_tempList.Add(cbtn_NoteColour_Blue);
+            f_tempList.Add(cbtn_NoteColour_Green);
+            f_tempList.Add(cbtn_NoteColour_Red);
+            f_tempList.Add(cbtn_NoteColour_Purple);
+            f_tempList.Add(cbtn_NoteColour_Yellow);
 
-            _FormNoteColour.Init(tempList);
+            _GUI.initNoteColourForm(f_FormNoteColour, f_tempList);
         }
-        
+        private void InitFormMeasureCreator() {
+            var f_measurecreatorform = new MeasureCreatorForm(cnv_MeasureCreatorForm, cbtn_createmeasure ,cbtn_deletemeasure, cbo_measuresizes);
+            _GUI.initMeasureCreatorForm(f_measurecreatorform);            
+        }
         public void TestModal() {
             var testsong = new SongData(0) {
                 Name = "We Stand for Everfree",
