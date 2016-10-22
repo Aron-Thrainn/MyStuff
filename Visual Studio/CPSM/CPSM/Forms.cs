@@ -39,11 +39,15 @@ namespace CPSM
                     RadioButtons.Add(tempbtn);
                 }
             }
+
+
+
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
                 _MouseCtrl.ActiveColour = (OctaveColour)btn.Tag;
                 _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
             }
+
             public void SimulateClickDown(OctaveColour f_col) {
                 CustomRadioButton tempbtn = null;
                 foreach (var btn in RadioButtons) {
@@ -57,6 +61,7 @@ namespace CPSM
 
 
             }
+
             public void SimulateClickUp(OctaveColour f_col) {
                 CustomRadioButton tempbtn = null;
                 foreach (var btn in RadioButtons) {
@@ -71,39 +76,6 @@ namespace CPSM
 
             }
         }
-
-        public class MeasureCreatorForm
-        {
-            public Canvas MainCan { get; set; }
-            public CustomButton CreateButton { get; set; }
-            public CustomButton DeleteButton { get; set; }
-            public ComboBox ComboList { get; set; }
-            public SongCanvas _Song { get; set; }
-
-            public MeasureCreatorForm(Canvas f_can, Canvas f_cbtn_create, Canvas f_cbtn_delete, ComboBox f_combo) {
-                MainCan = f_can;
-                ComboList = f_combo;
-
-                CreateButton = new CustomButton(f_cbtn_create);
-                CreateButton.SetButtonClickEvent(ClickEvent_create);
-                CreateButton.SetImg(ImageControl.IconAnnual);
-
-                DeleteButton = new CustomButton(f_cbtn_delete);
-                DeleteButton.SetButtonClickEvent(ClickEvent_delete);
-                DeleteButton.SetImg(ImageControl.IconDelete);
-            }
-
-            public void ClickEvent_create(object sender, MouseButtonEventArgs e) {
-                var btn = sender as CustomButton;
-
-                MeasureSize f_selectedSize = (MeasureSize)((ComboList.SelectedIndex * 2) + 4);
-                _Song.AddNewMeasure(f_selectedSize);
-            }
-            public void ClickEvent_delete(object sender, MouseButtonEventArgs e) {
-                _Song.DeleteMeasure();
-            }
-        }
-
 
 
         public class FormSongSelect

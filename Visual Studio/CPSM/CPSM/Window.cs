@@ -25,24 +25,12 @@ namespace CPSM
         public MainWindow _Window { get; set; }
         public Canvas Can { get; set; }
         public SongCanvas _SongCan { get; set; }
-        public NoteColourForm _FormNoteColour { get; set; }
-        public MeasureCreatorForm _FormMeasureCreator { get; set; }
 
         public GUI(MainWindow f_wind, Canvas f_can, SongCanvas f_songcan) {
             _Window = f_wind;
             Can = f_can;
-            _SongCan = f_songcan;
         }
-
-        public void initNoteColourForm(NoteColourForm f_form ,List<Canvas> f_cans) {
-            _FormNoteColour = f_form;
-            _FormNoteColour.Init(f_cans);
-        }
-        public void initMeasureCreatorForm(MeasureCreatorForm f_form) {
-            _FormMeasureCreator = f_form;
-            _FormMeasureCreator._Song = _SongCan;
-        }
-
+        
     }
     
     public class SongCanvas {
@@ -70,15 +58,7 @@ namespace CPSM
         public void CreateNoteDisplay(Canvas f_can) {
             _NoteDisp = new NoteDisplay(f_can);
         }
-        public void AddNewMeasure(MeasureSize f_size) {
-            ActiveSongData.AddMeasure(f_size);
-            var f_tempmes = new MeasureData(ActiveSongData, f_size);
-            _Creator.CreateMeasure(f_tempmes, true);
-        }
-        public void DeleteMeasure() {
-            ActiveSongData.DeleteMeasure();
-            _Creator.DeleteMeasure();
-        }
+
         public void InitializeNoteDisplay(Canvas f_can) {
             _NoteDisp = new NoteDisplay(f_can);
         }
