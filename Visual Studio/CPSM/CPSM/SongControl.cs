@@ -137,6 +137,9 @@ namespace CPSM
             var NewMeasure = new MeasureData(this, f_size);
             Measures.Add(NewMeasure);
         }
+        public void DeleteMeasure() {
+            Measures.RemoveAt(Measures.Count-1);
+        }
     }
     public class MeasureData {
         public NoteData[,] WhiteNotes { get; set; }

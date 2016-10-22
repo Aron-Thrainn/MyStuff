@@ -41,15 +41,19 @@ namespace CPSM
             public void LoadSong(SongData f_song) {
                 MeasureStack.Children.Clear();
                 foreach (var mes in f_song.Measures) {
-                    CreateMeasure(mes);
+                    CreateMeasure(mes, false);
                 }
                 TitleBox.Content = f_song.Name;
                 SourceBox.Content = f_song.Source;
             }
-            public void CreateMeasure(MeasureData f_measure) {
-                var modal = new MeasureViewModal(f_measure, _Mouse, this);
+            public void CreateMeasure(MeasureData f_measure, bool f_empty) {
+                var modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty);
                 Measures.Add(modal);
                 MeasureStack.Children.Add(modal.Can);
+            }
+            public void DeleteMeasure() {
+                MeasureStack.Children.RemoveAt(Measures.Count - 1);
+                Measures.RemoveAt(Measures.Count-1);
             }
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
@@ -144,14 +148,14 @@ namespace CPSM
             public BlackNoteViewModal[,] BlackNotes { get; set; }
             public MeasureSize Size { get; set; }
             public SongViewModalCreator Parent { get; set; }
-
-            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse, SongViewModalCreator f_parent) {
+            
+            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse, SongViewModalCreator f_parent, bool f_empty) {
                 Size = f_measure.Size;
                 WhiteNotes = new WhiteNoteViewModal[14, (int)Size];
                 BlackNotes = new BlackNoteViewModal[10, (int)Size];
                 Parent = f_parent;
                 Can = new Canvas() {
-                    Height = ImageControl.MeasureImg(Size).Height-2, //-2 for the seperator
+                    Height = ImageControl.MeasureImg(Size).Height - 2, //-2 for the seperator
                     Width = 220
                 };
                 ModalImg = new Image() {
@@ -164,7 +168,7 @@ namespace CPSM
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, this, i, o);
                         var temptemplate = new NoteTemplate(f_measure.WhiteNotes[i, o]);
-                        tempNote.SetColour(temptemplate);
+                        if (!f_empty) tempNote.SetColour(temptemplate);
                         WhiteNotes[i, o] = tempNote;
                     }
                 }
