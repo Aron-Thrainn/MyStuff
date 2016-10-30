@@ -20,10 +20,8 @@ using CPSM.Forms;
 /*
     ToDo:
     Make measures fill out multiple columns
-    add numbers to measures
+    Black notes
 
-    global mouse event handler
-    Hotkey Control
 
 
     Was working on save song & hotkeys last time
@@ -34,6 +32,9 @@ using CPSM.Forms;
 /*
     Done:
     change songdata data structure
+    Add numbers to measures
+    global mouse event handler
+    Hotkey Control
 
 
 */
@@ -198,19 +199,23 @@ namespace CPSM
                     testmeasure2.WhiteNotes[i, o].SetColour(OctaveColour.none);
                 }
             }
-
+            
             testmeasure.WhiteNotes[0, 0].SetColour(OctaveColour.Brown);
             testmeasure.WhiteNotes[0, 1].SetColour(OctaveColour.Teal);
             testmeasure.WhiteNotes[0, 2].SetColour(OctaveColour.Blue);
             testmeasure.WhiteNotes[0, 3].SetColour(OctaveColour.Green);
             testmeasure.WhiteNotes[0, 4].SetColour(OctaveColour.Red);
-            testmeasure.WhiteNotes[0, 5].SetColour(OctaveColour.Purple);
+            testmeasure.WhiteNotes[0, 5].SetColour(OctaveColour.Yellow);
             testmeasure.WhiteNotes[0, 6].SetColour(OctaveColour.Yellow);
             testmeasure.WhiteNotes[13, 9].SetColour(OctaveColour.Green);
-            testmeasure.WhiteNotes[8, 11].SetColour(OctaveColour.Yellow);
-            testmeasure.WhiteNotes[10, 10].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[8, 10].SetColour(OctaveColour.Yellow);
+            
+            for (int i=0; i<14; i++) {
+                testmeasure.WhiteNotes[i, 11].SetColour(OctaveColour.Purple);
+                testmeasure2.WhiteNotes[i, 3].SetColour(OctaveColour.Purple);
+            }
 
-
+            
             var notetemp1 = new NoteTemplate();
             notetemp1.SetHalfColour(Half.Left, OctaveColour.Teal);
             notetemp1.SetHalfColour(Half.Right, OctaveColour.Blue);
@@ -252,7 +257,7 @@ namespace CPSM
             testmeasure.WhiteNotes[8, 8].SetColour(OctaveColour.Brown);
 
 
-
+            
             testsong.Measures.Add(testmeasure);
             testsong.Measures.Add(testmeasure2);
 

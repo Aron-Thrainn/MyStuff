@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows;
@@ -24,11 +25,12 @@ namespace CPSM
             public Label TitleBox { get; set; }
             public Label SourceBox { get; set; }
             public Label VersionBox { get; set; }
+            private NoteInitializer _Initializer { get; set; }
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox) {
                 //MeasuresCan = f_measurecan;
                 MeasureStack = new StackPanel() {
-                    Margin = new Thickness(10, 10, 0, 0)
+                    Margin = new Thickness(20, 10, 0, 0)
                 };
                 f_measurecan.Children.Add(MeasureStack);
                 _Mouse = f_mousectrl;
@@ -36,6 +38,8 @@ namespace CPSM
 
                 TitleBox = f_titlebox;
                 SourceBox = f_sourcebox;
+
+                _Initializer = new NoteInitializer();
             }
 
             public void LoadSong(SongData f_song) {
@@ -47,13 +51,15 @@ namespace CPSM
                 SourceBox.Content = f_song.Source;
             }
             public void CreateMeasure(MeasureData f_measure, bool f_empty) {
-                var modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty);
+                var modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty, Measures.Count + 1);
                 Measures.Add(modal);
                 MeasureStack.Children.Add(modal.Can);
             }
             public void DeleteMeasure() {
+                var f_mes = Measures.ElementAt(Measures.Count - 1);
+                f_mes.Exists = false;
                 MeasureStack.Children.RemoveAt(Measures.Count - 1);
-                Measures.RemoveAt(Measures.Count-1);
+                Measures.RemoveAt(Measures.Count - 1);
             }
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
@@ -81,6 +87,49 @@ namespace CPSM
                     }
                 }
                 throw new Exception();
+            }
+
+            public void EnqueueNote(NoteViewModal f_note) {
+                _Initializer.AddNote(f_note);
+            }
+
+            public class NoteInitializer
+            {
+                private readonly double INTERVAL = 0.0001;
+                public Queue<NoteViewModal> NoteQueue { get; set; }
+                public DispatcherTimer Timer { get; set; }
+                public bool SleepMode { get; set; }
+
+
+                public NoteInitializer() {
+                    NoteQueue = new Queue<NoteViewModal>();
+                    Timer = new DispatcherTimer();
+                    Timer.Interval = TimeSpan.FromSeconds(INTERVAL);
+                    Timer.Tick += Timer_Tick;
+                    SleepMode = true;
+                }
+
+                private void Timer_Tick(object sender, EventArgs e) {
+                    if (NoteQueue.Count == 0) {
+                        SleepMode = true;
+                        Timer.Stop();
+                        return;
+                    }
+                    var f_note = NoteQueue.Dequeue();
+                    if (f_note.Parent.Exists) {
+                        f_note.Initialize();
+                    }else {
+                        Timer_Tick(null, null);
+                    }
+                }
+                public void AddNote(NoteViewModal f_note) {
+                    if (SleepMode) {
+                        SleepMode = false;
+                        Timer.Start();
+                    }
+
+                    NoteQueue.Enqueue(f_note);
+                }
             }
         }
 
@@ -144,12 +193,15 @@ namespace CPSM
         {
             public Canvas Can { get; set; }
             public Image ModalImg { get; set; }
+            public Label MeasureCount { get; set; }
             public WhiteNoteViewModal[,] WhiteNotes { get; set; }
             public BlackNoteViewModal[,] BlackNotes { get; set; }
             public MeasureSize Size { get; set; }
             public SongViewModalCreator Parent { get; set; }
-            
-            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse, SongViewModalCreator f_parent, bool f_empty) {
+            public bool Exists { get; set; } // for use by note initializer
+
+            public MeasureViewModal(MeasureData f_measure, MouseNoteControl f_mouse, SongViewModalCreator f_parent, bool f_empty, int f_measurecount) {
+                Exists = true;
                 Size = f_measure.Size;
                 WhiteNotes = new WhiteNoteViewModal[14, (int)Size];
                 BlackNotes = new BlackNoteViewModal[10, (int)Size];
@@ -163,18 +215,26 @@ namespace CPSM
                     Width = 220,
                     Stretch = Stretch.None
                 };
+                MeasureCount = new Label() {
+                    Content = f_measurecount.ToString(),
+                    Height = 40,
+                    Width = 30,
+                    Margin = new Thickness(-20, 5, 0, 0),
+
+                };
                 Can.Children.Add(ModalImg);
+                Can.Children.Add(MeasureCount);
                 for (int i = 0; i < 14; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, this, i, o);
-                        var temptemplate = new NoteTemplate(f_measure.WhiteNotes[i, o]);
-                        if (!f_empty) tempNote.SetColour(temptemplate);
+                        tempNote._TempVars.empty = f_empty;
+                        Parent.EnqueueNote(tempNote);
                         WhiteNotes[i, o] = tempNote;
                     }
                 }
                 for (int i = 0; i < 10; i++) {
                     for (int o = 0; o < (int)Size; o++) {
-                        var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this);
+                        var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this, i, o);
                         BlackNotes[i, o] = tempNote;
                     }
                 }
@@ -243,7 +303,7 @@ namespace CPSM
                                 //note above is in previous measure
                                 var f_previousmeasure = Parent.GetpreviousMeasure(this);
                                 if (f_previousmeasure != null) {
-                                    return f_previousmeasure.WhiteNotes[ii, (int)f_previousmeasure.Size-1];
+                                    return f_previousmeasure.WhiteNotes[ii, (int)f_previousmeasure.Size - 1];
                                 }
                                 else {
                                     return null;
@@ -266,7 +326,7 @@ namespace CPSM
                                 //note above is in previous measure
                                 var f_previousmeasure = Parent.GetpreviousMeasure(this);
                                 if (f_previousmeasure != null) {
-                                    return f_previousmeasure.BlackNotes[ii, (int)f_previousmeasure.Size-1];
+                                    return f_previousmeasure.BlackNotes[ii, (int)f_previousmeasure.Size - 1];
                                 }
                                 else {
                                     return null;
@@ -290,11 +350,14 @@ namespace CPSM
             public Canvas NoteCan { get; set; }
             public Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
             public MeasureViewModal Parent { get; set; }
+            public NoteVars _TempVars { get; set; }
 
-            public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent) {
+            public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) {
                 CounterPart = f_note;
                 _Mouse = f_mouse;
                 Parent = f_parent;
+
+                _TempVars = new NoteVars(f_measureCan, f_xpos, f_ypos);
             }
 
             public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
@@ -323,6 +386,7 @@ namespace CPSM
             }
             public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
             public virtual void SetColour(NoteTemplate f_template) { }
+            public virtual void Initialize() { }
 
             public void ClearNote() {
                 SetColour(new NoteTemplate());
@@ -349,13 +413,8 @@ namespace CPSM
             public int x { get; set; }
             public int y { get; set; }
 
-            public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent) {
-                NoteCan = new Canvas();
-                Halves = new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal>(new WhiteNoteHalfViewModal(NoteCan, Half.Left, this), new WhiteNoteHalfViewModal(NoteCan, Half.Right, this));
-                f_measureCan.Children.Add(NoteCan);
-                SetPosition(f_xpos, f_ypos);
-                x = f_xpos;
-                y = f_ypos;
+            public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
+                
             }
 
             public void SetPosition(int f_xpos, int f_ypos) {
@@ -382,6 +441,22 @@ namespace CPSM
                 NoteCan.Margin = new Thickness(xx, yy, 0, 0);
             }
 
+            public override void Initialize() {
+                NoteCan = new Canvas();
+                Halves = new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal>(new WhiteNoteHalfViewModal(NoteCan, Half.Left, this), new WhiteNoteHalfViewModal(NoteCan, Half.Right, this));
+                _TempVars.MeasureCan.Children.Add(NoteCan);
+                if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
+                //debug
+                //SetColourHelper(OctaveColour.Blue);
+                if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
+                    x = _TempVars.xpos.Value;
+                    y = _TempVars.ypos.Value;
+                    SetPosition(x, y);
+                }
+                else throw new Exception();
+
+                _TempVars = null;
+            }
             public override void SetColour(NoteTemplate f_template) {
                 //clear note and paste
                 if (f_template == null) {
@@ -405,7 +480,7 @@ namespace CPSM
                 foreach (var bit in Halves.Item2.Bits) {
                     bit.setOct(f_oct);
                 }
-                
+
                 CounterPart.SetColour(f_oct);
             }
             protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
@@ -577,7 +652,7 @@ namespace CPSM
             public new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal> Halves { get; set; }
             public bool Debugvar { get; set; }
 
-            public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent) : base(f_note, f_measureCan, f_mouse, f_parent) {
+            public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
                 Debugvar = true;
                 //create note halves
                 //create canvas/stack panel
@@ -602,7 +677,7 @@ namespace CPSM
 
             public NoteTemplate() {
                 Init();
-                for (int i=0; i<16; i++) {
+                for (int i = 0; i < 16; i++) {
                     Colours[i] = OctaveColour.none;
                     Positions[i] = (NoteBitPos)i;
                 }
@@ -806,5 +881,21 @@ namespace CPSM
                 //probably wont use
             }
         }
+
+        public class NoteVars
+        {
+            public Canvas MeasureCan { get; set; }
+            public int? xpos { get; set; }
+            public int? ypos { get; set; }
+            public bool empty { get; set; }
+
+            public NoteVars(Canvas f_measureCan, int? f_xpos, int? f_ypos) {
+                MeasureCan = f_measureCan;
+                xpos = f_xpos;
+                ypos = f_ypos;
+                empty = false; // initialize to true could make non-empty notes to be shown as empty
+            }
+        }
     }
 }
+
