@@ -184,8 +184,7 @@ namespace CPSM
                     }
 
                 }
-                //default
-                return new Int32Rect(0, 0, 6, 2);
+                throw new Exception();
             }
         }
 
@@ -427,30 +426,8 @@ namespace CPSM
                 Pos = f_pos;
                 Oct = OctaveColour.none;
 
-                ClickableGrid = new Grid() {
-                    Height = 2,
-                    Width = 6,
-                    Background = Brushes.Transparent
-                };
+                
 
-                NoteBitImg = new Image() {
-                    Height = 2,
-                    Width = 6,
-                    Stretch = Stretch.None
-                };
-                ClickableGrid.Children.Add(NoteBitImg);
-                NoteCan.Children.Add(ClickableGrid);
-
-                //debug:
-                //setOct(OctaveColour.Blue, f_pos);
-
-                ClickableGrid.MouseLeftButtonDown += new MouseButtonEventHandler(BitLeftClickDown);
-                ClickableGrid.MouseLeftButtonUp += new MouseButtonEventHandler(BitLeftClickUp);
-                ClickableGrid.MouseRightButtonDown += new MouseButtonEventHandler(BitRightClickDown);
-                ClickableGrid.MouseRightButtonUp += new MouseButtonEventHandler(BitRightClickUp);
-                ClickableGrid.MouseEnter += new MouseEventHandler(BitMouseEnter);
-                ClickableGrid.MouseLeave += new MouseEventHandler(BitMouseLeave);
-                setPos(f_pos);
 
             }
 
@@ -476,6 +453,19 @@ namespace CPSM
                 ParentNote.NoteMouseLeave(sender, e);
             }
 
+            protected virtual void InitClickableGrid() { }
+            protected void InitClickableGrid2() {
+                ClickableGrid.Children.Add(NoteBitImg);
+                NoteCan.Children.Add(ClickableGrid);
+                setPos(Pos);
+
+                ClickableGrid.MouseLeftButtonDown += new MouseButtonEventHandler(BitLeftClickDown);
+                ClickableGrid.MouseLeftButtonUp += new MouseButtonEventHandler(BitLeftClickUp);
+                ClickableGrid.MouseRightButtonDown += new MouseButtonEventHandler(BitRightClickDown);
+                ClickableGrid.MouseRightButtonUp += new MouseButtonEventHandler(BitRightClickUp);
+                ClickableGrid.MouseEnter += new MouseEventHandler(BitMouseEnter);
+                ClickableGrid.MouseLeave += new MouseEventHandler(BitMouseLeave);
+            }
             protected void CheckForNote() {
                 //make empty notes invisible
                 if (Oct == OctaveColour.none) {
@@ -487,6 +477,7 @@ namespace CPSM
             }
 
         }
+        #region whitenotes
         public class WhiteNoteViewModal : NoteViewModal
         {
             public new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
@@ -625,7 +616,7 @@ namespace CPSM
         {
 
             public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) : base(f_notecan, f_pos, f_parent) {
-
+                InitClickableGrid();
             }
 
             public override void setPos(NoteBitPos f_pos) {
@@ -658,9 +649,25 @@ namespace CPSM
                 Oct = f_oct;
                 CheckForNote();
             }
-        }
-        
 
+            protected override void InitClickableGrid() {
+                ClickableGrid = new Grid() {
+                    Height = 2,
+                    Width = 6,
+                    Background = Brushes.Transparent
+                };
+
+                NoteBitImg = new Image() {
+                    Height = 2,
+                    Width = 6,
+                    Stretch = Stretch.None
+                };
+
+                InitClickableGrid2();
+            }
+        }
+
+        #endregion
 
         public class BlackNoteViewModal : NoteViewModal
         {
@@ -669,35 +676,35 @@ namespace CPSM
             public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
 
             }
-
-
+            
             public override void SetPosition(int f_xpos, int f_ypos) {
                 int xx = 0, yy;
 
                 switch (f_xpos) {
-                    case 0: { xx = 10; break; }
-                    case 1: { xx = 26; break; }
-                    case 2: { xx = 54; break; }
-                    case 3: { xx = 70; break; }
-                    case 4: { xx = 85; break; }
-                    case 5: { xx = 126; break; }
-                    case 6: { xx = 142; break; }
-                    case 7: { xx = 170; break; }
-                    case 8: { xx = 186; break; }
-                    case 9: { xx = 202; break; }
+                    case 0: { xx = 8; break; }
+                    case 1: { xx = 24; break; }
+                    case 2: { xx = 52; break; }
+                    case 3: { xx = 68; break; }
+                    case 4: { xx = 84; break; }
+                    case 5: { xx = 124; break; }
+                    case 6: { xx = 140; break; }
+                    case 7: { xx = 168; break; }
+                    case 8: { xx = 184; break; }
+                    case 9: { xx = 200; break; }
                 }
+                xx += 1; // offset shortcut
+
                 yy = (1 + (f_ypos * 16));
 
                 NoteCan.Margin = new Thickness(xx, yy, 0, 0);
             }
-
             public override void Initialize() {
                 NoteCan = new Canvas();
                 Halves = new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal>(new BlackNoteHalfViewModal(NoteCan, Half.Left, this), new BlackNoteHalfViewModal(NoteCan, Half.Right, this));
                 _TempVars.MeasureCan.Children.Add(NoteCan);
-                //if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
+                if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
                 //debug
-                SetColourHelper(OctaveColour.Blue);
+                //SetColourHelper(OctaveColour.Blue);
                 if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
                     x = _TempVars.xpos.Value;
                     y = _TempVars.ypos.Value;
@@ -722,30 +729,6 @@ namespace CPSM
                     count++;
                 }
             }
-
-            protected override void SetColourHelper(OctaveColour f_oct) {
-                foreach (var bit in Halves.Item1.Bits) {
-                    bit.setOct(f_oct);
-                }
-                foreach (var bit in Halves.Item2.Bits) {
-                    bit.setOct(f_oct);
-                }
-
-                CounterPart.SetColour(f_oct);
-            }
-            protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
-                BlackNoteHalfViewModal half;
-                if (f_half == Half.Left) { half = Halves.Item1; }
-                else { half = Halves.Item2; }
-
-                foreach (var bit in half.Bits) {
-                    bit.setOct(f_oct);
-                }
-
-                var template = new NoteTemplate(this);
-                CounterPart.SetColour(template);
-            }
-
             public override void SetPreview(NoteTemplate f_preview) {
                 int counter = 0;
                 foreach (var f_bit in Halves.Item1.Bits) {
@@ -777,6 +760,30 @@ namespace CPSM
             public override void ClearPreview() {
                 SetColour(new NoteTemplate(CounterPart));
             }
+
+            protected override void SetColourHelper(OctaveColour f_oct) {
+                foreach (var bit in Halves.Item1.Bits) {
+                    bit.setOct(f_oct);
+                }
+                foreach (var bit in Halves.Item2.Bits) {
+                    bit.setOct(f_oct);
+                }
+
+                CounterPart.SetColour(f_oct);
+            }
+            protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
+                BlackNoteHalfViewModal half;
+                if (f_half == Half.Left) { half = Halves.Item1; }
+                else { half = Halves.Item2; }
+
+                foreach (var bit in half.Bits) {
+                    bit.setOct(f_oct);
+                }
+
+                var template = new NoteTemplate(this);
+                CounterPart.SetColour(template);
+            }
+
         
         }
 
@@ -798,27 +805,27 @@ namespace CPSM
         public class BlackNoteBitViewModal : NoteBitViewModal
         {
             public BlackNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) : base(f_notecan, f_pos, f_parent) {
-
+                InitClickableGrid();
             }
 
             public override void setPos(NoteBitPos f_pos) {
                 switch (f_pos) {
-                    case NoteBitPos.a1: { ClickableGrid.Margin = new Thickness(0, 0, 0, 0); break; }
-                    case NoteBitPos.a2: { ClickableGrid.Margin = new Thickness(0, 2, 0, 0); break; }
-                    case NoteBitPos.a3: { ClickableGrid.Margin = new Thickness(0, 4, 0, 0); break; }
-                    case NoteBitPos.a4: { ClickableGrid.Margin = new Thickness(0, 6, 0, 0); break; }
-                    case NoteBitPos.a5: { ClickableGrid.Margin = new Thickness(0, 8, 0, 0); break; }
-                    case NoteBitPos.a6: { ClickableGrid.Margin = new Thickness(0, 10, 0, 0); break; }
-                    case NoteBitPos.a7: { ClickableGrid.Margin = new Thickness(0, 12, 0, 0); break; }
-                    case NoteBitPos.a8: { ClickableGrid.Margin = new Thickness(0, 14, 0, 0); break; }
-                    case NoteBitPos.b1: { ClickableGrid.Margin = new Thickness(6, 0, 0, 0); break; }
-                    case NoteBitPos.b2: { ClickableGrid.Margin = new Thickness(6, 2, 0, 0); break; }
-                    case NoteBitPos.b3: { ClickableGrid.Margin = new Thickness(6, 4, 0, 0); break; }
-                    case NoteBitPos.b4: { ClickableGrid.Margin = new Thickness(6, 6, 0, 0); break; }
-                    case NoteBitPos.b5: { ClickableGrid.Margin = new Thickness(6, 8, 0, 0); break; }
-                    case NoteBitPos.b6: { ClickableGrid.Margin = new Thickness(6, 10, 0, 0); break; }
-                    case NoteBitPos.b7: { ClickableGrid.Margin = new Thickness(6, 12, 0, 0); break; }
-                    case NoteBitPos.b8: { ClickableGrid.Margin = new Thickness(6, 14, 0, 0); break; }
+                    case NoteBitPos.a1: { ClickableGrid.Margin = new Thickness(2, 0, 0, 0); break; }
+                    case NoteBitPos.a2: { ClickableGrid.Margin = new Thickness(2, 2, 0, 0); break; }
+                    case NoteBitPos.a3: { ClickableGrid.Margin = new Thickness(2, 4, 0, 0); break; }
+                    case NoteBitPos.a4: { ClickableGrid.Margin = new Thickness(2, 6, 0, 0); break; }
+                    case NoteBitPos.a5: { ClickableGrid.Margin = new Thickness(2, 8, 0, 0); break; }
+                    case NoteBitPos.a6: { ClickableGrid.Margin = new Thickness(2, 10, 0, 0); break; }
+                    case NoteBitPos.a7: { ClickableGrid.Margin = new Thickness(2, 12, 0, 0); break; }
+                    case NoteBitPos.a8: { ClickableGrid.Margin = new Thickness(2, 14, 0, 0); break; }
+                    case NoteBitPos.b1: { ClickableGrid.Margin = new Thickness(5, 0, 0, 0); break; }
+                    case NoteBitPos.b2: { ClickableGrid.Margin = new Thickness(5, 2, 0, 0); break; }
+                    case NoteBitPos.b3: { ClickableGrid.Margin = new Thickness(5, 4, 0, 0); break; }
+                    case NoteBitPos.b4: { ClickableGrid.Margin = new Thickness(5, 6, 0, 0); break; }
+                    case NoteBitPos.b5: { ClickableGrid.Margin = new Thickness(5, 8, 0, 0); break; }
+                    case NoteBitPos.b6: { ClickableGrid.Margin = new Thickness(5, 10, 0, 0); break; }
+                    case NoteBitPos.b7: { ClickableGrid.Margin = new Thickness(5, 12, 0, 0); break; }
+                    case NoteBitPos.b8: { ClickableGrid.Margin = new Thickness(5, 14, 0, 0); break; }
                 }
             }
             public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
@@ -830,6 +837,29 @@ namespace CPSM
                 NoteBitImg.Source = BitImages.GetBitImg(Pos, f_oct, NoteType.Black);
                 Oct = f_oct;
                 CheckForNote();
+            }
+
+            protected override void InitClickableGrid() {
+                ClickableGrid = new Grid() {
+                    Height = 2,
+                    Width = 3,
+                    Background = Brushes.Transparent
+                };
+
+                NoteBitImg = new Image() {
+                    Height = 2,
+                    Width = 5,
+                    Stretch = Stretch.None
+                };
+                if ((int)Pos > 7) {
+                    NoteBitImg.Margin = new Thickness(0, 0, -2, 0);
+                }
+                else {
+                    NoteBitImg.Margin = new Thickness(-2, 0, 0, 0);
+                }
+
+
+                InitClickableGrid2();
             }
         }
 

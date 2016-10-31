@@ -20,7 +20,6 @@ using CPSM.Forms;
 /*
     ToDo:
     Make measures fill out multiple columns
-    Black notes
     handle rightclick while creating a long note
 
 
@@ -36,6 +35,7 @@ using CPSM.Forms;
     Add numbers to measures
     global mouse event handler
     Hotkey Control
+    Black notes
 
 
 */
@@ -50,7 +50,6 @@ namespace CPSM
         public SongCanvas _SongCan { get; set; }
         public FormSongSelect _FormSongSelect { get; set; }
         public MouseControl _MouseCtrl { get; set; }
-        //public SongControl _SongCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
         public Version _vers { get; set; }
         private Hotkeycontrol _keyCtrl { get; set; }

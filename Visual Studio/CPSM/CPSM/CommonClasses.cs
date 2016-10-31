@@ -651,7 +651,7 @@ namespace CommonClasses
             public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png"));
 
 
-
+            
             private static readonly BitmapImage[] WhiteNotes = new BitmapImage[]{
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a0.png")),
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png")),
@@ -700,7 +700,6 @@ namespace CommonClasses
                 new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_6.png")),
                 new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_7.png"))
             };
-            
             #endregion
 
             public static BitmapImage IconFrame(ButtonState f_state) {
