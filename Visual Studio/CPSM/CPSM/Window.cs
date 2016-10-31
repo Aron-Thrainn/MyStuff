@@ -444,14 +444,10 @@ namespace CPSM
             Note = f_note;
             NoteOverride = f_override;
             StartPoint = f_startpoint;
-            var existingnote = new NoteTemplate(f_note as WhiteNoteViewModal);
+            var existingnote = new NoteTemplate(f_note as NoteViewModal);
 
             if (!f_startpoint) {
                 f_HeldNote.SetAsExtension();
-            }
-            var f_debugnote = f_note as WhiteNoteViewModal;
-            if (f_debugnote.x == 13 && f_debugnote.y == 2) {
-
             }
 
 

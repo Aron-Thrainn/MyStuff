@@ -235,6 +235,8 @@ namespace CPSM
                 for (int i = 0; i < 10; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this, i, o);
+                        tempNote._TempVars.empty = f_empty;
+                        Parent.EnqueueNote(tempNote);
                         BlackNotes[i, o] = tempNote;
                     }
                 }
@@ -351,6 +353,8 @@ namespace CPSM
             public Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
             public MeasureViewModal Parent { get; set; }
             public NoteVars _TempVars { get; set; }
+            public int x { get; set; }
+            public int y { get; set; }
 
             public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) {
                 CounterPart = f_note;
@@ -384,14 +388,16 @@ namespace CPSM
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteMouseLeave(this, e, MousePos);
             }
-            public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
-            public virtual void SetColour(NoteTemplate f_template) { }
-            public virtual void Initialize() { }
-
             public void ClearNote() {
                 SetColour(new NoteTemplate());
                 CounterPart.SetColour(new NoteTemplate());
             }
+
+            public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
+            public virtual void SetColour(NoteTemplate f_template) { }
+            public virtual void Initialize() { }
+            public virtual void SetPosition(int f_xpos, int f_ypos) { }
+
             protected virtual void SetColourHelper(OctaveColour f_oct) { }
             protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
 
@@ -406,18 +412,90 @@ namespace CPSM
             }
         }
 
+        public class NoteBitViewModal
+        {
+            public Image NoteBitImg { get; set; }
+            public Canvas NoteCan { get; set; }
+            public NoteViewModal ParentNote { get; set; }
+            public Grid ClickableGrid { get; set; }
+            public NoteBitPos Pos { get; set; }
+            public OctaveColour Oct { get; set; }
 
+            public NoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) {
+                NoteCan = f_notecan;
+                ParentNote = f_parent;
+                Pos = f_pos;
+                Oct = OctaveColour.none;
+
+                ClickableGrid = new Grid() {
+                    Height = 2,
+                    Width = 6,
+                    Background = Brushes.Transparent
+                };
+
+                NoteBitImg = new Image() {
+                    Height = 2,
+                    Width = 6,
+                    Stretch = Stretch.None
+                };
+                ClickableGrid.Children.Add(NoteBitImg);
+                NoteCan.Children.Add(ClickableGrid);
+
+                //debug:
+                //setOct(OctaveColour.Blue, f_pos);
+
+                ClickableGrid.MouseLeftButtonDown += new MouseButtonEventHandler(BitLeftClickDown);
+                ClickableGrid.MouseLeftButtonUp += new MouseButtonEventHandler(BitLeftClickUp);
+                ClickableGrid.MouseRightButtonDown += new MouseButtonEventHandler(BitRightClickDown);
+                ClickableGrid.MouseRightButtonUp += new MouseButtonEventHandler(BitRightClickUp);
+                ClickableGrid.MouseEnter += new MouseEventHandler(BitMouseEnter);
+                ClickableGrid.MouseLeave += new MouseEventHandler(BitMouseLeave);
+                setPos(f_pos);
+
+            }
+
+            public virtual void setPos(NoteBitPos f_pos) { }
+            public virtual void setOct(OctaveColour f_oct, NoteBitPos f_pos) { }
+            public virtual void setOct(OctaveColour f_oct) { }
+            public void BitLeftClickDown(object sender, MouseButtonEventArgs e) {
+                ParentNote.NoteLeftClickDown(sender, e);
+            }
+            public void BitLeftClickUp(object sender, MouseButtonEventArgs e) {
+                ParentNote.NoteLeftClickUp(sender, e);
+            }
+            public void BitRightClickDown(object sender, MouseButtonEventArgs e) {
+                ParentNote.NoteRightClickDown(sender, e);
+            }
+            public void BitRightClickUp(object sender, MouseButtonEventArgs e) {
+                ParentNote.NoteRightClickUp(sender, e);
+            }
+            public void BitMouseEnter(object sender, MouseEventArgs e) {
+                ParentNote.NoteMouseEnter(sender, e);
+            }
+            public void BitMouseLeave(object sender, MouseEventArgs e) {
+                ParentNote.NoteMouseLeave(sender, e);
+            }
+
+            protected void CheckForNote() {
+                //make empty notes invisible
+                if (Oct == OctaveColour.none) {
+                    NoteBitImg.Opacity = 0;
+                }
+                else {
+                    NoteBitImg.Opacity = 1;
+                }
+            }
+
+        }
         public class WhiteNoteViewModal : NoteViewModal
         {
             public new Tuple<WhiteNoteHalfViewModal, WhiteNoteHalfViewModal> Halves { get; set; }
-            public int x { get; set; }
-            public int y { get; set; }
 
             public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
                 
             }
 
-            public void SetPosition(int f_xpos, int f_ypos) {
+            public override void SetPosition(int f_xpos, int f_ypos) {
                 int xx = 0, yy;
 
                 switch (f_xpos) {
@@ -543,49 +621,14 @@ namespace CPSM
                 }
             }
         }
-        public class WhiteNoteBitViewModal
+        public class WhiteNoteBitViewModal : NoteBitViewModal
         {
-            public Image NoteBitImg { get; set; }
-            public Canvas NoteCan { get; set; }
-            public NoteViewModal ParentNote { get; set; }
-            public Grid ClickableGrid { get; set; }
-            public NoteBitPos Pos { get; set; }
-            public OctaveColour Oct { get; set; }
 
-            public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) {
-                NoteCan = f_notecan;
-                ParentNote = f_parent;
-                Pos = f_pos;
-                Oct = OctaveColour.none;
-
-                ClickableGrid = new Grid() {
-                    Height = 2,
-                    Width = 6,
-                    Background = Brushes.Transparent
-                };
-
-                NoteBitImg = new Image() {
-                    Height = 2,
-                    Width = 6,
-                    Stretch = Stretch.None
-                };
-                ClickableGrid.Children.Add(NoteBitImg);
-                NoteCan.Children.Add(ClickableGrid);
-
-                //debug:
-                //setOct(OctaveColour.Blue, f_pos);
-
-                ClickableGrid.MouseLeftButtonDown += new MouseButtonEventHandler(BitLeftClickDown);
-                ClickableGrid.MouseLeftButtonUp += new MouseButtonEventHandler(BitLeftClickUp);
-                ClickableGrid.MouseRightButtonDown += new MouseButtonEventHandler(BitRightClickDown);
-                ClickableGrid.MouseRightButtonUp += new MouseButtonEventHandler(BitRightClickUp);
-                ClickableGrid.MouseEnter += new MouseEventHandler(BitMouseEnter);
-                ClickableGrid.MouseLeave += new MouseEventHandler(BitMouseLeave);
-                setPos(f_pos);
+            public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) : base(f_notecan, f_pos, f_parent) {
 
             }
 
-            public void setPos(NoteBitPos f_pos) {
+            public override void setPos(NoteBitPos f_pos) {
                 switch (f_pos) {
                     case NoteBitPos.a1: { ClickableGrid.Margin = new Thickness(0, 0, 0, 0); break; }
                     case NoteBitPos.a2: { ClickableGrid.Margin = new Thickness(0, 2, 0, 0); break; }
@@ -605,69 +648,189 @@ namespace CPSM
                     case NoteBitPos.b8: { ClickableGrid.Margin = new Thickness(6, 14, 0, 0); break; }
                 }
             }
-            public void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
+            public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
                 NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.White);
                 Oct = f_oct;
                 CheckForNote();
             }
-            public void setOct(OctaveColour f_oct) {
+            public override void setOct(OctaveColour f_oct) {
                 NoteBitImg.Source = BitImages.GetBitImg(Pos, f_oct, NoteType.White);
                 Oct = f_oct;
                 CheckForNote();
             }
-            public void BitLeftClickDown(object sender, MouseButtonEventArgs e) {
-                ParentNote.NoteLeftClickDown(sender, e);
-            }
-            public void BitLeftClickUp(object sender, MouseButtonEventArgs e) {
-                ParentNote.NoteLeftClickUp(sender, e);
-            }
-            public void BitRightClickDown(object sender, MouseButtonEventArgs e) {
-                ParentNote.NoteRightClickDown(sender, e);
-            }
-            public void BitRightClickUp(object sender, MouseButtonEventArgs e) {
-                ParentNote.NoteRightClickUp(sender, e);
-            }
-            public void BitMouseEnter(object sender, MouseEventArgs e) {
-                ParentNote.NoteMouseEnter(sender, e);
-            }
-            public void BitMouseLeave(object sender, MouseEventArgs e) {
-                ParentNote.NoteMouseLeave(sender, e);
-            }
-
-            private void CheckForNote() {
-                //make empty notes invisible
-                if (Oct == OctaveColour.none) {
-                    NoteBitImg.Opacity = 0;
-                }
-                else {
-                    NoteBitImg.Opacity = 1;
-                }
-            }
-
         }
+        
 
 
         public class BlackNoteViewModal : NoteViewModal
         {
             public new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal> Halves { get; set; }
-            public bool Debugvar { get; set; }
 
             public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
-                Debugvar = true;
-                //create note halves
-                //create canvas/stack panel
-                //set position in MeasureData canvas
-                //throw new NotImplementedException();
+
             }
+
+
+            public override void SetPosition(int f_xpos, int f_ypos) {
+                int xx = 0, yy;
+
+                switch (f_xpos) {
+                    case 0: { xx = 10; break; }
+                    case 1: { xx = 26; break; }
+                    case 2: { xx = 54; break; }
+                    case 3: { xx = 70; break; }
+                    case 4: { xx = 85; break; }
+                    case 5: { xx = 126; break; }
+                    case 6: { xx = 142; break; }
+                    case 7: { xx = 170; break; }
+                    case 8: { xx = 186; break; }
+                    case 9: { xx = 202; break; }
+                }
+                yy = (1 + (f_ypos * 16));
+
+                NoteCan.Margin = new Thickness(xx, yy, 0, 0);
+            }
+
+            public override void Initialize() {
+                NoteCan = new Canvas();
+                Halves = new Tuple<BlackNoteHalfViewModal, BlackNoteHalfViewModal>(new BlackNoteHalfViewModal(NoteCan, Half.Left, this), new BlackNoteHalfViewModal(NoteCan, Half.Right, this));
+                _TempVars.MeasureCan.Children.Add(NoteCan);
+                //if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
+                //debug
+                SetColourHelper(OctaveColour.Blue);
+                if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
+                    x = _TempVars.xpos.Value;
+                    y = _TempVars.ypos.Value;
+                    SetPosition(x, y);
+                }
+                else throw new Exception();
+
+                _TempVars = null;
+            }
+            public override void SetColour(NoteTemplate f_template) {
+                //clear note and paste
+                if (f_template == null) {
+                    return;
+                }
+                int count = 0;
+                foreach (var bit in Halves.Item1.Bits) {
+                    bit.setOct(f_template.Colours[count], f_template.Positions[count]);
+                    count++;
+                }
+                foreach (var bit in Halves.Item2.Bits) {
+                    bit.setOct(f_template.Colours[count], f_template.Positions[count]);
+                    count++;
+                }
+            }
+
+            protected override void SetColourHelper(OctaveColour f_oct) {
+                foreach (var bit in Halves.Item1.Bits) {
+                    bit.setOct(f_oct);
+                }
+                foreach (var bit in Halves.Item2.Bits) {
+                    bit.setOct(f_oct);
+                }
+
+                CounterPart.SetColour(f_oct);
+            }
+            protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
+                BlackNoteHalfViewModal half;
+                if (f_half == Half.Left) { half = Halves.Item1; }
+                else { half = Halves.Item2; }
+
+                foreach (var bit in half.Bits) {
+                    bit.setOct(f_oct);
+                }
+
+                var template = new NoteTemplate(this);
+                CounterPart.SetColour(template);
+            }
+
+            public override void SetPreview(NoteTemplate f_preview) {
+                int counter = 0;
+                foreach (var f_bit in Halves.Item1.Bits) {
+                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+
+
+                    }
+                    else {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+                    }
+                    counter++;
+                }
+                foreach (var f_bit in Halves.Item2.Bits) {
+                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
+
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+                    }
+                    else {
+                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
+                        f_bit.NoteBitImg.Opacity = 0.5;
+                    }
+                    counter++;
+                }
+            }
+            public override void ClearPreview() {
+                SetColour(new NoteTemplate(CounterPart));
+            }
+        
         }
+
         public class BlackNoteHalfViewModal
         {
             public List<BlackNoteBitViewModal> Bits { get; set; }
+            public Canvas NoteCan { get; set; }
+
+            public BlackNoteHalfViewModal(Canvas f_notecan, Half f_half, NoteViewModal f_parent) {
+                NoteCan = f_notecan;
+                Bits = new List<BlackNoteBitViewModal>();
+
+                for (int i = 0; i < 8; i++) {
+                    Bits.Add(new BlackNoteBitViewModal(NoteCan, ((NoteBitPos)i + 8 * (int)f_half), f_parent));
+                }
+            }
         }
-        public class BlackNoteBitViewModal
+
+        public class BlackNoteBitViewModal : NoteBitViewModal
         {
-            public OctaveColour Oct { get; set; }
-            public NoteBitPos Pos { get; set; }
+            public BlackNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent) : base(f_notecan, f_pos, f_parent) {
+
+            }
+
+            public override void setPos(NoteBitPos f_pos) {
+                switch (f_pos) {
+                    case NoteBitPos.a1: { ClickableGrid.Margin = new Thickness(0, 0, 0, 0); break; }
+                    case NoteBitPos.a2: { ClickableGrid.Margin = new Thickness(0, 2, 0, 0); break; }
+                    case NoteBitPos.a3: { ClickableGrid.Margin = new Thickness(0, 4, 0, 0); break; }
+                    case NoteBitPos.a4: { ClickableGrid.Margin = new Thickness(0, 6, 0, 0); break; }
+                    case NoteBitPos.a5: { ClickableGrid.Margin = new Thickness(0, 8, 0, 0); break; }
+                    case NoteBitPos.a6: { ClickableGrid.Margin = new Thickness(0, 10, 0, 0); break; }
+                    case NoteBitPos.a7: { ClickableGrid.Margin = new Thickness(0, 12, 0, 0); break; }
+                    case NoteBitPos.a8: { ClickableGrid.Margin = new Thickness(0, 14, 0, 0); break; }
+                    case NoteBitPos.b1: { ClickableGrid.Margin = new Thickness(6, 0, 0, 0); break; }
+                    case NoteBitPos.b2: { ClickableGrid.Margin = new Thickness(6, 2, 0, 0); break; }
+                    case NoteBitPos.b3: { ClickableGrid.Margin = new Thickness(6, 4, 0, 0); break; }
+                    case NoteBitPos.b4: { ClickableGrid.Margin = new Thickness(6, 6, 0, 0); break; }
+                    case NoteBitPos.b5: { ClickableGrid.Margin = new Thickness(6, 8, 0, 0); break; }
+                    case NoteBitPos.b6: { ClickableGrid.Margin = new Thickness(6, 10, 0, 0); break; }
+                    case NoteBitPos.b7: { ClickableGrid.Margin = new Thickness(6, 12, 0, 0); break; }
+                    case NoteBitPos.b8: { ClickableGrid.Margin = new Thickness(6, 14, 0, 0); break; }
+                }
+            }
+            public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
+                NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.Black);
+                Oct = f_oct;
+                CheckForNote();
+            }
+            public override void setOct(OctaveColour f_oct) {
+                NoteBitImg.Source = BitImages.GetBitImg(Pos, f_oct, NoteType.Black);
+                Oct = f_oct;
+                CheckForNote();
+            }
         }
 
         public class NoteTemplate
@@ -690,7 +853,7 @@ namespace CPSM
                     Positions[i] = f_note.Positions[i];
                 }
             }
-            public NoteTemplate(WhiteNoteViewModal f_note) {
+            public NoteTemplate(NoteViewModal f_note) {
                 Init();
 
                 for (int i = 0; i < 16; i++) {

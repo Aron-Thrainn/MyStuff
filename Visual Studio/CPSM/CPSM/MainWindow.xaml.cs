@@ -21,6 +21,7 @@ using CPSM.Forms;
     ToDo:
     Make measures fill out multiple columns
     Black notes
+    handle rightclick while creating a long note
 
 
 
