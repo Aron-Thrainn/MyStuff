@@ -22,6 +22,12 @@ using CPSM.Forms;
     Make measures fill out multiple columns
     handle rightclick while creating a long note
 
+    Rework note initialization
+      - Clickable Grid on notes does not appear to show up
+     - CHECK disconnect clickable grids from images
+     - New code for image initialization
+     - rework notepreview to have its own images
+     
 
 
     Was working on save song & hotkeys last time

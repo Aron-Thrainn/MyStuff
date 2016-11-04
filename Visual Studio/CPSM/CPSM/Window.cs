@@ -435,12 +435,20 @@ namespace CPSM
 
     public class NotePreview
     {
+        //debug
+        public Image DebugImage { get; set; }
+
         private NoteTemplate PreviewTemplate { get;  set; }
         public NoteViewModal Note { get; set; }
         public bool NoteOverride { get; set; }
         public bool StartPoint { get; set; }
 
         public NotePreview(NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override, bool f_startpoint) {
+            //debug
+            DebugImage = new Image() {
+                Source = ImageControl.NoteImg(OctaveColour.Blue, NoteType.White)
+            };
+
             Note = f_note;
             NoteOverride = f_override;
             StartPoint = f_startpoint;
@@ -457,17 +465,16 @@ namespace CPSM
 
         public void Display() {
             if (PreviewTemplate != null) {
-                Note.SetPreview(PreviewTemplate);
+                Note.NoteCan.Children.Add(DebugImage);
             }
         }
         public void Activate() {
             if (PreviewTemplate != null) {
-                Note.SetColour(PreviewTemplate);
-                Note.CounterPart.SetNote(PreviewTemplate);
+                throw new NotImplementedException();
             }
         }
         public void Cancel() {
-            Note.ClearPreview();
+            Note.NoteCan.Children.Remove(DebugImage);
         }
 
         private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_HeldNote, NoteTemplate f_ExistingNote) {
