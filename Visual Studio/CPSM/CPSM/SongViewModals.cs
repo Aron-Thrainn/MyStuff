@@ -95,7 +95,7 @@ namespace CPSM
 
             public class NoteInitializer
             {
-                private readonly double INTERVAL = 0.0001;
+                private readonly double INTERVAL = 1;
                 public Queue<NoteViewModal> NoteQueue { get; set; }
                 public DispatcherTimer Timer { get; set; }
                 public bool SleepMode { get; set; }
@@ -111,7 +111,7 @@ namespace CPSM
 
                 private void Timer_Tick(object sender, EventArgs e) {
                     //debug
-                    /*
+                    
                     if (NoteQueue.Count == 0) {
                         SleepMode = true;
                         Timer.Stop();
@@ -122,7 +122,7 @@ namespace CPSM
                         f_note.Initialize();
                     }else {
                         Timer_Tick(null, null);
-                    }*/
+                    }
                 }
                 public void AddNote(NoteViewModal f_note) {
                     if (SleepMode) {
@@ -351,7 +351,7 @@ namespace CPSM
             public NoteData CounterPart { get; set; }
             public MouseNoteControl _Mouse { get; set; }
             public Canvas NoteCan { get; set; }
-            public List<Grid> ClickableGrid { get; set; }
+            public List<Canvas> ClickableGrid { get; set; }
             public MeasureViewModal Parent { get; set; }
             public NoteVars _TempVars { get; set; }
             public bool Initialized { get; set; }
@@ -365,27 +365,27 @@ namespace CPSM
                 _TempVars = new NoteVars(f_measureCan, f_xpos, f_ypos);
             }
 
-            public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteLeftClickedDown(this, e, MousePos);
             }
-            public void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteLeftClickedUp(this, e, MousePos);
             }
-            public void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteRightClickedDown(this, e, MousePos);
             }
-            public void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteRightClickedUp(this, e, MousePos);
             }
-            public void NoteMouseEnter(object sender, MouseEventArgs e) {
+            public virtual void NoteMouseEnter(object sender, MouseEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteMouseEnter(this, e, MousePos);
             }
-            public void NoteMouseLeave(object sender, MouseEventArgs e) {
+            public virtual void NoteMouseLeave(object sender, MouseEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
                 _Mouse.NoteMouseLeave(this, e, MousePos);
             }
@@ -404,7 +404,6 @@ namespace CPSM
             public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
 
             public virtual void SetColour(NoteTemplate f_template) { }
-            public virtual void SetPreview(NoteTemplate f_preview) { }
             public virtual void ClearPreview() { }
             protected virtual void SetColourHelper(OctaveColour f_oct) { }
             protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
@@ -461,6 +460,8 @@ namespace CPSM
                     Height = 16,
                     Width = 12
                 };
+                f_parent.Can.Children.Add(NoteCan);
+                SetPosition(f_xpos, f_ypos);
                 InitializeClickableGrid();
             }
 
@@ -490,7 +491,7 @@ namespace CPSM
 
             public override void InitializeClickableGrid() {
                
-                ClickableGrid = new List<Grid>();
+                ClickableGrid = new List<Canvas>();
 
                 ClickableGrid.Add(InitGridHelper(0));
                 ClickableGrid.Add(InitGridHelper(2));
@@ -512,11 +513,12 @@ namespace CPSM
                 }
 
             }
-            private Grid InitGridHelper(int f_ypos) {
-                return new Grid() {
+            private Canvas InitGridHelper(int f_ypos) {
+                return new Canvas() {
                     Width = 12,
                     Height = 2,
-                    Margin = new Thickness(0, f_ypos, 0, 0)
+                    Margin = new Thickness(0, f_ypos, 0, 0),
+                    Background = Brushes.Transparent
                 };
             }
             public override void Initialize() {
@@ -527,17 +529,21 @@ namespace CPSM
                     Bits.Add(new WhiteNoteBitViewModal(NoteCan, ((NoteBitPos)i), this, (NoteBitPos)i));
                 }
 
+
+                /*
                 _TempVars.MeasureCan.Children.Add(NoteCan);
-                //debug
-                //SetColourHelper(OctaveColour.Blue);
                 if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
                     var f_x = _TempVars.xpos.Value;
                     var f_y = _TempVars.ypos.Value;
                     SetPosition(f_x, f_y);
                 }
                 else throw new Exception();
+                */
 
                 InitializeImages();
+
+                //debug
+                //SetColourHelper(OctaveColour.Blue);
 
                 Initialized = true;
                 
@@ -562,20 +568,6 @@ namespace CPSM
                 foreach (var bit in Bits) {
                     bit.setOct(f_template.Colours[count], f_template.Positions[count]);
                     count++;
-                }
-            }
-            public override void SetPreview(NoteTemplate f_preview) {
-                int counter = 0;
-                foreach (var f_bit in Bits) {
-                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
-                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
-                        f_bit.NoteBitImg.Opacity = 0.5;
-                    }
-                    else {
-                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
-                        f_bit.NoteBitImg.Opacity = 0.5;
-                    }
-                    counter++;
                 }
             }
             public override void ClearPreview() {
@@ -609,7 +601,26 @@ namespace CPSM
                 CounterPart.SetColour(template);
             }
 
+            public override void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
+                base.NoteLeftClickDown(sender, e);
+            }
+            public override void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
+                base.NoteLeftClickUp(sender, e);
+            }
+            public override void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
+                base.NoteRightClickDown(sender, e);
+            }
+            public override void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
+                base.NoteRightClickUp(sender, e);
+            }
+            public override void NoteMouseLeave(object sender, MouseEventArgs e) {
+                base.NoteMouseLeave(sender, e);
+            }
+            public override void NoteMouseEnter(object sender, MouseEventArgs e) {
+                base.NoteMouseEnter(sender, e);
+            }
         }
+
         public class WhiteNoteBitViewModal : NoteBitViewModal
         {
 
@@ -623,6 +634,7 @@ namespace CPSM
                     Width = 8
                 };
                 NoteBitImg.Margin = setTruePos(TruePos);
+                ParentNote.NoteCan.Children.Add(NoteBitImg);
             }
             public override Thickness setTruePos(NoteBitPos f_truepos) {
                 switch (f_truepos) {
@@ -656,8 +668,7 @@ namespace CPSM
                 CheckForNote();
             }
         }
-
-
+        
 
         public class BlackNoteViewModal : NoteViewModal
         {
@@ -691,7 +702,7 @@ namespace CPSM
 
             public override void InitializeClickableGrid() {
 
-                ClickableGrid = new List<Grid>();
+                ClickableGrid = new List<Canvas>();
 
                 ClickableGrid.Add(InitGridHelper(0));
                 ClickableGrid.Add(InitGridHelper(2));
@@ -712,8 +723,8 @@ namespace CPSM
                     NoteCan.Children.Add(grid);
                 }
             }
-            private Grid InitGridHelper(int f_ypos) {
-                return new Grid() {
+            private Canvas InitGridHelper(int f_ypos) {
+                return new Canvas() {
                     Width = 8,
                     Height = 2,
                     Margin = new Thickness(2, f_ypos, 0, 0)
@@ -767,20 +778,6 @@ namespace CPSM
                     count++;
                 }
             }
-            public override void SetPreview(NoteTemplate f_preview) {
-                int counter = 0;
-                foreach (var f_bit in Bits) {
-                    if (f_bit.Oct == f_preview.Colours[counter] && f_bit.Pos == f_preview.Positions[counter]) {
-                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
-                        f_bit.NoteBitImg.Opacity = 0.5;
-                    }
-                    else {
-                        f_bit.setOct(f_preview.Colours[counter], f_preview.Positions[counter]);
-                        f_bit.NoteBitImg.Opacity = 0.5;
-                    }
-                    counter++;
-                }
-            }
             public override void ClearPreview() {
                 SetColour(new NoteTemplate(CounterPart));
             }
@@ -811,8 +808,6 @@ namespace CPSM
                 var template = new NoteTemplate(this);
                 CounterPart.SetColour(template);
             }
-
-        
         }
 
         public class BlackNoteBitViewModal : NoteBitViewModal

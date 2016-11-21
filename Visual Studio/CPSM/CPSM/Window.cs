@@ -435,20 +435,14 @@ namespace CPSM
 
     public class NotePreview
     {
-        //debug
-        public Image DebugImage { get; set; }
-
         private NoteTemplate PreviewTemplate { get;  set; }
         public NoteViewModal Note { get; set; }
         public bool NoteOverride { get; set; }
         public bool StartPoint { get; set; }
+        public Canvas NoteImage { get; set; }
 
         public NotePreview(NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override, bool f_startpoint) {
-            //debug
-            DebugImage = new Image() {
-                Source = ImageControl.NoteImg(OctaveColour.Blue, NoteType.White)
-            };
-
+            
             Note = f_note;
             NoteOverride = f_override;
             StartPoint = f_startpoint;
@@ -460,21 +454,23 @@ namespace CPSM
 
 
             PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
+            if (PreviewTemplate != null) { CreatePreviewImage(); }
             Display();
         }
 
         public void Display() {
             if (PreviewTemplate != null) {
-                Note.NoteCan.Children.Add(DebugImage);
+                Note.NoteCan.Children.Add(NoteImage);
             }
         }
         public void Activate() {
             if (PreviewTemplate != null) {
-                throw new NotImplementedException();
+                //Note.SetColour(PreviewTemplate);
             }
+            Cancel(); //removes the preview image
         }
         public void Cancel() {
-            Note.NoteCan.Children.Remove(DebugImage);
+            Note.NoteCan.Children.Remove(NoteImage);
         }
 
         private NoteTemplate CreatePreview(bool f_override, NoteTemplate f_HeldNote, NoteTemplate f_ExistingNote) {
@@ -543,6 +539,27 @@ namespace CPSM
             else {
                 return new NoteTemplate(f_HeldNote);
             }
+        }
+
+        private void CreatePreviewImage() {
+            NoteImage = new Canvas() {
+                Height = 16,
+                Width = 12,
+                Opacity = 0.5
+            };
+
+            for (var i = 0; i < 16; i++) {
+                int f_num = 6 * i / 8;
+                var f_img = new Image() {
+                    Height = 2,
+                    Width = 6,
+                    Source = BitImages.GetBitImg(PreviewTemplate.Positions[i], PreviewTemplate.Colours[i], NoteType.White),
+                    Margin = new Thickness(6 * (i / 8), i % 8 * 2, 0, 0)
+                    
+                };
+                NoteImage.Children.Add(f_img);
+            }
+
         }
     }
 
