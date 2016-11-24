@@ -21,16 +21,12 @@ using CPSM.Forms;
     ToDo:
     Make measures fill out multiple columns
     handle rightclick while creating a long note
-
-    Rework note initialization
-     - rework notepreview to have its own images     
-     - CHECK Clickable Grid on notes does not appear to show up
-     - CHECK disconnect clickable grids from images
-     - CHECK New code for image initialization
-     
+    Make Copy notes (middle click) appear in a button icon
 
     
     Bugs: 
+    copy note icon is black & white if note is simple
+    creating dual-octive notes with note dragging doesnt properly display extensions
     
 */
 /*
@@ -40,7 +36,7 @@ using CPSM.Forms;
     global mouse event handler
     Hotkey Control
     Black notes
-
+    Rework note initialization
 
 */
 
@@ -71,11 +67,13 @@ namespace CPSM
             _ScreenCap = new ScreenCapturer(cnv_SongCan);
             _vers = new Version();
             _keyCtrl = new Hotkeycontrol(this);
-
+            
             _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
     
             InitFormNoteColour();
             InitFormMeasureCreator();
+
+            _MouseCtrl._noteCtrl._Form = _GUI._FormNoteColour;
 
             TestModal();
 

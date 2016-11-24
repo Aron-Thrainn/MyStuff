@@ -213,6 +213,14 @@ namespace CPSM
                 Colours[i] = f_template.Colours[i];
             }
         }
+        public bool IsEmpty() {
+            foreach(var col in Colours) {
+                if (col != OctaveColour.none) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
     }
     /*

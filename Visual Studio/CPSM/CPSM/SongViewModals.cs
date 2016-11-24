@@ -95,7 +95,7 @@ namespace CPSM
 
             public class NoteInitializer
             {
-                private readonly double INTERVAL = 1;
+                private readonly double INTERVAL = 0.0001;
                 public Queue<NoteViewModal> NoteQueue { get; set; }
                 public DispatcherTimer Timer { get; set; }
                 public bool SleepMode { get; set; }
@@ -142,6 +142,10 @@ namespace CPSM
 
                 var crpimg = new CroppedBitmap(ImageBit, CreateRect(f_pos, f_type));
                 return crpimg;
+            }
+
+            internal static ImageSource GetBitImg(object p1, object p2, NoteType white) {
+                throw new NotImplementedException();
             }
 
             private static Int32Rect CreateRect(NoteBitPos f_pos, NoteType f_type) {
@@ -228,16 +232,20 @@ namespace CPSM
                 for (int i = 0; i < 14; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new WhiteNoteViewModal(f_measure.WhiteNotes[i, o], Can, f_mouse, this, i, o);
-                        tempNote._TempVars.empty = f_empty;
-                        Parent.EnqueueNote(tempNote);
+                        if (!f_empty && !f_measure.WhiteNotes[i, o].IsEmpty()) {
+                            tempNote._TempVars.empty = false;
+                            Parent.EnqueueNote(tempNote);
+                        }
                         WhiteNotes[i, o] = tempNote;
                     }
                 }
                 for (int i = 0; i < 10; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this, i, o);
-                        tempNote._TempVars.empty = f_empty;
-                        Parent.EnqueueNote(tempNote);
+                        if (!f_empty && !f_measure.WhiteNotes[i, o].IsEmpty()) {
+                            tempNote._TempVars.empty = false;
+                            Parent.EnqueueNote(tempNote);
+                        }
                         BlackNotes[i, o] = tempNote;
                     }
                 }
@@ -386,8 +394,8 @@ namespace CPSM
                 _Mouse.NoteMouseEnter(this, e, MousePos);
             }
             public virtual void NoteMouseLeave(object sender, MouseEventArgs e) {
-                Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteMouseLeave(this, e, MousePos);
+                //Point MousePos = e.GetPosition(NoteCan);
+                //_Mouse.NoteMouseLeave(this, e, MousePos);
             }
             public void ClearNote() {
                 SetColour(new NoteTemplate());
@@ -398,18 +406,14 @@ namespace CPSM
             public virtual void InitializeClickableGrid() { }
             public virtual void InitializeImages() { }
             public virtual void SetPosition(int f_xpos, int f_ypos) { }
-
-
-
+            
             public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
 
             public virtual void SetColour(NoteTemplate f_template) { }
             public virtual void ClearPreview() { }
             protected virtual void SetColourHelper(OctaveColour f_oct) { }
             protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
-
-
-
+            
             public NoteViewModal FindNoteBelow() {
                 return Parent.FindNoteBelow(this);
             }
@@ -531,7 +535,7 @@ namespace CPSM
 
 
                 /*
-                _TempVars.MeasureCan.Children.Add(NoteCan);
+                //_TempVars.MeasureCan.Children.Add(NoteCan);
                 if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
                     var f_x = _TempVars.xpos.Value;
                     var f_y = _TempVars.ypos.Value;
@@ -541,6 +545,9 @@ namespace CPSM
                 */
 
                 InitializeImages();
+
+                ClickableGrid = null;
+                InitializeClickableGrid();
 
                 //debug
                 //SetColourHelper(OctaveColour.Blue);
@@ -555,10 +562,12 @@ namespace CPSM
                 foreach (var bit in Bits) {
                     bit.InitializeImage();
                 }
+                //debug
+                //NoteCan.Background = Brushes.Pink;
             }
 
             public override void SetColour(NoteTemplate f_template) {
-                if (!Initialized) { Initialize(); }
+                if (!Initialized) { Initialize();}
 
                 //clear note and paste
                 if (f_template == null) {
@@ -569,6 +578,7 @@ namespace CPSM
                     bit.setOct(f_template.Colours[count], f_template.Positions[count]);
                     count++;
                 }
+                CounterPart.SetColour(f_template);
             }
             public override void ClearPreview() {
                 SetColour(new NoteTemplate(CounterPart));
@@ -623,7 +633,6 @@ namespace CPSM
 
         public class WhiteNoteBitViewModal : NoteBitViewModal
         {
-
             public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent, NoteBitPos f_truepos) : base(f_notecan, f_pos, f_parent, f_truepos) {
                 
             }
@@ -637,23 +646,24 @@ namespace CPSM
                 ParentNote.NoteCan.Children.Add(NoteBitImg);
             }
             public override Thickness setTruePos(NoteBitPos f_truepos) {
+                int xx = -1;
                 switch (f_truepos) {
-                    case NoteBitPos.a1: { return new Thickness(0, 0, 0, 0); }
-                    case NoteBitPos.a2: { return new Thickness(0, 2, 0, 0); }
-                    case NoteBitPos.a3: { return new Thickness(0, 4, 0, 0); }
-                    case NoteBitPos.a4: { return new Thickness(0, 6, 0, 0); }
-                    case NoteBitPos.a5: { return new Thickness(0, 8, 0, 0); }
-                    case NoteBitPos.a6: { return new Thickness(0, 10, 0, 0); }
-                    case NoteBitPos.a7: { return new Thickness(0, 12, 0, 0); }
-                    case NoteBitPos.a8: { return new Thickness(0, 14, 0, 0); }
-                    case NoteBitPos.b1: { return new Thickness(6, 0, 0, 0); }
-                    case NoteBitPos.b2: { return new Thickness(6, 2, 0, 0); }
-                    case NoteBitPos.b3: { return new Thickness(6, 4, 0, 0); }
-                    case NoteBitPos.b4: { return new Thickness(6, 6, 0, 0); }
-                    case NoteBitPos.b5: { return new Thickness(6, 8, 0, 0); }
-                    case NoteBitPos.b6: { return new Thickness(6, 10, 0, 0); }
-                    case NoteBitPos.b7: { return new Thickness(6, 12, 0, 0); }
-                    case NoteBitPos.b8: { return new Thickness(6, 14, 0, 0); }
+                    case NoteBitPos.a1: { return new Thickness(xx, 0, 0, 0); }
+                    case NoteBitPos.a2: { return new Thickness(xx, 2, 0, 0); }
+                    case NoteBitPos.a3: { return new Thickness(xx, 4, 0, 0); }
+                    case NoteBitPos.a4: { return new Thickness(xx, 6, 0, 0); }
+                    case NoteBitPos.a5: { return new Thickness(xx, 8, 0, 0); }
+                    case NoteBitPos.a6: { return new Thickness(xx, 10, 0, 0); }
+                    case NoteBitPos.a7: { return new Thickness(xx, 12, 0, 0); }
+                    case NoteBitPos.a8: { return new Thickness(xx, 14, 0, 0); }
+                    case NoteBitPos.b1: { return new Thickness(xx + 6, 0, 0, 0); }
+                    case NoteBitPos.b2: { return new Thickness(xx + 6, 2, 0, 0); }
+                    case NoteBitPos.b3: { return new Thickness(xx + 6, 4, 0, 0); }
+                    case NoteBitPos.b4: { return new Thickness(xx + 6, 6, 0, 0); }
+                    case NoteBitPos.b5: { return new Thickness(xx + 6, 8, 0, 0); }
+                    case NoteBitPos.b6: { return new Thickness(xx + 6, 10, 0, 0); }
+                    case NoteBitPos.b7: { return new Thickness(xx + 6, 12, 0, 0); }
+                    case NoteBitPos.b8: { return new Thickness(xx + 6, 14, 0, 0); }
                 }
                 throw new Exception();
             }
@@ -901,33 +911,28 @@ namespace CPSM
                 }
                 */
             }
-            public NoteTemplate(BlackNoteViewModal f_note) {
-                Colours = new OctaveColour[16];
-                Positions = new NoteBitPos[16];
-
-                int count = 0;
-                foreach (var bit in f_note.Bits) {
-                    Colours[count] = bit.Oct;
-                    Positions[count] = bit.Pos;
-                    count++;
-                }
-            }
-            public NoteTemplate(MouseNoteColour f_mousecolour, Point f_mousepoint) {
+            public NoteTemplate(MouseNote f_mousecolour, Point f_mousepoint) {
                 Init();
-
-                switch (f_mousecolour.ActivePatrial) {
-                    case PartialNote.Full: {
-                            for (int i = 0; i < 16; i++) {
-                                Colours[i] = f_mousecolour.ActiveColour;
-                                Positions[i] = (NoteBitPos)i;
-
-                            }
-                            break;
-                        }
-                        //todo:  cases for non-full notes
-
+                if (f_mousecolour.IsTemplate) {
+                    var f_note = f_mousecolour.Template;
+                    for (int i = 0; i < 16; i++) {
+                        Colours[i] = f_note.Colours[i];
+                        Positions[i] = f_note.Positions[i];
+                    }
                 }
+                else {
+                    switch (f_mousecolour.ActivePatrial) {
+                        case PartialNote.Full: {
+                                for (int i = 0; i < 16; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)i;
 
+                                }
+                                break;
+                            }
+                            //todo:  cases for non-full notes
+                    }
+                }
             }
             public NoteTemplate(NoteTemplate f_note) {
                 Init();
@@ -1077,7 +1082,7 @@ namespace CPSM
                 MeasureCan = f_measureCan;
                 xpos = f_xpos;
                 ypos = f_ypos;
-                empty = false; // initialize to true could make non-empty notes to be shown as empty
+                empty = true;
             }
         }
     }

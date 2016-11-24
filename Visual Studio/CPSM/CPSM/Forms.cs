@@ -8,6 +8,10 @@ using System.Windows.Controls;
 using CommonClasses.CustomButtons;
 using CommonClasses.Images;
 using System.Windows.Input;
+using CPSM.ViewModals;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace CPSM
 {
@@ -15,12 +19,13 @@ namespace CPSM
     {
         public class NoteColourForm
         {
-            public MouseNoteColour _MouseCtrl { get; set; }
+            public MouseNote _MouseCtrl { get; set; }
             public Canvas MainCan { get; set; }
             public List<CustomRadioButton> RadioButtons { get; set; }
             public CustomRadioButtonGroup RadioGroup { get; set; }
+            public CustomRadioButton FirstButton { get; set; }
 
-            public NoteColourForm(Canvas f_can, MouseNoteColour f_mousectrl) {
+            public NoteColourForm(Canvas f_can, MouseNote f_mousectrl) {
                 MainCan = f_can;
                 _MouseCtrl = f_mousectrl;
                 RadioButtons = new List<CustomRadioButton>();
@@ -34,6 +39,7 @@ namespace CPSM
                     tempbtn.SetButtonClickEvent(ClickEvent);
                     tempbtn.SetImg(ImageControl.noteIcons((OctaveColour)count));
                     tempbtn.Tag = count;
+                    if (count == 0) FirstButton = tempbtn;
                     count++;
 
                     RadioButtons.Add(tempbtn);
@@ -41,7 +47,7 @@ namespace CPSM
             }
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
-                _MouseCtrl.ActiveColour = (OctaveColour)btn.Tag;
+                _MouseCtrl.SetColour((OctaveColour)btn.Tag);
                 _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
             }
             public void SimulateClickDown(OctaveColour f_col) {
@@ -69,6 +75,34 @@ namespace CPSM
                 tempbtn.SimulateButtonUp();
 
 
+            }
+
+            public void SetFirstButtonIcon(Canvas f_note) {
+                var f_tempop = f_note.Opacity;
+                f_note.Opacity = 1;
+                f_note.Loaded += delegate {
+                    PresentationSource source = PresentationSource.FromVisual(f_note);
+                    RenderTargetBitmap rtb = new RenderTargetBitmap((int)f_note.RenderSize.Width,
+                          (int)f_note.RenderSize.Height, 96, 96, PixelFormats.Default);
+
+                    VisualBrush sourceBrush = new VisualBrush(f_note);
+                    DrawingVisual drawingVisual = new DrawingVisual();
+                    DrawingContext drawingContext = drawingVisual.RenderOpen();
+                    using (drawingContext) {
+                        drawingContext.DrawRectangle(sourceBrush, null, new Rect(new Point(0, 0),
+                              new Point(f_note.RenderSize.Width, f_note.RenderSize.Height)));
+                    }
+                    rtb.Render(drawingVisual);
+                    var f_image = rtb as BitmapSource;
+                    FirstButton.SetImg(f_image);
+                    f_note.Opacity = f_tempop;
+
+                    if (f_note.Tag != null && f_note.Tag.ToString() == "Forced") {
+                        var f_parent = VisualTreeHelper.GetParent(f_note) as Canvas;
+                        //f_parent.Children.Remove(f_note);
+                    }
+                };
+                //also reset the image when button is pressed
             }
         }
 
