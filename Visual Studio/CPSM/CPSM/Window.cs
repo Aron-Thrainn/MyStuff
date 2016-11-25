@@ -383,7 +383,7 @@ namespace CPSM
         public void NoteClickUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             switch (e.ChangedButton) {
                 case MouseButton.Right: {
-                        NoteRightClickedUp(sender, e, f_mousepos);
+                        if (!Creating) NoteRightClickedUp(sender, e, f_mousepos);
                         break;
                     }
                 case MouseButton.Left: {
@@ -391,7 +391,7 @@ namespace CPSM
                         break;
                     }
                 case MouseButton.Middle: {
-                        if (!sender.CounterPart.IsEmpty()) {
+                        if (!Creating && !sender.CounterPart.IsEmpty()) {
                             _Form.SimulateClickDown(OctaveColour.none);
                             _Form.SimulateClickUp(OctaveColour.none);
                             NoteMiddleClickedUp(sender, e, f_mousepos);
@@ -404,7 +404,7 @@ namespace CPSM
         public void NoteClickDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             switch (e.ChangedButton) {
                 case MouseButton.Right: {
-                        NoteRightClickedDown(sender, e, f_mousepos);
+                        if (!Creating) NoteRightClickedDown(sender, e, f_mousepos);
                         break;
                     }
                 case MouseButton.Left: {
@@ -501,12 +501,14 @@ namespace CPSM
         public bool StartPoint { get; set; }
         public Canvas NoteImage { get; set; }
         public MouseNoteControl _Control { get; set; }
+        public bool Initialized { get; set; } 
 
         public NotePreview(NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override, bool f_startpoint, MouseNoteControl f_control) {
             _Control = f_control;
             Note = f_note;
             NoteOverride = f_override;
             StartPoint = f_startpoint;
+            Initialized = false;
             var existingnote = new NoteTemplate(f_note as NoteViewModal);
 
             if (!f_startpoint) {
@@ -520,15 +522,15 @@ namespace CPSM
                 Display();
             }
             else {
-                //force the image to load
-                Note.Parent.Can.Children.Add(NoteImage);
-                NoteImage.Tag = "Forced";
-
+                ForceDisplay();
             }
         }
 
         public void Display() {
-            if (PreviewTemplate != null) {
+            if (PreviewTemplate.IsEqual(new NoteTemplate(Note))) {
+                ForceDisplay(); // note must still be loaded for middle click function
+            }
+            else {
                 var f_xx = Note.NoteCan.Margin.Left;
                 var f_yy = Note.NoteCan.Margin.Top;
 
@@ -547,7 +549,14 @@ namespace CPSM
             Note.Parent.Can.Children.Remove(NoteImage);
             Note.NoteCan.Opacity = 1;
         }
-        
+        public void ForceDisplay() {
+            Note.Parent.Can.Children.Add(NoteImage);
+            Note.NoteCan.Loaded += delegate {
+                var f_parent = VisualTreeHelper.GetParent(Note.NoteCan) as Canvas;
+                f_parent.Children.Remove(Note.NoteCan);// Bugged, note isn't bieng removed
+            };
+
+        }
 
         public bool HasTemplate() {
             return PreviewTemplate != null;
@@ -568,10 +577,10 @@ namespace CPSM
 
             if (f_ExistingNote.isUsniform() == f_HeldNote.isUsniform()) {
                 if (!f_ExistingNote.IsExtension() && !f_HeldNote.IsExtension()) { //both are simple and not extensions
-                    return new NoteTemplate();
+                    return new NoteTemplate(f_HeldNote);
                 }
                 else if (f_ExistingNote.IsExtension() && f_HeldNote.IsExtension()) { //both are simple and extensions
-                    return new NoteTemplate();
+                    return new NoteTemplate(f_HeldNote);
                 }
                 else return new NoteTemplate(f_HeldNote);
                 
@@ -639,12 +648,6 @@ namespace CPSM
             }
             NoteImage.MouseDown += new MouseButtonEventHandler(NoteClickDown);
             NoteImage.MouseUp += new MouseButtonEventHandler(NoteClickUp);
-
-
-            //NoteImage.MouseLeftButtonDown += new MouseButtonEventHandler(NoteLeftClickDown);
-            //NoteImage.MouseLeftButtonUp += new MouseButtonEventHandler(NoteLeftClickUp);
-            //NoteImage.MouseRightButtonDown += new MouseButtonEventHandler(NoteRightClickDown);
-            //NoteImage.MouseRightButtonUp += new MouseButtonEventHandler(NoteRightClickUp);
             NoteImage.MouseLeave += new MouseEventHandler(NoteMouseLeave);
             NoteImage.MouseEnter += new MouseEventHandler(NoteMouseEnter);
         }
@@ -663,8 +666,11 @@ namespace CPSM
             _Control.NoteMouseLeave(Note, e, MousePos);
         }
         public void NoteMouseEnter(object sender, MouseEventArgs e) {
-            Point MousePos = e.GetPosition(NoteImage);
-            _Control.NoteMouseEnter(Note, e, MousePos);
+            if (Initialized) { // avoids infinite loops when mouseEnter triggers on a new preview
+                Point MousePos = e.GetPosition(NoteImage);
+                _Control.NoteMouseEnter(Note, e, MousePos);
+            }
+            else Initialized = true;
         }
         public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
             Point MousePos = e.GetPosition(NoteImage);
@@ -704,12 +710,22 @@ namespace CPSM
             var f_preview = NewNotes.Peek();
             var f_previous = f_existingnote.FindNoteAbove();
             var f_next = f_existingnote.FindNoteBelow();
+            if (f_previous != null) {
+                if (f_preview.Note == f_previous) { PushNote(f_existingnote); }
+                else if (f_preview.Note == f_previous.FindNoteToLeft()) { PushNote(f_existingnote.FindNoteToLeft()); }
+                else if (f_preview.Note == f_previous.FindNoteToRight()) { PushNote(f_existingnote.FindNoteToRight()); }
+                else if (f_preview.Note == f_previous.FindNoteToLeft().FindNoteToLeft()) { PushNote(f_existingnote.FindNoteToLeft().FindNoteToLeft()); }
+                else if (f_preview.Note == f_previous.FindNoteToRight().FindNoteToRight()) { PushNote(f_existingnote.FindNoteToRight().FindNoteToRight()); }
 
-            if (f_preview.Note == f_previous) {
-                PushNote(f_existingnote);
             }
-            else if (f_preview.Note == f_next){
-                PopNote();
+            if (f_next != null) {
+                if (f_preview.Note == f_next
+                || f_preview.Note == f_next.FindNoteToLeft()
+                || f_preview.Note == f_next.FindNoteToRight()
+                || f_preview.Note == f_next.FindNoteToLeft().FindNoteToLeft()
+                || f_preview.Note == f_next.FindNoteToRight().FindNoteToRight()) {
+                    PopNote();
+                }
             }
         }
         public void PushNote(NoteViewModal f_existingnote) {

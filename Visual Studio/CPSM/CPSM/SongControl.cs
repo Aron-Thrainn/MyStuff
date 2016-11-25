@@ -211,6 +211,7 @@ namespace CPSM
         public void SetColour(NoteTemplate f_template) {
             for (int i = 0; i < 16; i++) {
                 Colours[i] = f_template.Colours[i];
+                Positions[i] = f_template.Positions[i];
             }
         }
         public bool IsEmpty() {

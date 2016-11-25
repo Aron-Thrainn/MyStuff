@@ -19,14 +19,17 @@ using CPSM.Forms;
 
 /*
     ToDo:
+    Partial Notes
     Make measures fill out multiple columns
-    handle rightclick while creating a long note
-    Make Copy notes (middle click) appear in a button icon
+    Add Save & load functions
+    Add Export funcion
+    Add Copy/Paste functions
+
+
 
     
     Bugs: 
-    copy note icon is black & white if note is simple
-    creating dual-octive notes with note dragging doesnt properly display extensions
+    Note preview showes up in top left when not supposed to
     
 */
 /*
@@ -37,6 +40,10 @@ using CPSM.Forms;
     Hotkey Control
     Black notes
     Rework note initialization
+    Make Copy notes (middle click) appear in a button icon
+    handle rightclick while creating a long note
+    Smooth out long note creation
+    copy note icon is black & white if note is simple
 
 */
 

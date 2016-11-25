@@ -36,10 +36,15 @@ namespace CPSM
                 int count = 0;
                 foreach (var can in f_buttoncans) {
                     var tempbtn = new CustomRadioButton(can, RadioGroup);
-                    tempbtn.SetButtonClickEvent(ClickEvent);
                     tempbtn.SetImg(ImageControl.noteIcons((OctaveColour)count));
                     tempbtn.Tag = count;
-                    if (count == 0) FirstButton = tempbtn;
+                    if (count == 0) {
+                        tempbtn.SetButtonClickEvent(FirstButtonClickEvent);
+                        FirstButton = tempbtn;
+                    }
+                    else {
+                        tempbtn.SetButtonClickEvent(ClickEvent);
+                    }
                     count++;
 
                     RadioButtons.Add(tempbtn);
@@ -47,6 +52,12 @@ namespace CPSM
             }
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
+                _MouseCtrl.SetColour((OctaveColour)btn.Tag);
+                _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
+            }
+            public void FirstButtonClickEvent(object sender, MouseButtonEventArgs e) {
+                var btn = sender as CustomRadioButton;
+                btn.SetImg(ImageControl.noteIcons(OctaveColour.none));
                 _MouseCtrl.SetColour((OctaveColour)btn.Tag);
                 _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
             }
@@ -96,11 +107,6 @@ namespace CPSM
                     var f_image = rtb as BitmapSource;
                     FirstButton.SetImg(f_image);
                     f_note.Opacity = f_tempop;
-
-                    if (f_note.Tag != null && f_note.Tag.ToString() == "Forced") {
-                        var f_parent = VisualTreeHelper.GetParent(f_note) as Canvas;
-                        //f_parent.Children.Remove(f_note);
-                    }
                 };
                 //also reset the image when button is pressed
             }

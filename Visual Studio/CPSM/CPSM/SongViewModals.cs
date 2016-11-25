@@ -351,6 +351,108 @@ namespace CPSM
                 }
                 throw new Exception();
             }
+            public NoteViewModal FindNoteToLeft(NoteViewModal f_note) {
+                int ii = 0;
+                int oo = 0;
+                for (int i = 0; i < 14; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_whitenote = f_note as WhiteNoteViewModal;
+                        if (WhiteNotes[i, o] == f_whitenote) {
+                            ii = i;
+                            oo = o;
+                            switch (ii) {
+                                case 0: return new NoteViewModal();
+                                case 1:
+                                case 2: return BlackNotes[ii - 1, oo];
+                                case 3: return WhiteNotes[ii - 1, oo];
+                                case 4:
+                                case 5:
+                                case 6: return BlackNotes[ii - 2, oo];
+                                case 7: return new NoteViewModal();
+                                case 8:
+                                case 9: return BlackNotes[ii - 3, oo];
+                                case 10: return WhiteNotes[ii - 1, oo];
+                                case 11:
+                                case 12:
+                                case 13: return BlackNotes[ii - 4, oo];
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_blacknote = f_note as BlackNoteViewModal;
+                        if (BlackNotes[i, o] == f_blacknote) {
+                            ii = i;
+                            oo = o;
+                            switch (ii) {
+                                case 0:
+                                case 1: return WhiteNotes[ii, oo];
+                                case 2:
+                                case 3:
+                                case 4: return WhiteNotes[ii + 1, oo];
+                                case 5:
+                                case 6: return WhiteNotes[ii + 2, oo];
+                                case 7:
+                                case 8:
+                                case 9: return WhiteNotes[ii + 3, oo];
+                            }
+                        }
+                    }
+                }
+                throw new Exception();
+            }
+            public NoteViewModal FindNoteToRight(NoteViewModal f_note) {
+                int ii = 0;
+                int oo = 0;
+                for (int i = 0; i < 14; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_whitenote = f_note as WhiteNoteViewModal;
+                        if (WhiteNotes[i, o] == f_whitenote) {
+                            ii = i;
+                            oo = o;
+                            switch (ii) {
+                                case 0: 
+                                case 1: return BlackNotes[ii, oo];
+                                case 2: return WhiteNotes[ii + 1, oo];
+                                case 3: 
+                                case 4:
+                                case 5: return BlackNotes[ii - 1, oo];
+                                case 6: return new NoteViewModal();
+                                case 7: 
+                                case 8: return BlackNotes[ii - 2, oo];
+                                case 9: return WhiteNotes[ii + 1, oo];
+                                case 10: 
+                                case 11:
+                                case 12: return BlackNotes[ii - 3, oo];
+                                case 13: return new NoteViewModal();
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < 10; i++) {
+                    for (int o = 0; o < (int)Size; o++) {
+                        var f_blacknote = f_note as BlackNoteViewModal;
+                        if (BlackNotes[i, o] == f_blacknote) {
+                            ii = i;
+                            oo = o;
+                            switch (ii) {
+                                case 0:
+                                case 1: return WhiteNotes[ii + 1, oo];
+                                case 2:
+                                case 3:
+                                case 4: return WhiteNotes[ii + 2, oo];
+                                case 5:
+                                case 6: return WhiteNotes[ii + 3, oo];
+                                case 7:
+                                case 8:
+                                case 9: return WhiteNotes[ii + 4, oo];
+                            }
+                        }
+                    }
+                }
+                throw new Exception();
+            }
         }
 
 
@@ -364,6 +466,7 @@ namespace CPSM
             public NoteVars _TempVars { get; set; }
             public bool Initialized { get; set; }
 
+            public NoteViewModal() { /* Dummy note for, baisically a null when searching for adjacent notes*/}
             public NoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) {
                 CounterPart = f_note;
                 _Mouse = f_mouse;
@@ -373,21 +476,13 @@ namespace CPSM
                 _TempVars = new NoteVars(f_measureCan, f_xpos, f_ypos);
             }
 
-            public virtual void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteClickDown(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteLeftClickedDown(this, e, MousePos);
+                _Mouse.NoteClickDown(this, e, MousePos);
             }
-            public virtual void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
+            public virtual void NoteClickUp(object sender, MouseButtonEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteLeftClickedUp(this, e, MousePos);
-            }
-            public virtual void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
-                Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteRightClickedDown(this, e, MousePos);
-            }
-            public virtual void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
-                Point MousePos = e.GetPosition(NoteCan);
-                _Mouse.NoteRightClickedUp(this, e, MousePos);
+                _Mouse.NoteClickUp(this, e, MousePos);
             }
             public virtual void NoteMouseEnter(object sender, MouseEventArgs e) {
                 Point MousePos = e.GetPosition(NoteCan);
@@ -419,6 +514,18 @@ namespace CPSM
             }
             public NoteViewModal FindNoteAbove() {
                 return Parent.FindNoteAbove(this);
+            }
+            public NoteViewModal FindNoteToLeft() {
+                if (Parent != null) {
+                    return Parent.FindNoteToLeft(this);
+                }
+                else return new NoteViewModal();
+            }
+            public NoteViewModal FindNoteToRight() {
+                if (Parent != null) {
+                    return Parent.FindNoteToRight(this);
+                }
+                else return new NoteViewModal();
             }
         }
 
@@ -507,10 +614,8 @@ namespace CPSM
                 ClickableGrid.Add(InitGridHelper(14));
 
                 foreach (var grid in ClickableGrid) {
-                    grid.MouseLeftButtonDown += new MouseButtonEventHandler(NoteLeftClickDown);
-                    grid.MouseLeftButtonUp += new MouseButtonEventHandler(NoteLeftClickUp);
-                    grid.MouseRightButtonDown += new MouseButtonEventHandler(NoteRightClickDown);
-                    grid.MouseRightButtonUp += new MouseButtonEventHandler(NoteRightClickUp);
+                    grid.MouseDown += new MouseButtonEventHandler(NoteClickDown);
+                    grid.MouseUp += new MouseButtonEventHandler(NoteClickUp);
                     grid.MouseEnter += new MouseEventHandler(NoteMouseEnter);
                     grid.MouseLeave += new MouseEventHandler(NoteMouseLeave);
                     NoteCan.Children.Add(grid);
@@ -580,57 +685,8 @@ namespace CPSM
                 }
                 CounterPart.SetColour(f_template);
             }
-            public override void ClearPreview() {
-                SetColour(new NoteTemplate(CounterPart));
-            }
-            protected override void SetColourHelper(OctaveColour f_oct) {
-                foreach (var bit in Bits) {
-                    bit.setOct(f_oct);
-                }
-
-                CounterPart.SetColour(f_oct);
-            }
-            protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
-                int count;
-
-                if (f_half == Half.Left) {
-                    count = 0;
-                }
-                else {
-                    count = -8;
-                }
-
-                foreach (var bit in Bits) {
-                    if (count >= 0 && count <= 8) {
-                        bit.setOct(f_oct);
-                    }
-                    count++;
-                }
-
-                var template = new NoteTemplate(this);
-                CounterPart.SetColour(template);
-            }
-
-            public override void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
-                base.NoteLeftClickDown(sender, e);
-            }
-            public override void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
-                base.NoteLeftClickUp(sender, e);
-            }
-            public override void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
-                base.NoteRightClickDown(sender, e);
-            }
-            public override void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
-                base.NoteRightClickUp(sender, e);
-            }
-            public override void NoteMouseLeave(object sender, MouseEventArgs e) {
-                base.NoteMouseLeave(sender, e);
-            }
-            public override void NoteMouseEnter(object sender, MouseEventArgs e) {
-                base.NoteMouseEnter(sender, e);
-            }
         }
-
+        
         public class WhiteNoteBitViewModal : NoteBitViewModal
         {
             public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent, NoteBitPos f_truepos) : base(f_notecan, f_pos, f_parent, f_truepos) {
@@ -670,6 +726,7 @@ namespace CPSM
             public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
                 NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.White);
                 Oct = f_oct;
+                Pos = f_pos;
                 CheckForNote();
             }
             public override void setOct(OctaveColour f_oct) {
@@ -677,6 +734,7 @@ namespace CPSM
                 Oct = f_oct;
                 CheckForNote();
             }
+            
         }
         
 
@@ -724,10 +782,8 @@ namespace CPSM
                 ClickableGrid.Add(InitGridHelper(14));
 
                 foreach (var grid in ClickableGrid) {
-                    grid.MouseLeftButtonDown += new MouseButtonEventHandler(NoteLeftClickDown);
-                    grid.MouseLeftButtonUp += new MouseButtonEventHandler(NoteLeftClickUp);
-                    grid.MouseRightButtonDown += new MouseButtonEventHandler(NoteRightClickDown);
-                    grid.MouseRightButtonUp += new MouseButtonEventHandler(NoteRightClickUp);
+                    grid.MouseDown += new MouseButtonEventHandler(NoteClickDown);
+                    grid.MouseUp += new MouseButtonEventHandler(NoteClickUp);
                     grid.MouseEnter += new MouseEventHandler(NoteMouseEnter);
                     grid.MouseLeave += new MouseEventHandler(NoteMouseLeave);
                     NoteCan.Children.Add(grid);
@@ -788,36 +844,6 @@ namespace CPSM
                     count++;
                 }
             }
-            public override void ClearPreview() {
-                SetColour(new NoteTemplate(CounterPart));
-            }
-            protected override void SetColourHelper(OctaveColour f_oct) {
-                foreach (var bit in Bits) {
-                    bit.setOct(f_oct);
-                }
-
-                CounterPart.SetColour(f_oct);
-            }
-            protected override void SetColourHelperHalf(OctaveColour f_oct, Half f_half) {
-                int count;
-
-                if (f_half == Half.Left) {
-                    count = 0;
-                }
-                else {
-                    count = -8;
-                }
-
-                foreach (var bit in Bits) {
-                    if (count >= 0 && count <= 8) {
-                        bit.setOct(f_oct);
-                    }
-                    count++;
-                }
-            
-                var template = new NoteTemplate(this);
-                CounterPart.SetColour(template);
-            }
         }
 
         public class BlackNoteBitViewModal : NoteBitViewModal
@@ -857,6 +883,7 @@ namespace CPSM
             public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
                 NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.Black);
                 Oct = f_oct;
+                Pos = f_pos;
                 CheckForNote();
             }
             public override void setOct(OctaveColour f_oct) {
@@ -1058,6 +1085,14 @@ namespace CPSM
                 }
                 for (int i = 8; i < 16; i++) {
                     if (Positions[i] != NoteBitPos.b8) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            public bool IsEqual(NoteTemplate f_other) {
+                for (int i = 0; i < 16; i++) {
+                    if (Colours[i] != f_other.Colours[i] || Positions[i] != f_other.Positions[i]) {
                         return false;
                     }
                 }
