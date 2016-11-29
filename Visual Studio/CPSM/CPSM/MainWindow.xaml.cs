@@ -25,11 +25,15 @@ using CPSM.Forms;
     Add Export funcion
     Add Copy/Paste functions
 
-
+    Rework note images to have only 1 image
+     - Initialize common notes
+     - fix complex note creation
 
     
     Bugs: 
     Note preview showes up in top left when not supposed to
+    Note Extensions arent bieng drawn normally, but are when loading
+    Note extensions are partially transparent
     
 */
 /*
@@ -67,7 +71,7 @@ namespace CPSM
             InitializeComponent();
 
             _MouseCtrl = new MouseControl(this);
-            var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion);
+            var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion, _MouseCtrl._noteCtrl._NoteImageConrtol);
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
             _FormSongSelect = new FormSongSelect(this);
@@ -88,14 +92,6 @@ namespace CPSM
             PreviewKeyUp += new KeyEventHandler(HotkeysUp);
 
             PreviewMouseLeftButtonUp += new MouseButtonEventHandler(MouseButtonUp);
-
-            //temp for testing, delays until Loaded
-            //enter to take screenshot
-            /*Loaded += delegate
-            {
-                _ScreenCap.SaveScreenShot();
-            };*/
-
         }
 
         private void HotkeysDown(object sender, KeyEventArgs e) {
@@ -242,7 +238,6 @@ namespace CPSM
             notetemp2.Positions[13] = NoteBitPos.b2;
             notetemp2.Positions[14] = NoteBitPos.b3;
             notetemp2.Positions[15] = NoteBitPos.b4;
-            notetemp2.Colours[15] = OctaveColour.Yellow;
 
             testmeasure.WhiteNotes[10, 5].SetColour(notetemp1);
             testmeasure.WhiteNotes[10, 6].SetColour(notetemp2);
@@ -271,8 +266,6 @@ namespace CPSM
             testsong.Measures.Add(testmeasure2);
 
             _SongCan.LoadSong(testsong);
-            //Space to save to .txt
-            //_SongCan.SaveSong();
 
         }
         

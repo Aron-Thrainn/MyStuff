@@ -327,7 +327,7 @@ namespace CPSM
 
         public MouseControl(MainWindow f_wind) {
             _Window = f_wind;
-            _noteCtrl = new MouseNoteControl();
+            _noteCtrl = new MouseNoteControl(_Window.cnv_NoteLoaderCan);
         }
     }
     public enum PartialNote
@@ -375,9 +375,11 @@ namespace CPSM
         public NoteCreator _Creator { get; set; }
         public bool Creating { get; set; }
         public NoteColourForm _Form { get; set; }
+        public NoteImageControl _NoteImageConrtol { get; set; }
 
-        public MouseNoteControl() {
+        public MouseNoteControl(Canvas f_NoteLoaderCan) {
             _colourctrl = new MouseNote(this);
+            _NoteImageConrtol = new NoteImageControl(f_NoteLoaderCan);
         }
 
         public void NoteClickUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
@@ -542,7 +544,7 @@ namespace CPSM
         public void Activate() {
             if (PreviewTemplate != null) {
                 Cancel();
-                Note.SetColour(PreviewTemplate);
+                Note.SetColour(PreviewTemplate, _Control._NoteImageConrtol.GetImage(PreviewTemplate, Note.GetType()));
             }
         }
         public void Cancel() {

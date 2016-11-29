@@ -27,7 +27,7 @@ namespace CPSM
             public Label VersionBox { get; set; }
             private NoteInitializer _Initializer { get; set; }
 
-            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox) {
+            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, NoteImageControl f_NoteImageControl) {
                 //MeasuresCan = f_measurecan;
                 MeasureStack = new StackPanel() {
                     Margin = new Thickness(20, 10, 0, 0)
@@ -39,7 +39,7 @@ namespace CPSM
                 TitleBox = f_titlebox;
                 SourceBox = f_sourcebox;
 
-                _Initializer = new NoteInitializer();
+                _Initializer = new NoteInitializer(f_NoteImageControl);
             }
 
             public void LoadSong(SongData f_song) {
@@ -88,7 +88,6 @@ namespace CPSM
                 }
                 throw new Exception();
             }
-
             public void EnqueueNote(NoteViewModal f_note) {
                 _Initializer.AddNote(f_note);
             }
@@ -99,9 +98,10 @@ namespace CPSM
                 public Queue<NoteViewModal> NoteQueue { get; set; }
                 public DispatcherTimer Timer { get; set; }
                 public bool SleepMode { get; set; }
-
-
-                public NoteInitializer() {
+                public NoteImageControl _NoteImageControl { get; set; }
+                
+                public NoteInitializer(NoteImageControl f_NoteImageControl) {
+                    _NoteImageControl = f_NoteImageControl;
                     NoteQueue = new Queue<NoteViewModal>();
                     Timer = new DispatcherTimer();
                     Timer.Interval = TimeSpan.FromSeconds(INTERVAL);
@@ -119,7 +119,13 @@ namespace CPSM
                     }
                     var f_note = NoteQueue.Dequeue();
                     if (f_note.Parent.Exists && !f_note.Initialized) {
-                        f_note.Initialize();
+                        if (!f_note._TempVars.empty) {
+                            //SetColour handles Initialization
+                            f_note.SetColour(new NoteTemplate(f_note), _NoteImageControl.GetImage(new NoteTemplate(f_note), f_note.GetType()));
+                        }
+                        else {
+                            f_note.Initialize();
+                        }
                     }else {
                         Timer_Tick(null, null);
                     }
@@ -129,8 +135,148 @@ namespace CPSM
                         SleepMode = false;
                         Timer.Start();
                     }
-
+                    if (f_note.GetType() == NoteType.Black) { }
                     NoteQueue.Enqueue(f_note);
+                }
+            }
+        }
+
+        public class NoteImageControl
+        {
+            private Queue<NoteCache> Cache { get; set; }
+            private List<NoteCache> CommonNotes { get; set; }
+            private readonly int MAXCACHE = 12;
+            private Canvas NoteLoaderCan { get; set; }
+            private Canvas NoteLoader { get; set; }
+            private List<Image> NoteLoaderImages { get; set; }
+
+            public NoteImageControl(Canvas f_NoteLoaderCan) {
+                NoteLoaderCan = f_NoteLoaderCan;
+                NoteLoaderCan.Opacity = 1;
+                Cache = new Queue<NoteCache>();
+                NoteLoaderImages = new List<Image>();
+                NoteLoader = new Canvas() {
+                    Height = 16,
+                    Width = 12,
+                    Opacity = 1
+                };
+                NoteLoaderCan.Children.Add(NoteLoader);
+                for (int i=0; i<16; i++) {
+                    var f_img = new Image() {
+                        Height = 2,
+                        Width = 12,
+                        Margin = new Thickness(6 * (i / 8), i % 8 * 2, 0, 0),
+                        Opacity = 1
+                    };
+                    NoteLoader.Children.Add(f_img);
+                    NoteLoaderImages.Add(f_img);
+                }
+
+
+                InitializeCommonNotes();
+            }
+            
+            private void InitializeCommonNotes() {
+                CommonNotes = new List<NoteCache>();
+                NoteLoader.Loaded += delegate {
+                    for (int i = 0; i < 2; i++) {
+                        for (int o = 1; o < 8; o++) {
+                            int count = 0;
+                            foreach (var bit in NoteLoaderImages) {
+                                bit.Source = BitImages.GetBitImg((NoteBitPos)(7 + (8 * (count / 8))), (OctaveColour)o, (NoteType)i);
+                                count++;
+                            }
+                            var f_Template = new NoteTemplate();
+                            f_Template.SetColour((OctaveColour)o);
+                            f_Template.SetAsExtension();
+                            var f_TempCache = new NoteCache(f_Template, FromVisual(), (NoteType)i);
+                            CommonNotes.Add(f_TempCache);
+                        }
+                    }
+                };
+
+            }
+
+            public BitmapSource GetImage(NoteTemplate f_template, NoteType f_type) {
+                if (f_template.IsSimple()) { return GetCommonImage(f_template, f_type); }
+                var f_CacheResult = SearchCache(f_template, f_type);
+                if (f_CacheResult != null) {
+                    return f_CacheResult;
+                }
+                else {
+                    int count = 0;
+                    foreach (var img in NoteLoaderImages) {
+                        img.Source = BitImages.GetBitImg(f_template.Positions[count], f_template.Colours[count], NoteType.White);
+                        count++;
+                    }
+                    var f_Image = FromVisual();
+                    CacheAdd(f_template, f_Image, f_type);
+                    return f_Image;
+                }
+            }
+            public BitmapSource GetCommonImage(NoteTemplate f_template, NoteType f_type) {
+                if (f_template.IsStart()) {
+                    return ImageControl.NoteImg(f_template.isUsniform().Value, f_type);
+                }
+                else if (f_template.IsExtension()) {
+                    return SearchCommonCache(f_template, f_type);
+                }
+                else {
+                    throw new Exception();
+                }
+
+            }
+
+            private BitmapSource SearchCache(NoteTemplate f_template, NoteType f_type) {
+                foreach (var img in Cache) {
+                    if (img.Template.IsEqual(f_template) && f_type == img.Type) {
+                        return img.NoteImage;
+                    }
+                }
+                return null;
+            }
+            private BitmapSource SearchCommonCache(NoteTemplate f_template, NoteType f_type) {
+                foreach (var img in CommonNotes) {
+                    if (img.Template.IsEqual(f_template) && f_type == img.Type) {
+                        return img.NoteImage;
+                    }
+                }
+                return null;
+            }
+            private void CacheAdd(NoteTemplate f_template, BitmapSource f_image, NoteType f_type) {
+                if (SearchCache(f_template, f_type) == null) { return; }
+                if (Cache.Count >= MAXCACHE) Cache.Dequeue();
+                var f_CacheElement = new NoteCache(f_template, f_image, f_type);
+                Cache.Enqueue(f_CacheElement);
+                
+            }
+            private BitmapSource FromVisual() {
+                PresentationSource source = PresentationSource.FromVisual(NoteLoader);
+                RenderTargetBitmap rtb = new RenderTargetBitmap((int)NoteLoader.RenderSize.Width,
+                      (int)NoteLoader.RenderSize.Height, 96, 96, PixelFormats.Default);
+
+                VisualBrush sourceBrush = new VisualBrush(NoteLoader);
+                DrawingVisual drawingVisual = new DrawingVisual();
+                DrawingContext drawingContext = drawingVisual.RenderOpen();
+                using (drawingContext) {
+                    drawingContext.DrawRectangle(sourceBrush, null, new Rect(new Point(0, 0),
+                          new Point(NoteLoader.RenderSize.Width, NoteLoader.RenderSize.Height)));
+                }
+                rtb.Render(drawingVisual);
+                var f_image = rtb as BitmapSource;
+                return f_image;
+            }
+            
+            private class NoteCache
+            {
+                public NoteTemplate Template { get; set; }
+                public BitmapSource NoteImage { get; set; }
+                public NoteType Type { get; set; }
+
+                public NoteCache(NoteTemplate f_template, BitmapSource f_image, NoteType f_type) {
+                    Template = f_template;
+                    NoteImage = f_image;
+                    Type = f_type;
                 }
             }
         }
@@ -143,11 +289,6 @@ namespace CPSM
                 var crpimg = new CroppedBitmap(ImageBit, CreateRect(f_pos, f_type));
                 return crpimg;
             }
-
-            internal static ImageSource GetBitImg(object p1, object p2, NoteType white) {
-                throw new NotImplementedException();
-            }
-
             private static Int32Rect CreateRect(NoteBitPos f_pos, NoteType f_type) {
                 if (f_type == NoteType.White) {
                     switch (f_pos) {
@@ -242,7 +383,7 @@ namespace CPSM
                 for (int i = 0; i < 10; i++) {
                     for (int o = 0; o < (int)Size; o++) {
                         var tempNote = new BlackNoteViewModal(f_measure.BlackNotes[i, o], Can, f_mouse, this, i, o);
-                        if (!f_empty && !f_measure.WhiteNotes[i, o].IsEmpty()) {
+                        if (!f_empty && !f_measure.BlackNotes[i, o].IsEmpty()) {
                             tempNote._TempVars.empty = false;
                             Parent.EnqueueNote(tempNote);
                         }
@@ -462,6 +603,7 @@ namespace CPSM
             public MouseNoteControl _Mouse { get; set; }
             public Canvas NoteCan { get; set; }
             public List<Canvas> ClickableGrid { get; set; }
+            public Image NoteImage { get; set; }
             public MeasureViewModal Parent { get; set; }
             public NoteVars _TempVars { get; set; }
             public bool Initialized { get; set; }
@@ -493,21 +635,27 @@ namespace CPSM
                 //_Mouse.NoteMouseLeave(this, e, MousePos);
             }
             public void ClearNote() {
-                SetColour(new NoteTemplate());
-                CounterPart.SetColour(new NoteTemplate());
+                NoteCan.Children.Remove(NoteImage);
+                NoteImage = null;
+                Initialized = false;
             }
+            public virtual new NoteType GetType() { return NoteType.White; }
 
             public virtual void Initialize() { }
             public virtual void InitializeClickableGrid() { }
-            public virtual void InitializeImages() { }
+            public virtual void InitializeImage() { }
             public virtual void SetPosition(int f_xpos, int f_ypos) { }
-            
-            public virtual void SetColour(OctaveColour f_oct, PartialNote f_part) { }
 
-            public virtual void SetColour(NoteTemplate f_template) { }
-            public virtual void ClearPreview() { }
-            protected virtual void SetColourHelper(OctaveColour f_oct) { }
-            protected virtual void SetColourHelperHalf(OctaveColour f_oct, Half f_half) { }
+            public void SetColour(NoteTemplate f_template, BitmapSource f_source) {
+                if (!Initialized) { Initialize(); }
+                
+                if (f_template == null) {
+                    return;
+                }
+                NoteImage.Source = f_source;
+                CounterPart.SetColour(f_template);
+                NoteImage.Opacity = 1;
+            }
             
             public NoteViewModal FindNoteBelow() {
                 return Parent.FindNoteBelow(this);
@@ -529,42 +677,8 @@ namespace CPSM
             }
         }
 
-        public class NoteBitViewModal
-        {
-            public Image NoteBitImg { get; set; }
-            public NoteViewModal ParentNote { get; set; }
-            public NoteBitPos Pos { get; set; }
-            public OctaveColour Oct { get; set; }
-            public NoteBitPos TruePos { get; set; }
-
-            public NoteBitViewModal(Canvas f_NoteCan, NoteBitPos f_pos, NoteViewModal f_parent, NoteBitPos f_truepos) {
-                ParentNote = f_parent;
-                Pos = f_pos;
-                Oct = OctaveColour.none;
-                TruePos = f_truepos;
-            }
-
-            public virtual void InitializeImage() { }
-            public virtual Thickness setTruePos(NoteBitPos f_truepos) { return new Thickness(); }
-            public virtual void setPos(NoteBitPos f_pos) { }
-            public virtual void setOct(OctaveColour f_oct, NoteBitPos f_pos) { }
-            public virtual void setOct(OctaveColour f_oct) { }
-            
-            protected void CheckForNote() {
-                //make empty notes invisible
-                if (Oct == OctaveColour.none) {
-                    NoteBitImg.Opacity = 0;
-                }
-                else {
-                    NoteBitImg.Opacity = 1;
-                }
-            }
-
-        }
-
         public class WhiteNoteViewModal : NoteViewModal
         {
-            public List<WhiteNoteBitViewModal> Bits { get; set; }
 
             public WhiteNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
                 NoteCan = new Canvas() {
@@ -631,119 +745,36 @@ namespace CPSM
                 };
             }
             public override void Initialize() {
-
-                Bits = new List<WhiteNoteBitViewModal>();
-
-                for (int i = 0; i < 16; i++) {
-                    Bits.Add(new WhiteNoteBitViewModal(NoteCan, ((NoteBitPos)i), this, (NoteBitPos)i));
-                }
-
-
-                /*
-                //_TempVars.MeasureCan.Children.Add(NoteCan);
-                if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
-                    var f_x = _TempVars.xpos.Value;
-                    var f_y = _TempVars.ypos.Value;
-                    SetPosition(f_x, f_y);
-                }
-                else throw new Exception();
-                */
-
-                InitializeImages();
-
+                InitializeImage();
                 ClickableGrid = null;
                 InitializeClickableGrid();
-
-                //debug
-                //SetColourHelper(OctaveColour.Blue);
-
                 Initialized = true;
-                
-                if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
                 _TempVars = null;
             }
-
-            public override void InitializeImages() {
-                foreach (var bit in Bits) {
-                    bit.InitializeImage();
-                }
-                //debug
-                //NoteCan.Background = Brushes.Pink;
-            }
-
-            public override void SetColour(NoteTemplate f_template) {
-                if (!Initialized) { Initialize();}
-
-                //clear note and paste
-                if (f_template == null) {
-                    return;
-                }
-                int count = 0;
-                foreach (var bit in Bits) {
-                    bit.setOct(f_template.Colours[count], f_template.Positions[count]);
-                    count++;
-                }
-                CounterPart.SetColour(f_template);
-            }
-        }
-        
-        public class WhiteNoteBitViewModal : NoteBitViewModal
-        {
-            public WhiteNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent, NoteBitPos f_truepos) : base(f_notecan, f_pos, f_parent, f_truepos) {
-                
-            }
-
             public override void InitializeImage() {
-                NoteBitImg = new Image() {
-                    Height = 2,
-                    Width = 8
+                NoteImage = new Image() {
+                    Height = 16,
+                    Width = 12
                 };
-                NoteBitImg.Margin = setTruePos(TruePos);
-                ParentNote.NoteCan.Children.Add(NoteBitImg);
+                NoteCan.Children.Add(NoteImage);
             }
-            public override Thickness setTruePos(NoteBitPos f_truepos) {
-                int xx = -1;
-                switch (f_truepos) {
-                    case NoteBitPos.a1: { return new Thickness(xx, 0, 0, 0); }
-                    case NoteBitPos.a2: { return new Thickness(xx, 2, 0, 0); }
-                    case NoteBitPos.a3: { return new Thickness(xx, 4, 0, 0); }
-                    case NoteBitPos.a4: { return new Thickness(xx, 6, 0, 0); }
-                    case NoteBitPos.a5: { return new Thickness(xx, 8, 0, 0); }
-                    case NoteBitPos.a6: { return new Thickness(xx, 10, 0, 0); }
-                    case NoteBitPos.a7: { return new Thickness(xx, 12, 0, 0); }
-                    case NoteBitPos.a8: { return new Thickness(xx, 14, 0, 0); }
-                    case NoteBitPos.b1: { return new Thickness(xx + 6, 0, 0, 0); }
-                    case NoteBitPos.b2: { return new Thickness(xx + 6, 2, 0, 0); }
-                    case NoteBitPos.b3: { return new Thickness(xx + 6, 4, 0, 0); }
-                    case NoteBitPos.b4: { return new Thickness(xx + 6, 6, 0, 0); }
-                    case NoteBitPos.b5: { return new Thickness(xx + 6, 8, 0, 0); }
-                    case NoteBitPos.b6: { return new Thickness(xx + 6, 10, 0, 0); }
-                    case NoteBitPos.b7: { return new Thickness(xx + 6, 12, 0, 0); }
-                    case NoteBitPos.b8: { return new Thickness(xx + 6, 14, 0, 0); }
-                }
-                throw new Exception();
+            public override NoteType GetType() {
+                return NoteType.White;
             }
-            public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
-                NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.White);
-                Oct = f_oct;
-                Pos = f_pos;
-                CheckForNote();
-            }
-            public override void setOct(OctaveColour f_oct) {
-                NoteBitImg.Source = BitImages.GetBitImg(Pos, f_oct, NoteType.White);
-                Oct = f_oct;
-                CheckForNote();
-            }
-            
+
         }
-        
 
         public class BlackNoteViewModal : NoteViewModal
         {
-            public List<BlackNoteBitViewModal> Bits { get; set; }
 
             public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
-
+                NoteCan = new Canvas() {
+                    Height = 16,
+                    Width = 12
+                };
+                f_parent.Can.Children.Add(NoteCan);
+                SetPosition(f_xpos, f_ypos);
+                InitializeClickableGrid();
             }
             
             public override void SetPosition(int f_xpos, int f_ypos) {
@@ -796,101 +827,24 @@ namespace CPSM
                     Margin = new Thickness(2, f_ypos, 0, 0)
                 };
             }
-
             public override void Initialize() {
-                NoteCan = new Canvas() {
+                InitializeImage();
+                ClickableGrid = null;
+                InitializeClickableGrid();
+                Initialized = true;
+                _TempVars = null;
+            }
+            public override void InitializeImage() {
+                NoteImage = new Image() {
                     Height = 16,
                     Width = 10
                 };
-
-                Bits = new List<BlackNoteBitViewModal>();
-
-                for (int i = 0; i < 16; i++) {
-                    Bits.Add(new BlackNoteBitViewModal(NoteCan, ((NoteBitPos)i), this, (NoteBitPos)i));
-                }
-
-                _TempVars.MeasureCan.Children.Add(NoteCan);
-                //debug
-                //SetColourHelper(OctaveColour.Blue);
-                if (_TempVars.xpos.HasValue && _TempVars.ypos.HasValue) {
-                    var f_x = _TempVars.xpos.Value;
-                    var f_y = _TempVars.ypos.Value;
-                    SetPosition(f_x, f_y);
-                }
-                else throw new Exception();
-
-                InitializeImages();
-                Initialized = true;
-
-                if (!_TempVars.empty) SetColour(new NoteTemplate(CounterPart));
-                _TempVars = null;
+                NoteCan.Children.Add(NoteImage);
             }
-            public override void InitializeImages() {
-                foreach (var bit in Bits) {
-                    bit.InitializeImage();
-                }
+            public override NoteType GetType() {
+                return NoteType.Black;
             }
 
-            public override void SetColour(NoteTemplate f_template) {
-                if (!Initialized) { Initialize(); }
-
-                //clear note and paste
-                if (f_template == null) {
-                    return;
-                }
-                int count = 0;
-                foreach (var bit in Bits) {
-                    bit.setOct(f_template.Colours[count], f_template.Positions[count]);
-                    count++;
-                }
-            }
-        }
-
-        public class BlackNoteBitViewModal : NoteBitViewModal
-        {
-            public BlackNoteBitViewModal(Canvas f_notecan, NoteBitPos f_pos, NoteViewModal f_parent, NoteBitPos f_truepos) : base(f_notecan, f_pos, f_parent, f_truepos) {
-                
-            }
-
-            public override void InitializeImage() {
-                NoteBitImg = new Image() {
-                    Height = 2,
-                    Width = 6
-                };
-                NoteBitImg.Margin = setTruePos(TruePos);
-            }
-            public override Thickness setTruePos(NoteBitPos f_truepos) {
-                switch (f_truepos) {
-                    case NoteBitPos.a1: { return new Thickness(-2, 0, 0, 0); }
-                    case NoteBitPos.a2: { return new Thickness(-2, 2, 0, 0); }
-                    case NoteBitPos.a3: { return new Thickness(-2, 4, 0, 0); }
-                    case NoteBitPos.a4: { return new Thickness(-2, 6, 0, 0); }
-                    case NoteBitPos.a5: { return new Thickness(-2, 8, 0, 0); }
-                    case NoteBitPos.a6: { return new Thickness(-2, 10, 0, 0); }
-                    case NoteBitPos.a7: { return new Thickness(-2, 12, 0, 0); }
-                    case NoteBitPos.a8: { return new Thickness(-2, 14, 0, 0); }
-                    case NoteBitPos.b1: { return new Thickness(0, 0, -2, 0); }
-                    case NoteBitPos.b2: { return new Thickness(0, 2, -2, 0); }
-                    case NoteBitPos.b3: { return new Thickness(0, 4, -2, 0); }
-                    case NoteBitPos.b4: { return new Thickness(0, 6, -2, 0); }
-                    case NoteBitPos.b5: { return new Thickness(0, 8, -2, 0); }
-                    case NoteBitPos.b6: { return new Thickness(0, 10, -2, 0); }
-                    case NoteBitPos.b7: { return new Thickness(0, 12, -2, 0); }
-                    case NoteBitPos.b8: { return new Thickness(0, 14, -2, 0); }
-                }
-                throw new Exception();
-            }
-            public override void setOct(OctaveColour f_oct, NoteBitPos f_pos) {
-                NoteBitImg.Source = BitImages.GetBitImg(f_pos, f_oct, NoteType.Black);
-                Oct = f_oct;
-                Pos = f_pos;
-                CheckForNote();
-            }
-            public override void setOct(OctaveColour f_oct) {
-                NoteBitImg.Source = BitImages.GetBitImg(Pos, f_oct, NoteType.Black);
-                Oct = f_oct;
-                CheckForNote();
-            }
         }
 
 
@@ -1097,6 +1051,17 @@ namespace CPSM
                     }
                 }
                 return true;
+            }
+            public bool IsStart() {
+                int count = 0;
+                foreach (var pos in Positions) {
+                    if (pos != (NoteBitPos)count) { return false; }
+                    count++;
+                }
+                return true;
+            }
+            public bool IsSimple() {
+                return ((IsStart() || IsExtension()) && isUsniform() != null);
             }
 
 
