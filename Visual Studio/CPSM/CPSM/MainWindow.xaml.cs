@@ -184,8 +184,8 @@ namespace CPSM
             _GUI.initMeasureCreatorForm(f_measurecreatorform);            
         }
         public void TestModal() {
-            var testsong = new SongData(0) {
-                Name = "We Stand for Everfree",
+            var testsong = new SongData() {
+                Title = "We Stand for Everfree",
                 Source = "Legend of Everfree"
             };
 
@@ -265,7 +265,8 @@ namespace CPSM
             testsong.Measures.Add(testmeasure);
             testsong.Measures.Add(testmeasure2);
 
-            _SongCan.LoadSong(testsong);
+            //_SongCan.LoadSong(testsong.Title, testsong.Source);
+            _SongCan.LoadSongFromData(testsong);
 
         }
         

@@ -47,7 +47,7 @@ namespace CPSM
                 foreach (var mes in f_song.Measures) {
                     CreateMeasure(mes, false);
                 }
-                TitleBox.Content = f_song.Name;
+                TitleBox.Content = f_song.Title;
                 SourceBox.Content = f_song.Source;
             }
             public void CreateMeasure(MeasureData f_measure, bool f_empty) {
@@ -923,6 +923,11 @@ namespace CPSM
                     Positions[i] = f_note.Positions[i];
                 }
             }
+            public NoteTemplate(char f_char) {
+                Init();
+                var f_col = GetColourFromChar(f_char);
+                SetColour(f_col);
+            }
 
             public OctaveColour? isUsniform() {
                 bool colourfound = false;
@@ -981,6 +986,10 @@ namespace CPSM
                             break;
                         }
                 }
+            }
+            public void SetHalfColour(Half f_half, char f_char) {
+                var f_col = GetColourFromChar(f_char);
+                SetHalfColour(f_half, f_col);
             }
             public void SetHalfColour(Half f_half, NoteTemplate f_note) {
                 switch (f_half) {
@@ -1064,6 +1073,19 @@ namespace CPSM
                 return ((IsStart() || IsExtension()) && isUsniform() != null);
             }
 
+            private OctaveColour GetColourFromChar(char f_char) {
+                switch (f_char) {
+                    case 'o': return OctaveColour.none;
+                    case 'q': return OctaveColour.Brown;
+                    case 'w': return OctaveColour.Teal;
+                    case 'e': return OctaveColour.Blue;
+                    case 'r': return OctaveColour.Green;
+                    case 't': return OctaveColour.Red;
+                    case 'y': return OctaveColour.Purple;
+                    case 'u': return OctaveColour.Yellow;
+                }
+                throw new Exception();
+            }
 
             public static class NoteTemplates
             {

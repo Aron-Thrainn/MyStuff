@@ -8,7 +8,7 @@ using CPSM.ViewModals;
 
 namespace CPSM
 {
-    /*
+    /* // Song Saver is elseware
     public class SongControl {
         private IniFile SaveFile { get; set; }
         public SongData ActiveSong { get; set; }
@@ -115,27 +115,41 @@ namespace CPSM
 
 
 
+    public class SongDataSmall {
+        public string Title { get; set; }
+        public string Source { get; set; }
+        public int MeasureCount { get; set; }
+        public int PageCount { get; set; }
+
+        public SongDataSmall() {
+
+        }
+    }
 
     public class SongData {
-        public int ID { get; set; } // might use name as unique primary key
+        // name + Source is unique primary key
         public List<MeasureData> Measures { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Source { get; set; }
 
         //meta data about the song
         public int PageCount { get; set; }
         public List<int> MeasuresPerPage { get; set; }
 
-        public SongData(int f_ID) {
-            ID = f_ID;
+        public SongData() {
             Measures = new List<MeasureData>();
-            Name = "";
+            Title = "";
             Source = "";
+            PageCount = 0;
+            MeasuresPerPage = new List<int>();
         }
 
         public void AddMeasure(MeasureSize f_size) {
-            var NewMeasure = new MeasureData(this, f_size);
-            Measures.Add(NewMeasure);
+            var f_NewMeasure = new MeasureData(this, f_size);
+            Measures.Add(f_NewMeasure);
+        }
+        public void AddMeasure(MeasureData f_measure) {
+            Measures.Add(f_measure);
         }
         public void DeleteMeasure() {
             Measures.RemoveAt(Measures.Count-1);

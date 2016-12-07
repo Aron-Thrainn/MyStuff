@@ -60,7 +60,15 @@ namespace CPSM
             _Creator = f_creator;
         }
 
-        public void LoadSong(SongData f_song) {
+
+        public void LoadSong(string f_title, string f_source) {
+            var f_loader = new SongLoader(@"C:\\Users\\Arthas Menethil\\Desktop\\temptxt.txt");
+            var f_song = f_loader.LoadSong(f_title, f_source);
+            if (f_song != null) {
+                LoadSongFromData(f_song);
+            }
+        }
+        public void LoadSongFromData(SongData f_song) {
             ActiveSongData = f_song;
             _Creator.LoadSong(f_song);
         }
@@ -94,15 +102,24 @@ namespace CPSM
             public int state { get; set; }
             public NoteTemplate prevNote { get; set; }
 
+            public static string PCPath = @"C:\\Users\\Notandi\\Desktop\\temptxt.txt";
+            public static string LaptopPath = @"C:\\Users\\Arthas Menethil\\Desktop\\temptxt.txt";
+
+
             #region static chars
             private static string TITLE = "T";
             private static string SOURCE = "S";
+            private static string MEASCOUNT = "C";
+            private static string PAGECOUNT = "V";
             private static string MEASURE = "M";
             private static string NOTE = "N";
             private static string BIT = "B";
             private static string DUPLICATE = "X";
+            private static string EXTESNION = "Z";
             private static string OPEN = "(";
             private static string CLOSE = ")";
+            private static string END = ";";
+
 
 
             private static string O = "o";
@@ -115,17 +132,15 @@ namespace CPSM
             private static string U = "u";
 
             //a & b reserved for note bit pos
-
-
             #endregion
-
-
-
+                
             public SongSaver(SongData f_Song) {
-                using (StreamWriter file = new StreamWriter(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt")) {
+                using (StreamWriter file = new StreamWriter(LaptopPath)) {
 
-                    file.Write(TITLE + OPEN + f_Song.Name + CLOSE);
+                    file.Write(TITLE + OPEN + f_Song.Title + CLOSE);
                     file.Write(SOURCE + OPEN + f_Song.Source + CLOSE);
+                    file.Write(MEASCOUNT + OPEN + f_Song.Measures.Count + CLOSE);
+                    file.Write(PAGECOUNT + OPEN + f_Song.PageCount + CLOSE); //pagecount is not bieng calculated
 
                     foreach (var measure in f_Song.Measures) {
                         currMesSize = (int)measure.Size;
@@ -190,8 +205,8 @@ namespace CPSM
                             }
                         }
                         file.Write(CLOSE);
-
                     }
+                    file.Write(END);
                 }
             }
 
@@ -301,6 +316,248 @@ namespace CPSM
             }
         }
 
+        public class SongLoader {
+
+            public string Path { get; set; }
+            public int i { get; set; }
+            public int o { get; set; }
+            public int count { get; set; }
+            public bool LastHandled { get; set; }
+            public NoteTemplate LastNote { get; set; }
+
+            #region static chars
+            private static string TITLE = "T";
+            private static string SOURCE = "S";
+            private static string MEASCOUNT = "C";
+            private static string PAGECOUNT = "V";
+            private static string MEASURE = "M";
+            private static string NOTE = "N";
+            private static string BIT = "B";
+            private static string DUPLICATE = "X";
+            private static string EXTESNION = "Z";
+            private static string OPEN = "(";
+            private static string CLOSE = ")";
+            private static string END = ";";
+
+
+            private static string O = "o";
+            private static string Q = "q";
+            private static string W = "w";
+            private static string E = "e";
+            private static string R = "r";
+            private static string T = "t";
+            private static string Y = "y";
+            private static string U = "u";
+
+            //a & b reserved for note bit pos
+            #endregion
+
+            public SongLoader(string f_Path) {
+                Path = f_Path;
+            }
+
+            public SongData LoadSong(string f_title, string f_source) {
+                var f_Lines = File.ReadAllLines(Path);
+                var f_Song = new SongData();
+                string f_Line = "";
+
+                foreach (var line in f_Lines) {
+                    //var f_temp1 = ReadName(line);
+                    //var f_temp2 = ReadSource(line);
+
+
+                    if (ReadName(line) == f_title && ReadSource(line) == f_source) {
+                        f_Line = line;
+                        break;
+                    }
+                }
+                if (f_Line == "") {
+                    return null; // song not found
+                }
+
+                f_Song.Title = f_title;
+                f_Song.Source = f_source;
+                count = 0;
+                while (f_Line[count] != END[0]) {
+                    if (f_Line[count] == MEASURE[0] && f_Line[count+3] == OPEN[0]) { //count+3 because measures are 3 characters long (m03, m12 ect)
+                        string f_tempmes = MEASURE;
+                        count++;
+                        f_tempmes += f_Line[count].ToString();
+                        count++;
+                        f_tempmes += f_Line[count].ToString();
+                        count++;
+                        var f_messize = GetMeasureSize(f_tempmes);
+                        var f_measure = new MeasureData(f_Song, f_messize);
+                        count++;
+                        i = 0;
+                        o = 0;
+                        SetLast(new NoteTemplate(f_Line[count])); // first note
+                        count++;
+                        while (f_Line[count] != CLOSE[0]) { //read to end of measure
+                            if (f_Line[count] == DUPLICATE[0]) {
+                                HandleDup(f_measure, f_Line);
+                            }
+                            else if (f_Line[count] == EXTESNION[0]) {
+                                HandleExt(f_measure, f_Line);
+                            }
+                            else if (f_Line[count] == NOTE[0]) {
+                                HandleComplex(f_measure, f_Line);
+                            }
+                            else {  //simple note
+                                HandleSimple(f_measure, f_Line);
+                            }
+                        }
+                        AddNote(f_measure, 1);//add last note
+                        f_Song.AddMeasure(f_measure);
+                    }
+                    count++;
+                }
+                return f_Song;
+            }
+            public List<SongDataSmall> LoadSongsSmall() {
+                var f_Lines = File.ReadAllLines(Path);
+                var f_SongDataSmall = new List<SongDataSmall>();
+                foreach (var line in f_Lines) {
+                    var f_SmallData = new SongDataSmall();
+
+                    f_SmallData.Title = ReadName(line);
+                    f_SmallData.Source = ReadSource(line);
+                    f_SmallData.MeasureCount = ReadMeasureCount(line);
+                    f_SmallData.PageCount= ReadPageCount(line);
+                }
+                return f_SongDataSmall;
+            }
+            
+            private void HandleSimple(MeasureData f_measure, string f_Line) {
+                //if (f_Line[count+1] != EXTESNION[0] && f_Line[count + 1] != DUPLICATE[0]) {
+                    AddNote(f_measure, 1);
+                //}
+                SetLast(new NoteTemplate(f_Line[count]));
+                count++;
+            }
+            private void HandleComplex(MeasureData f_measure, string f_Line) {
+                AddNote(f_measure, 1);
+                var f_temptemp = new NoteTemplate();
+                if (f_Line[count] != BIT[0] && f_Line[count + 1] == OPEN[0]) {
+                    count++;
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Left, f_Line[count]);
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Right, f_Line[count]);
+                    count++;
+                    SetLast(f_temptemp);
+                    count++;
+                }
+                else {
+                    //TODO:
+                    //Complex Notes
+                    throw new NotImplementedException();
+                }
+            }
+            private void HandleDup(MeasureData f_measure, string f_Line) {
+                count++;
+                var f_tempstring = new StringBuilder();
+                while (char.IsDigit(f_Line[count])) {
+                    f_tempstring.Append(f_Line[count]);
+                    count++;
+                }
+                AddNote(f_measure, int.Parse(f_tempstring.ToString()));
+
+            }
+            private void HandleExt(MeasureData f_measure, string f_Line) {
+                throw new NotImplementedException();
+            }
+
+            private string ReadName(string f_line) {
+                int count = 0;
+                StringBuilder f_name = new StringBuilder();
+                while (!(f_line[count] == TITLE[0] && f_line[count+1] == OPEN[0])) {
+                    count++;
+                }
+                count++;
+                count++;
+                while (f_line[count] != CLOSE[0]) {
+                    f_name.Append(f_line[count]);
+                    count++;
+                }
+                return f_name.ToString();
+            }
+            private string ReadSource(string f_line) {
+                int count = 0;
+                StringBuilder f_name = new StringBuilder();
+                while (!(f_line[count] == SOURCE[0] && f_line[count + 1] == OPEN[0])) {
+                    count++;
+                }
+                count++;
+                count++;
+                while (f_line[count] != CLOSE[0]) {
+                    f_name.Append(f_line[count]);
+                    count++;
+                }
+                return f_name.ToString();
+            }
+            private int ReadMeasureCount(string f_line) {
+                int count = 0;
+                StringBuilder f_name = new StringBuilder();
+                while (!(f_line[count] == MEASCOUNT[0] && f_line[count + 1] == OPEN[0])) {
+                    count++;
+                }
+                count++;
+                count++;
+                while (f_line[count] != CLOSE[0]) {
+                    f_name.Append(f_line[count]);
+                    count++;
+                }
+                return int.Parse(f_name.ToString());
+            }
+            private int ReadPageCount(string f_line) {
+                int count = 0;
+                StringBuilder f_name = new StringBuilder();
+                while (!(f_line[count] == PAGECOUNT[0] && f_line[count + 1] == OPEN[0])) {
+                    count++;
+                }
+                count++;
+                count++;
+                while (f_line[count] != CLOSE[0]) {
+                    f_name.Append(f_line[count]);
+                    count++;
+                }
+                return int.Parse(f_name.ToString());
+            }
+            private MeasureSize GetMeasureSize(string f_str) {
+                switch (f_str) {
+                    case "M04": return MeasureSize.four;
+                    case "M06": return MeasureSize.six;
+                    case "M08": return MeasureSize.eight;
+                    case "M10": return MeasureSize.ten;
+                    case "M12": return MeasureSize.twelve;
+                }
+                throw new Exception();
+            }
+            private void AddNote(MeasureData f_measure, int f_notecount) {
+                if (LastHandled) { return; }
+                for (int c=0; c<f_notecount; c++) {
+                    try {
+                        if (LastNote.isUsniform() != OctaveColour.none) {
+                            f_measure.WhiteNotes[i, o].SetNote(LastNote);
+                        }
+                    }
+                    catch { }
+                    o++;
+                    if (o >= (int)f_measure.Size) {
+                        o = 0;
+                        i++;
+                    }
+                }
+                LastHandled = true;
+            }
+            private void SetLast(NoteTemplate f_note) {
+                LastNote = f_note;
+                LastHandled = false;
+            }
+        }
+
+
         public class NoteDisplay
         {
             public NoteDisplay(Canvas f_candisplay) {
@@ -318,6 +575,7 @@ namespace CPSM
                 }
             }
         }
+
     }
     #endregion
     #region Mouse Control
@@ -760,7 +1018,8 @@ namespace CPSM
             //Saves in project folder
             //FilePath = new FileInfo("TempImage.png").FullName.ToString();
             //Saves to desktop
-            FilePath = "C:\\Users\\Notandi\\Desktop\\TempImage.png";
+            //FilePath = "C:\\Users\\Notandi\\Desktop\\TempImage.png";
+            FilePath = "C:\\Users\\Arthas Menethil\\Desktop\\TempImage.png";
             SongCan = f_SongCan;
         }
 
