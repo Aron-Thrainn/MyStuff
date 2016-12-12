@@ -621,7 +621,7 @@ namespace CPSM
         }
 
         public void UpdatePreview(OctaveColour f_oct) {
-            _Parent.UpdatePreview(f_oct);
+             _Parent.UpdatePreview();
         }
 
     }
@@ -689,6 +689,7 @@ namespace CPSM
         }
         public void NoteRightClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             sender.ClearNote();
+            UpdatePreview();
         }
         public void NoteRightClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
 
@@ -712,10 +713,8 @@ namespace CPSM
         public void NoteMouseLeave(NoteViewModal sender, MouseEventArgs e, Point f_mousepos) {
             //leave triggers before enter when going from one to another
             
-            if (Creating == false) {
-                if (_Preview != null) {
-                    ResetPreview();
-                }
+            if (Creating == false && _Preview != null && _Preview.Initialized == true) { // checks weather the preveiew has only just been created, else it loops
+                ResetPreview();
             }
         }
         //need global mouse enevt handler for _creator to work properly
@@ -725,15 +724,29 @@ namespace CPSM
             ResetPreview();
             _Preview = new NotePreview(sender, f_HeldNote, false, true, this);
         }
-        public void UpdatePreview(OctaveColour f_oct) {
+        public void UpdatePreview() {
+            if (_Preview != null) {
+                var f_tempnote = _Preview.Note;
+                NoteTemplate f_temptemplate;
+                if (_colourctrl.IsTemplate) {
+                    f_temptemplate = new NoteTemplate(_colourctrl.Template);
+                }
+                else {
+                    f_temptemplate = new NoteTemplate();
+                    f_temptemplate.SetColour(_colourctrl.ActiveColour);
+                }
+                // sets the heldnote to f_oct colour full note, does not currently work for partial notes
+                
+                ResetPreview();
+                _Preview = new NotePreview(f_tempnote, f_temptemplate, false, true, this);
+            }
+        }
+        public void UpdatePreview(NoteTemplate f_Note) {
             var f_tempnote = _Preview.Note;
-            var f_temptemplate = new NoteTemplate();
-            f_temptemplate.SetColour(f_oct); 
+            var f_temptemplate = new NoteTemplate(f_Note);
             // sets the heldnote to f_oct colour full note, does not currently work for partial notes
 
-            if (_Preview != null) {
-                ResetPreview();
-            }
+            ResetPreview();            
             _Preview = new NotePreview(f_tempnote, f_temptemplate, false, true, this);
         }
         public void GlobalMouseUp() {
@@ -748,7 +761,6 @@ namespace CPSM
         public void ResetPreview() {
             if (_Preview != null) {
                 _Preview.Cancel();
-                _Preview = null;
             }
         }
     }
@@ -774,8 +786,7 @@ namespace CPSM
             if (!f_startpoint) {
                 f_HeldNote.SetAsExtension();
             }
-
-
+            
             PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
             CreatePreviewImage();
             if (PreviewTemplate.isUsniform() != OctaveColour.none) {
@@ -796,7 +807,7 @@ namespace CPSM
 
                 NoteImage.Margin = new Thickness(f_xx, f_yy, 0, 0);
                 Note.Parent.Can.Children.Add(NoteImage);
-                Note.NoteCan.Opacity = 0;
+                Note.NoteCan.Opacity = 0; //suppresses the existing note in favor of the preview
             }
         }
         public void Activate() {
@@ -808,12 +819,12 @@ namespace CPSM
         public void Cancel() {
             Note.Parent.Can.Children.Remove(NoteImage);
             Note.NoteCan.Opacity = 1;
+            _Control._Preview = null;
         }
         public void ForceDisplay() {
             Note.Parent.Can.Children.Add(NoteImage);
-            Note.NoteCan.Loaded += delegate {
-                var f_parent = VisualTreeHelper.GetParent(Note.NoteCan) as Canvas;
-                f_parent.Children.Remove(Note.NoteCan);// Bugged, note isn't bieng removed
+            NoteImage.Loaded += delegate {
+                Note.Parent.Can.Children.Remove(NoteImage);
             };
 
         }
@@ -919,8 +930,7 @@ namespace CPSM
             Point MousePos = e.GetPosition(NoteImage);
             _Control.NoteClickUp(Note, e, MousePos);
         }
-
-
+        
         public void NoteMouseLeave(object sender, MouseEventArgs e) {
             Point MousePos = e.GetPosition(NoteImage);
             _Control.NoteMouseLeave(Note, e, MousePos);
@@ -931,22 +941,6 @@ namespace CPSM
                 _Control.NoteMouseEnter(Note, e, MousePos);
             }
             else Initialized = true;
-        }
-        public void NoteLeftClickDown(object sender, MouseButtonEventArgs e) {
-            Point MousePos = e.GetPosition(NoteImage);
-            _Control.NoteLeftClickedDown(Note, e, MousePos);
-        }
-        public void NoteLeftClickUp(object sender, MouseButtonEventArgs e) {
-            Point MousePos = e.GetPosition(NoteImage);
-            _Control.NoteLeftClickedUp(Note, e, MousePos);
-        }
-        public void NoteRightClickDown(object sender, MouseButtonEventArgs e) {
-            Point MousePos = e.GetPosition(NoteImage);
-            _Control.NoteRightClickedDown(Note, e, MousePos);
-        }
-        public void NoteRightClickUp(object sender, MouseButtonEventArgs e) {
-            Point MousePos = e.GetPosition(NoteImage);
-            _Control.NoteRightClickedUp(Note, e, MousePos);
         }
     }
 

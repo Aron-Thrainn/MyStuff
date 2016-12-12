@@ -631,13 +631,14 @@ namespace CPSM
                 _Mouse.NoteMouseEnter(this, e, MousePos);
             }
             public virtual void NoteMouseLeave(object sender, MouseEventArgs e) {
-                //Point MousePos = e.GetPosition(NoteCan);
-                //_Mouse.NoteMouseLeave(this, e, MousePos);
+                Point MousePos = e.GetPosition(NoteCan);
+                _Mouse.NoteMouseLeave(this, e, MousePos);
             }
             public void ClearNote() {
                 NoteCan.Children.Remove(NoteImage);
                 NoteImage = null;
                 Initialized = false;
+                CounterPart.SetColour(OctaveColour.none);
             }
             public virtual new NoteType GetType() { return NoteType.White; }
 

@@ -31,7 +31,6 @@ using CPSM.Forms;
 
     
     Bugs: 
-    Note preview showes up in top left when not supposed to
     Note Extensions arent bieng drawn normally, but are when loading
     Note extensions are partially transparent
     
@@ -159,6 +158,7 @@ namespace CPSM
                         break;
                     }
             }
+            _MouseCtrl._noteCtrl.UpdatePreview();
         }
         private void MouseButtonUp(object sender, MouseEventArgs e) {
             _MouseCtrl._noteCtrl.GlobalMouseUp();
@@ -239,8 +239,16 @@ namespace CPSM
             notetemp2.Positions[14] = NoteBitPos.b3;
             notetemp2.Positions[15] = NoteBitPos.b4;
 
+            var notetemp3 = new NoteTemplate();
+            notetemp3.SetColour(OctaveColour.Purple);
+            notetemp3.SetAsExtension();
+
+
             testmeasure.WhiteNotes[10, 5].SetColour(notetemp1);
             testmeasure.WhiteNotes[10, 6].SetColour(notetemp2);
+
+            testmeasure.WhiteNotes[10, 7].SetColour(OctaveColour.Purple);
+            testmeasure.WhiteNotes[10, 8].SetColour(notetemp3);
 
 
             testmeasure.WhiteNotes[1, 0].SetColour(OctaveColour.Brown);

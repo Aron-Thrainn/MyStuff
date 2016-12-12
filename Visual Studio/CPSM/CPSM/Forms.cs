@@ -53,7 +53,7 @@ namespace CPSM
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
                 _MouseCtrl.SetColour((OctaveColour)btn.Tag);
-                _MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
+                //_MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
             }
             public void FirstButtonClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
