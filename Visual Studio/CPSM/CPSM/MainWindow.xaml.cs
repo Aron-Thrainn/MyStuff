@@ -22,17 +22,12 @@ using CPSM.Forms;
     Partial Notes
     Make measures fill out multiple columns
     Add Save & load functions
-    Add Export funcion
+    Add Export Dialog funcion
     Add Copy/Paste functions
+    add NotetType to NoteTemplate
 
-    Rework note images to have only 1 image
-     - Initialize common notes
-     - fix complex note creation
 
-    
-    Bugs: 
-    Note Extensions arent bieng drawn normally, but are when loading
-    Note extensions are partially transparent
+    Bugs:
     
 */
 /*
@@ -47,6 +42,7 @@ using CPSM.Forms;
     handle rightclick while creating a long note
     Smooth out long note creation
     copy note icon is black & white if note is simple
+    Rework note images to have only 1 image
 
 */
 

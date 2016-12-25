@@ -11,6 +11,7 @@ using System.Windows.Input;
 using CommonClasses.Images;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Drawing;
 
 namespace CPSM
 {
@@ -146,55 +147,28 @@ namespace CPSM
             private Queue<NoteCache> Cache { get; set; }
             private List<NoteCache> CommonNotes { get; set; }
             private readonly int MAXCACHE = 12;
-            private Canvas NoteLoaderCan { get; set; }
-            private Canvas NoteLoader { get; set; }
-            private List<Image> NoteLoaderImages { get; set; }
+            private bool CommonNotesInitialized { get; set; }
 
-            public NoteImageControl(Canvas f_NoteLoaderCan) {
-                NoteLoaderCan = f_NoteLoaderCan;
-                NoteLoaderCan.Opacity = 1;
+            public NoteImageControl() {
+                CommonNotesInitialized = false;
                 Cache = new Queue<NoteCache>();
-                NoteLoaderImages = new List<Image>();
-                NoteLoader = new Canvas() {
-                    Height = 16,
-                    Width = 12,
-                    Opacity = 1
-                };
-                NoteLoaderCan.Children.Add(NoteLoader);
-                for (int i=0; i<16; i++) {
-                    var f_img = new Image() {
-                        Height = 2,
-                        Width = 12,
-                        Margin = new Thickness(6 * (i / 8), i % 8 * 2, 0, 0),
-                        Opacity = 1
-                    };
-                    NoteLoader.Children.Add(f_img);
-                    NoteLoaderImages.Add(f_img);
-                }
-
-
-                InitializeCommonNotes();
             }
             
             private void InitializeCommonNotes() {
                 CommonNotes = new List<NoteCache>();
-                NoteLoader.Loaded += delegate {
-                    for (int i = 0; i < 2; i++) {
-                        for (int o = 1; o < 8; o++) {
-                            int count = 0;
-                            foreach (var bit in NoteLoaderImages) {
-                                bit.Source = BitImages.GetBitImg((NoteBitPos)(7 + (8 * (count / 8))), (OctaveColour)o, (NoteType)i);
-                                count++;
-                            }
-                            var f_Template = new NoteTemplate();
-                            f_Template.SetColour((OctaveColour)o);
-                            f_Template.SetAsExtension();
-                            var f_TempCache = new NoteCache(f_Template, FromVisual(), (NoteType)i);
-                            CommonNotes.Add(f_TempCache);
-                        }
+                for (int i = 0; i < 2; i++) {
+                    for (int o = 1; o < 8; o++) {
+                        var f_Template = new NoteTemplate();
+                        f_Template.SetColour((OctaveColour)o);
+                        f_Template.SetAsExtension();
+
+                        var f_Image = SetImageBits(GetImageBits(f_Template));
+
+                        var f_TempCache = new NoteCache(f_Template, f_Image, (NoteType)i);
+                        CommonNotes.Add(f_TempCache);
                     }
                 };
-
+                CommonNotesInitialized = true;
             }
 
             public BitmapSource GetImage(NoteTemplate f_template, NoteType f_type) {
@@ -204,12 +178,10 @@ namespace CPSM
                     return f_CacheResult;
                 }
                 else {
-                    int count = 0;
-                    foreach (var img in NoteLoaderImages) {
-                        img.Source = BitImages.GetBitImg(f_template.Positions[count], f_template.Colours[count], NoteType.White);
-                        count++;
-                    }
-                    var f_Image = FromVisual();
+
+                    // Draws the images into a DrawingVisual component
+                    var f_Image = SetImageBits(GetImageBits(f_template));
+                    
                     CacheAdd(f_template, f_Image, f_type);
                     return f_Image;
                 }
@@ -219,6 +191,7 @@ namespace CPSM
                     return ImageControl.NoteImg(f_template.isUsniform().Value, f_type);
                 }
                 else if (f_template.IsExtension()) {
+                    if (!CommonNotesInitialized) { InitializeCommonNotes(); }
                     return SearchCommonCache(f_template, f_type);
                 }
                 else {
@@ -244,27 +217,47 @@ namespace CPSM
                 return null;
             }
             private void CacheAdd(NoteTemplate f_template, BitmapSource f_image, NoteType f_type) {
-                if (SearchCache(f_template, f_type) == null) { return; }
+                if (SearchCache(f_template, f_type) != null) { return; }
                 if (Cache.Count >= MAXCACHE) Cache.Dequeue();
                 var f_CacheElement = new NoteCache(f_template, f_image, f_type);
                 Cache.Enqueue(f_CacheElement);
                 
             }
-            private BitmapSource FromVisual() {
-                PresentationSource source = PresentationSource.FromVisual(NoteLoader);
-                RenderTargetBitmap rtb = new RenderTargetBitmap((int)NoteLoader.RenderSize.Width,
-                      (int)NoteLoader.RenderSize.Height, 96, 96, PixelFormats.Default);
-
-                VisualBrush sourceBrush = new VisualBrush(NoteLoader);
-                DrawingVisual drawingVisual = new DrawingVisual();
-                DrawingContext drawingContext = drawingVisual.RenderOpen();
-                using (drawingContext) {
-                    drawingContext.DrawRectangle(sourceBrush, null, new Rect(new Point(0, 0),
-                          new Point(NoteLoader.RenderSize.Width, NoteLoader.RenderSize.Height)));
+            private BitmapFrame[] GetImageBits(NoteTemplate f_template)
+            {
+                var f_BitImages = new BitmapFrame[16];
+                for (int i=0; i<16; i++)
+                {
+                    f_BitImages[i] = BitmapFrame.Create(BitImages.GetBitImg(f_template.Positions[i], f_template.Colours[i], f_template.Type));
                 }
+                return f_BitImages;
+            }
+            private BitmapSource SetImageBits(BitmapFrame[] f_bits)
+            {
+                DrawingVisual drawingVisual = new DrawingVisual();
+                using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+                {
+                    drawingContext.DrawImage(f_bits[0], new Rect(0, 0, 6, 2));
+                    drawingContext.DrawImage(f_bits[1], new Rect(0, 2, 6, 2));
+                    drawingContext.DrawImage(f_bits[2], new Rect(0, 4, 6, 2));
+                    drawingContext.DrawImage(f_bits[3], new Rect(0, 6, 6, 2));
+                    drawingContext.DrawImage(f_bits[4], new Rect(0, 8, 6, 2));
+                    drawingContext.DrawImage(f_bits[5], new Rect(0, 10, 6, 2));
+                    drawingContext.DrawImage(f_bits[6], new Rect(0, 12, 6, 2));
+                    drawingContext.DrawImage(f_bits[7], new Rect(0, 14, 6, 2));
+                    drawingContext.DrawImage(f_bits[8], new Rect(6, 0, 6, 2));
+                    drawingContext.DrawImage(f_bits[9], new Rect(6, 2, 6, 2));
+                    drawingContext.DrawImage(f_bits[10], new Rect(6, 4, 6, 2));
+                    drawingContext.DrawImage(f_bits[11], new Rect(6, 6, 6, 2));
+                    drawingContext.DrawImage(f_bits[12], new Rect(6, 8, 6, 2));
+                    drawingContext.DrawImage(f_bits[13], new Rect(6, 10, 6, 2));
+                    drawingContext.DrawImage(f_bits[14], new Rect(6, 12, 6, 2));
+                    drawingContext.DrawImage(f_bits[15], new Rect(6, 14, 6, 2));
+                }
+                RenderTargetBitmap rtb = new RenderTargetBitmap(12, 16, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(drawingVisual);
-                var f_image = rtb as BitmapSource;
-                return f_image;
+                var f_Image = rtb as BitmapSource;
+                return f_Image;
             }
             
             private class NoteCache
@@ -855,6 +848,7 @@ namespace CPSM
         {
             public OctaveColour[] Colours { get; set; }
             public NoteBitPos[] Positions { get; set; }
+            public NoteType Type { get; set; }
 
             public NoteTemplate() {
                 Init();
@@ -1020,7 +1014,7 @@ namespace CPSM
             private void Init() {
                 Colours = new OctaveColour[16];
                 Positions = new NoteBitPos[16];
-
+                Type = NoteType.White;
             }
             public void SetAsExtension() {
                 for (int i = 0; i < 8; i++) {
