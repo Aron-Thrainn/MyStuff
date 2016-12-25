@@ -21,7 +21,8 @@ namespace CPSM
         {
             public MouseNoteControl _Mouse { get; set; }
             public Canvas MeasuresCan { get; set; }
-            public StackPanel MeasureStack { get; set; }
+            public Stack<StackPanel> MeasureStack { get; set; }
+            public StackPanel MeasureStackHorizontal { get; set; }
             public List<MeasureViewModal> Measures { get; set; }
             public Label TitleBox { get; set; }
             public Label SourceBox { get; set; }
@@ -30,10 +31,11 @@ namespace CPSM
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, NoteImageControl f_NoteImageControl) {
                 //MeasuresCan = f_measurecan;
-                MeasureStack = new StackPanel() {
+                MeasureStack = new Stack<StackPanel>();
+                MeasureStackHorizontal = new StackPanel()
+                {
                     Margin = new Thickness(20, 10, 0, 0)
                 };
-                f_measurecan.Children.Add(MeasureStack);
                 _Mouse = f_mousectrl;
                 Measures = new List<MeasureViewModal>();
 
@@ -52,9 +54,20 @@ namespace CPSM
                 SourceBox.Content = f_song.Source;
             }
             public void CreateMeasure(MeasureData f_measure, bool f_empty) {
-                var modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty, Measures.Count + 1);
-                Measures.Add(modal);
-                MeasureStack.Children.Add(modal.Can);
+                var f_modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty, Measures.Count + 1);
+                Measures.Add(f_modal);
+
+                if (MeasureStack.Count == 0) {
+                    AddColumn();
+                }
+                var f_DistFromBottom = MeasuresCan.Height - MeasureStack.Peek().Height;
+
+                if (f_DistFromBottom < f_modal.Can.Height + 20)
+                {
+                    AddColumn();
+                }
+                AddMeasure(f_modal);
+
             }
             public void DeleteMeasure() {
                 var f_mes = Measures.ElementAt(Measures.Count - 1);
@@ -62,6 +75,23 @@ namespace CPSM
                 MeasureStack.Children.RemoveAt(Measures.Count - 1);
                 Measures.RemoveAt(Measures.Count - 1);
             }
+            private void AddColumn()
+            {
+                throw new NotImplementedException();
+            }
+            private void AddMeasure(MeasureViewModal f_modal)
+            {
+                throw new NotImplementedException();
+            }
+            private void RemoveColumn()
+            {
+                throw new NotImplementedException();
+            }
+            private void RemoveMeasure(MeasureViewModal f_modal)
+            {
+                throw new NotImplementedException();
+            }
+
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
                 bool f_found = false;
@@ -161,10 +191,10 @@ namespace CPSM
                         var f_Template = new NoteTemplate();
                         f_Template.SetColour((OctaveColour)o);
                         f_Template.SetAsExtension();
-
+                        f_Template.Type = (NoteType)i;
                         var f_Image = SetImageBits(GetImageBits(f_Template));
 
-                        var f_TempCache = new NoteCache(f_Template, f_Image, (NoteType)i);
+                        var f_TempCache = new NoteCache(f_Template, f_Image);
                         CommonNotes.Add(f_TempCache);
                     }
                 };
@@ -172,8 +202,8 @@ namespace CPSM
             }
 
             public BitmapSource GetImage(NoteTemplate f_template, NoteType f_type) {
-                if (f_template.IsSimple()) { return GetCommonImage(f_template, f_type); }
-                var f_CacheResult = SearchCache(f_template, f_type);
+                if (f_template.IsSimple()) { return GetCommonImage(f_template); }
+                var f_CacheResult = SearchCache(f_template);
                 if (f_CacheResult != null) {
                     return f_CacheResult;
                 }
@@ -182,17 +212,17 @@ namespace CPSM
                     // Draws the images into a DrawingVisual component
                     var f_Image = SetImageBits(GetImageBits(f_template));
                     
-                    CacheAdd(f_template, f_Image, f_type);
+                    CacheAdd(f_template, f_Image);
                     return f_Image;
                 }
             }
-            public BitmapSource GetCommonImage(NoteTemplate f_template, NoteType f_type) {
+            public BitmapSource GetCommonImage(NoteTemplate f_template) {
                 if (f_template.IsStart()) {
-                    return ImageControl.NoteImg(f_template.isUsniform().Value, f_type);
+                    return ImageControl.NoteImg(f_template.isUsniform().Value, f_template.Type);
                 }
                 else if (f_template.IsExtension()) {
                     if (!CommonNotesInitialized) { InitializeCommonNotes(); }
-                    return SearchCommonCache(f_template, f_type);
+                    return SearchCommonCache(f_template);
                 }
                 else {
                     throw new Exception();
@@ -200,26 +230,26 @@ namespace CPSM
 
             }
 
-            private BitmapSource SearchCache(NoteTemplate f_template, NoteType f_type) {
+            private BitmapSource SearchCache(NoteTemplate f_template) {
                 foreach (var img in Cache) {
-                    if (img.Template.IsEqual(f_template) && f_type == img.Type) {
+                    if (img.Template.IsEqual(f_template)) {
                         return img.NoteImage;
                     }
                 }
                 return null;
             }
-            private BitmapSource SearchCommonCache(NoteTemplate f_template, NoteType f_type) {
+            private BitmapSource SearchCommonCache(NoteTemplate f_template) {
                 foreach (var img in CommonNotes) {
-                    if (img.Template.IsEqual(f_template) && f_type == img.Type) {
+                    if (img.Template.IsEqual(f_template)) {
                         return img.NoteImage;
                     }
                 }
                 return null;
             }
-            private void CacheAdd(NoteTemplate f_template, BitmapSource f_image, NoteType f_type) {
-                if (SearchCache(f_template, f_type) != null) { return; }
+            private void CacheAdd(NoteTemplate f_template, BitmapSource f_image) {
+                if (SearchCache(f_template) != null) { return; }
                 if (Cache.Count >= MAXCACHE) Cache.Dequeue();
-                var f_CacheElement = new NoteCache(f_template, f_image, f_type);
+                var f_CacheElement = new NoteCache(f_template, f_image);
                 Cache.Enqueue(f_CacheElement);
                 
             }
@@ -264,12 +294,10 @@ namespace CPSM
             {
                 public NoteTemplate Template { get; set; }
                 public BitmapSource NoteImage { get; set; }
-                public NoteType Type { get; set; }
 
-                public NoteCache(NoteTemplate f_template, BitmapSource f_image, NoteType f_type) {
+                public NoteCache(NoteTemplate f_template, BitmapSource f_image) {
                     Template = f_template;
                     NoteImage = f_image;
-                    Type = f_type;
                 }
             }
         }
@@ -1054,7 +1082,11 @@ namespace CPSM
                         return false;
                     }
                 }
-                return true;
+                if (Type == f_other.Type)
+                {
+                    return true;
+                }
+                return false;
             }
             public bool IsStart() {
                 int count = 0;
