@@ -28,16 +28,20 @@ namespace CPSM
             public Label SourceBox { get; set; }
             public Label VersionBox { get; set; }
             private NoteInitializer _Initializer { get; set; }
+            private StackPanel ActiveStackPanel { get; set; }
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, NoteImageControl f_NoteImageControl) {
-                //MeasuresCan = f_measurecan;
+                MeasuresCan = f_measurecan;
                 MeasureStack = new Stack<StackPanel>();
                 MeasureStackHorizontal = new StackPanel()
                 {
-                    Margin = new Thickness(20, 10, 0, 0)
+                    Margin = new Thickness(0, 10, 0, 0),
+                    Orientation = Orientation.Horizontal
                 };
                 _Mouse = f_mousectrl;
                 Measures = new List<MeasureViewModal>();
+
+                MeasuresCan.Children.Add(MeasureStackHorizontal);
 
                 TitleBox = f_titlebox;
                 SourceBox = f_sourcebox;
@@ -46,7 +50,7 @@ namespace CPSM
             }
 
             public void LoadSong(SongData f_song) {
-                MeasureStack.Children.Clear();
+                MeasureStack = new Stack<StackPanel>();
                 foreach (var mes in f_song.Measures) {
                     CreateMeasure(mes, false);
                 }
@@ -55,41 +59,74 @@ namespace CPSM
             }
             public void CreateMeasure(MeasureData f_measure, bool f_empty) {
                 var f_modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty, Measures.Count + 1);
-                Measures.Add(f_modal);
 
                 if (MeasureStack.Count == 0) {
                     AddColumn();
                 }
-                var f_DistFromBottom = MeasuresCan.Height - MeasureStack.Peek().Height;
+                double f_ASPHeight = 0;
+                foreach (FrameworkElement mes in ActiveStackPanel.Children)
+                {
+                    f_ASPHeight += mes.Height;
+                }
+
+                var f_DistFromBottom = MeasuresCan.Height - f_ASPHeight;
 
                 if (f_DistFromBottom < f_modal.Can.Height + 20)
                 {
-                    AddColumn();
+                    if (MeasureStack.Count == 4)
+                    {
+                        //next page???
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        AddColumn();
+                    }
                 }
                 AddMeasure(f_modal);
 
             }
             public void DeleteMeasure() {
-                var f_mes = Measures.ElementAt(Measures.Count - 1);
-                f_mes.Exists = false;
-                MeasureStack.Children.RemoveAt(Measures.Count - 1);
+                
                 Measures.RemoveAt(Measures.Count - 1);
+                RemoveMeasure();
+
+                double f_ASPHeight = 0;
+                foreach (FrameworkElement mes in ActiveStackPanel.Children)
+                {
+                    f_ASPHeight += mes.Height;
+                }
+
+                if (f_ASPHeight == 0)
+                {
+                    RemoveColumn();
+                }
             }
             private void AddColumn()
             {
-                throw new NotImplementedException();
+                var f_newstack = new StackPanel() {
+                    Margin = new Thickness(35, 0, 0, 0)
+                };
+                MeasureStack.Push(f_newstack);
+                ActiveStackPanel = f_newstack;
+                MeasureStackHorizontal.Children.Add(f_newstack);
             }
             private void AddMeasure(MeasureViewModal f_modal)
             {
-                throw new NotImplementedException();
+                ActiveStackPanel.Children.Add(f_modal.Can);
+                Measures.Add(f_modal);
+                
             }
             private void RemoveColumn()
             {
-                throw new NotImplementedException();
+                var f_OldStack = MeasureStack.Pop();
+                MeasureStackHorizontal.Children.Remove(f_OldStack);
+                ActiveStackPanel = MeasureStack.Peek();
             }
-            private void RemoveMeasure(MeasureViewModal f_modal)
+            private void RemoveMeasure()
             {
-                throw new NotImplementedException();
+                ActiveStackPanel.Children.RemoveAt(ActiveStackPanel.Children.Count - 1);
+                Measures.RemoveAt(Measures.Count - 1);
             }
 
 

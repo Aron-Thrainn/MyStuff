@@ -20,15 +20,16 @@ using CPSM.Forms;
 /*
     ToDo:
     Partial Notes
-    Make measures fill out multiple columns
     Add Save & load functions
     Add Export Dialog funcion
     Add Copy/Paste functions
     add NotetType to NoteTemplate
+    Fix path for save & export
 
 
     Bugs:
-    
+    Remove measure doesnt always work across columns
+    save song doesnt work properly after first 2 measures
 */
 /*
     Done:
@@ -43,6 +44,7 @@ using CPSM.Forms;
     Smooth out long note creation
     copy note icon is black & white if note is simple
     Rework note images to have only 1 image
+    Make measures fill out multiple columns
 
 */
 

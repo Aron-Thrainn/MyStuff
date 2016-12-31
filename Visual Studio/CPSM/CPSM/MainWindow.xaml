@@ -31,7 +31,7 @@
                 <Canvas x:Name="cbtn_deletemeasure" Height="32" Canvas.Left="172" Canvas.Top="13" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
-        <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="#FFECECEC">
+        <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="White">
             <Label x:Name="lbl_SongName" Content="" Canvas.Left="140" Canvas.Top="10" Height="35" Width="369" BorderBrush="Black" BorderThickness="0,2,2,2" FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"/>
             <Label x:Name="lbl_SongSource" Canvas.Left="509" Canvas.Top="10" Height="35" Width="403" BorderBrush="Black" BorderThickness="0,2,2,2" Margin="0" FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"/>
             <Label x:Name="lbl_SongVersion" Canvas.Left="912" Canvas.Top="10" Height="35" Width="153" BorderBrush="Black" BorderThickness="0,2,2,2"/>

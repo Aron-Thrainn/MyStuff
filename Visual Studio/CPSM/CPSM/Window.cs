@@ -102,7 +102,7 @@ namespace CPSM
             public int state { get; set; }
             public NoteTemplate prevNote { get; set; }
 
-            public static string PCPath = @"C:\\Users\\Notandi\\Desktop\\temptxt.txt";
+            public static string PCPath = @"C:\\Users\\AliceLiz\\Desktop\\temptxt.txt";
             public static string LaptopPath = @"C:\\Users\\Arthas Menethil\\Desktop\\temptxt.txt";
 
 
@@ -135,7 +135,7 @@ namespace CPSM
             #endregion
                 
             public SongSaver(SongData f_Song) {
-                using (StreamWriter file = new StreamWriter(LaptopPath)) {
+                using (StreamWriter file = new StreamWriter(PCPath)) {
 
                     file.Write(TITLE + OPEN + f_Song.Title + CLOSE);
                     file.Write(SOURCE + OPEN + f_Song.Source + CLOSE);
@@ -1012,8 +1012,8 @@ namespace CPSM
             //Saves in project folder
             //FilePath = new FileInfo("TempImage.png").FullName.ToString();
             //Saves to desktop
-            //FilePath = "C:\\Users\\Notandi\\Desktop\\TempImage.png";
-            FilePath = "C:\\Users\\Arthas Menethil\\Desktop\\TempImage.png";
+            FilePath = "C:\\Users\\AliceLiz\\Desktop\\TempImage.png";
+            //FilePath = "C:\\Users\\Arthas Menethil\\Desktop\\TempImage.png";
             SongCan = f_SongCan;
         }
 
