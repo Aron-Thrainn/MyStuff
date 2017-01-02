@@ -20,16 +20,14 @@ using CPSM.Forms;
 /*
     ToDo:
     Partial Notes
-    Add Save & load functions
+    Add Save & load functions - export all pages at a time
     Add Export Dialog funcion
     Add Copy/Paste functions
-    add NotetType to NoteTemplate
-    Fix path for save & export
-
+    Add NotetType to NoteTemplate
+    Save/load black notes
 
     Bugs:
-    Remove measure doesnt always work across columns
-    save song doesnt work properly after first 2 measures
+    Page changing is super slow
 */
 /*
     Done:
@@ -45,6 +43,7 @@ using CPSM.Forms;
     copy note icon is black & white if note is simple
     Rework note images to have only 1 image
     Make measures fill out multiple columns
+    Multiple Pages
 
 */
 
@@ -68,11 +67,11 @@ namespace CPSM
             InitializeComponent();
 
             _MouseCtrl = new MouseControl(this);
-            var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion, _MouseCtrl._noteCtrl._NoteImageConrtol);
+            var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion, lbl_PageNumber, _MouseCtrl._noteCtrl._NoteImageConrtol);
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
             _FormSongSelect = new FormSongSelect(this);
-            _ScreenCap = new ScreenCapturer(cnv_SongCan);
+            _ScreenCap = new ScreenCapturer(cnv_SongCan, _MouseCtrl);
             _vers = new Version();
             _keyCtrl = new Hotkeycontrol(this);
             
@@ -80,6 +79,7 @@ namespace CPSM
     
             InitFormNoteColour();
             InitFormMeasureCreator();
+            _GUI.initPagesForm(cbtn_Page_Next, cbtn_Page_Previous);
 
             _MouseCtrl._noteCtrl._Form = _GUI._FormNoteColour;
 

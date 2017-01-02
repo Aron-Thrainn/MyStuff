@@ -144,7 +144,33 @@ namespace CPSM
             }
         }
 
+        public class PagesForm
+        {
+            public CustomButton NextPageBtn { get; set; }
+            public CustomButton PrevPageBtn { get; set; }
+            public SongViewModalCreator _Creator { get; set; }
 
+            public PagesForm(SongViewModalCreator f_creator,Canvas f_Next, Canvas f_prev)
+            {
+                _Creator = f_creator;
+                NextPageBtn = new CustomButton(f_Next);
+                NextPageBtn.SetButtonClickEvent(NextPage);
+                NextPageBtn.SetImg(ImageControl.Icon1);
+
+                PrevPageBtn = new CustomButton(f_prev);
+                PrevPageBtn.SetButtonClickEvent(PrevPage);
+                PrevPageBtn.SetImg(ImageControl.Icon2);
+            }
+
+            public void NextPage(object sender, MouseEventArgs e)
+            {
+                _Creator.NextPage();
+            }
+            public void PrevPage(object sender, MouseEventArgs e)
+            {
+                _Creator.PrevPage();
+            }
+        }
 
         public class FormSongSelect
         {

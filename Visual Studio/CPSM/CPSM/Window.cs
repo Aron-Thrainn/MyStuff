@@ -27,6 +27,7 @@ namespace CPSM
         public SongCanvas _SongCan { get; set; }
         public NoteColourForm _FormNoteColour { get; set; }
         public MeasureCreatorForm _FormMeasureCreator { get; set; }
+        public PagesForm _FormPages { get; set; }
 
         public GUI(MainWindow f_wind, Canvas f_can, SongCanvas f_songcan) {
             _Window = f_wind;
@@ -42,7 +43,10 @@ namespace CPSM
             _FormMeasureCreator = f_form;
             _FormMeasureCreator._Song = _SongCan;
         }
-
+        public void initPagesForm(Canvas f_Next, Canvas f_prev)
+        {
+            _FormPages = new PagesForm(_SongCan._Creator ,f_Next, f_prev);
+        }
     }
     
     public class SongCanvas {
@@ -632,12 +636,15 @@ namespace CPSM
         public NotePreview _Preview { get; set; }
         public NoteCreator _Creator { get; set; }
         public bool Creating { get; set; }
+        public bool Suppressed { get; set; }
         public NoteColourForm _Form { get; set; }
         public NoteImageControl _NoteImageConrtol { get; set; }
+
 
         public MouseNoteControl() {
             _colourctrl = new MouseNote(this);
             _NoteImageConrtol = new NoteImageControl();
+            Suppressed = false;
         }
 
         public void NoteClickUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
@@ -720,9 +727,12 @@ namespace CPSM
         //need global mouse enevt handler for _creator to work properly
 
         public void MakePreview(NoteViewModal sender, Point f_mousepos) {
-            var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
-            ResetPreview();
-            _Preview = new NotePreview(sender, f_HeldNote, false, true, this);
+            if (!Suppressed)
+            {
+                var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+                ResetPreview();
+                _Preview = new NotePreview(sender, f_HeldNote, false, true, this);
+            }
         }
         public void UpdatePreview() {
             if (_Preview != null) {
@@ -762,6 +772,16 @@ namespace CPSM
             if (_Preview != null) {
                 _Preview.Cancel();
             }
+        }
+
+        public void SuppressPreview()
+        {
+            Suppressed = true;
+            ResetPreview();
+        }
+        public void UnSuppressPreview()
+        {
+            Suppressed = false;
         }
     }
 
@@ -1006,18 +1026,23 @@ namespace CPSM
     public class ScreenCapturer {
         public Canvas SongCan { get; set; }
         public string FilePath { get; set; }
+        public MouseControl _MouseCtrl { get; set; }
 
-        
-        public ScreenCapturer(Canvas f_SongCan) {
+
+        public ScreenCapturer(Canvas f_SongCan, MouseControl f_mousecontr) {
             //Saves in project folder
             //FilePath = new FileInfo("TempImage.png").FullName.ToString();
             //Saves to desktop
             FilePath = "C:\\Users\\AliceLiz\\Desktop\\TempImage.png";
             //FilePath = "C:\\Users\\Arthas Menethil\\Desktop\\TempImage.png";
             SongCan = f_SongCan;
+            _MouseCtrl = f_mousecontr;
         }
 
         public void SaveScreenShot() {
+
+            _MouseCtrl._noteCtrl.SuppressPreview();
+
             PresentationSource source = PresentationSource.FromVisual(SongCan);
             RenderTargetBitmap rtb = new RenderTargetBitmap((int)SongCan.RenderSize.Width,
                   (int)SongCan.RenderSize.Height, 96, 96, PixelFormats.Default);
@@ -1037,7 +1062,8 @@ namespace CPSM
             using (Stream fileStream = File.Create(FilePath)) {
                 pngImage.Save(fileStream);
             }
-            
+
+            _MouseCtrl._noteCtrl.UnSuppressPreview();
         }
         
     }

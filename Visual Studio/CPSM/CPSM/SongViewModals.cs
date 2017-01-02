@@ -22,29 +22,31 @@ namespace CPSM
             public MouseNoteControl _Mouse { get; set; }
             public Canvas MeasuresCan { get; set; }
             public Stack<StackPanel> MeasureStack { get; set; }
-            public StackPanel MeasureStackHorizontal { get; set; }
+            public List<StackPanel> Pages { get; set; }
+            public StackPanel ActivePage { get; set; }
+            public StackPanel ActiveStackPanel { get; set; }
             public List<MeasureViewModal> Measures { get; set; }
             public Label TitleBox { get; set; }
             public Label SourceBox { get; set; }
             public Label VersionBox { get; set; }
+            public Label PageNum { get; set; }
             private NoteInitializer _Initializer { get; set; }
-            private StackPanel ActiveStackPanel { get; set; }
+            public int CurrentPage { get; set; }
+            public int TotalPages { get; set; }
 
-            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, NoteImageControl f_NoteImageControl) {
+            public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, Label f_Pagenumber, NoteImageControl f_NoteImageControl) {
                 MeasuresCan = f_measurecan;
                 MeasureStack = new Stack<StackPanel>();
-                MeasureStackHorizontal = new StackPanel()
-                {
-                    Margin = new Thickness(0, 10, 0, 0),
-                    Orientation = Orientation.Horizontal
-                };
+                Pages = new List<StackPanel>();
                 _Mouse = f_mousectrl;
                 Measures = new List<MeasureViewModal>();
 
-                MeasuresCan.Children.Add(MeasureStackHorizontal);
 
+
+                PageNum = f_Pagenumber;
                 TitleBox = f_titlebox;
                 SourceBox = f_sourcebox;
+                
 
                 _Initializer = new NoteInitializer(f_NoteImageControl);
             }
@@ -59,6 +61,7 @@ namespace CPSM
             }
             public void CreateMeasure(MeasureData f_measure, bool f_empty) {
                 var f_modal = new MeasureViewModal(f_measure, _Mouse, this, f_empty, Measures.Count + 1);
+                GoToPage(TotalPages);
 
                 if (MeasureStack.Count == 0) {
                     AddColumn();
@@ -73,22 +76,13 @@ namespace CPSM
 
                 if (f_DistFromBottom < f_modal.Can.Height + 20)
                 {
-                    if (MeasureStack.Count == 4)
-                    {
-                        //next page???
-                        throw new NotImplementedException();
-                    }
-                    else
-                    {
-                        AddColumn();
-                    }
+                    AddColumn();
                 }
                 AddMeasure(f_modal);
 
             }
             public void DeleteMeasure() {
                 
-                Measures.RemoveAt(Measures.Count - 1);
                 RemoveMeasure();
 
                 double f_ASPHeight = 0;
@@ -104,12 +98,16 @@ namespace CPSM
             }
             private void AddColumn()
             {
+                if (ActivePage == null || ActivePage.Children.Count == 4)
+                {
+                    AddPage();
+                }
                 var f_newstack = new StackPanel() {
                     Margin = new Thickness(35, 0, 0, 0)
                 };
                 MeasureStack.Push(f_newstack);
                 ActiveStackPanel = f_newstack;
-                MeasureStackHorizontal.Children.Add(f_newstack);
+                ActivePage.Children.Add(f_newstack);
             }
             private void AddMeasure(MeasureViewModal f_modal)
             {
@@ -120,15 +118,105 @@ namespace CPSM
             private void RemoveColumn()
             {
                 var f_OldStack = MeasureStack.Pop();
-                MeasureStackHorizontal.Children.Remove(f_OldStack);
+                ActivePage.Children.Remove(f_OldStack);
                 ActiveStackPanel = MeasureStack.Peek();
+
+                if (ActivePage.Children.Count == 0)
+                {
+                    RemovePage();
+                }
             }
             private void RemoveMeasure()
             {
-                ActiveStackPanel.Children.RemoveAt(ActiveStackPanel.Children.Count - 1);
-                Measures.RemoveAt(Measures.Count - 1);
+                var f_TempMeasure = Measures.ElementAt(Measures.Count - 1);
+                ActiveStackPanel.Children.Remove(f_TempMeasure.Can);
+                Measures.Remove(f_TempMeasure);
             }
+            private void AddPage()
+            {
+                if (Pages.Count != 0) // if there is a page, take it off the canvas
+                {
+                    var f_OldPage = Pages.ElementAt(Pages.Count-1);
+                    MeasuresCan.Children.Remove(f_OldPage);
+                } 
+                
+                var f_NewPage = new StackPanel()
+                {
+                    Margin = new Thickness(0, 10, 0, 0),
+                    Orientation = Orientation.Horizontal
+                };
+                MeasuresCan.Children.Add(f_NewPage);
+                Pages.Add(f_NewPage);
+                ActivePage = f_NewPage;
+                IncrementPageNumber();
+            }
+            private void RemovePage()
+            {
+                var f_OldPage = Pages.ElementAt(Pages.Count - 1);
+                ActivePage = Pages.ElementAt(Pages.Count - 1);
+                MeasuresCan.Children.Remove(f_OldPage);
+                MeasuresCan.Children.Add(ActivePage);
+                DeIncrementPageNumber();
+            }
+            private void IncrementPageNumber()
+            {
+                TotalPages++;
+                CurrentPage = TotalPages;
+                PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+            }
+            private void DeIncrementPageNumber()
+            {
+                TotalPages--;
+                CurrentPage = TotalPages;
+                PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+            }
+            public void NextPage()
+            {
+                if (CurrentPage < TotalPages)
+                {
+                    CurrentPage++;
+                    MeasuresCan.Children.Remove(ActivePage);
+                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
+                    ActivePage = f_NewPage;
+                    MeasuresCan.Children.Add(ActivePage);
+                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+                }
+            }
+            public void PrevPage()
+            {
+                if (CurrentPage > 1)
+                {
 
+                    CurrentPage--;
+                    MeasuresCan.Children.Remove(ActivePage);
+                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
+                    ActivePage = f_NewPage;
+                    MeasuresCan.Children.Add(ActivePage);
+                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+                }
+            }
+            public void GoToPage(int f_page)
+            {
+                if (f_page == CurrentPage)
+                {
+                    return;
+                }
+                try
+                {
+                    CurrentPage = f_page;
+                    MeasuresCan.Children.Remove(ActivePage);
+                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
+                    ActivePage = f_NewPage;
+                    MeasuresCan.Children.Add(ActivePage);
+                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+                }
+                catch // does nothing if the page number does not exist
+                {
+
+                }
+                    
+                
+            }
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
                 bool f_found = false;
@@ -159,7 +247,7 @@ namespace CPSM
             public void EnqueueNote(NoteViewModal f_note) {
                 _Initializer.AddNote(f_note);
             }
-
+            
             public class NoteInitializer
             {
                 private readonly double INTERVAL = 0.0001;
@@ -706,11 +794,13 @@ namespace CPSM
             public virtual void SetPosition(int f_xpos, int f_ypos) { }
 
             public void SetColour(NoteTemplate f_template, BitmapSource f_source) {
-                if (!Initialized) { Initialize(); }
-                
-                if (f_template == null) {
+                if (f_template == null)
+                {
                     return;
                 }
+
+                if (!Initialized) { Initialize(); }
+                
                 NoteImage.Source = f_source;
                 CounterPart.SetColour(f_template);
                 NoteImage.Opacity = 1;
