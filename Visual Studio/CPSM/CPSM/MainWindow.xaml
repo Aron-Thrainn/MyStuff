@@ -29,8 +29,9 @@
                 </ComboBox>
                 <Canvas x:Name="cbtn_createmeasure" Height="32" Canvas.Left="10" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_deletemeasure" Height="32" Canvas.Left="172" Canvas.Top="13" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_Page_Next" Height="32" Canvas.Left="296" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_Page_Previous" Height="32" Canvas.Left="259" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_Page_Next" Height="32" Canvas.Left="328" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_Page_Previous" Height="32" Canvas.Left="291" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_LoadSong" Height="32" Canvas.Left="254" Canvas.Top="10" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
         <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="White">
@@ -43,6 +44,7 @@
             </Border>
             <Label x:Name="lbl_PageNumber" Canvas.Left="808" Canvas.Top="10" Height="35" Width="104" BorderBrush="Black" BorderThickness="0,2,2,2" Margin="0" FontFamily="Arial" FontSize="16" HorizontalAlignment="Center"/>
         </Canvas>
+        <Canvas x:Name="cnv_SongLoadSelect" Margin="280,255,305,156" Background="#FFE4E4E4"/>
 
     </Grid>
 </Window>

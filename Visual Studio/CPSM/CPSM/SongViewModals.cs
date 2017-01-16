@@ -33,6 +33,7 @@ namespace CPSM
             private NoteInitializer _Initializer { get; set; }
             public int CurrentPage { get; set; }
             public int TotalPages { get; set; }
+            public SongData _ActiveSong { get; set; }
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, Label f_Pagenumber, NoteImageControl f_NoteImageControl) {
                 MeasuresCan = f_measurecan;
@@ -41,17 +42,17 @@ namespace CPSM
                 _Mouse = f_mousectrl;
                 Measures = new List<MeasureViewModal>();
 
-
-
                 PageNum = f_Pagenumber;
                 TitleBox = f_titlebox;
                 SourceBox = f_sourcebox;
-                
+
 
                 _Initializer = new NoteInitializer(f_NoteImageControl);
             }
 
             public void LoadSong(SongData f_song) {
+                ClearSong();
+                _ActiveSong = f_song;
                 MeasureStack = new Stack<StackPanel>();
                 foreach (var mes in f_song.Measures) {
                     CreateMeasure(mes, false);
@@ -67,39 +68,33 @@ namespace CPSM
                     AddColumn();
                 }
                 double f_ASPHeight = 0;
-                foreach (FrameworkElement mes in ActiveStackPanel.Children)
-                {
+                foreach (FrameworkElement mes in ActiveStackPanel.Children) {
                     f_ASPHeight += mes.Height;
                 }
 
                 var f_DistFromBottom = MeasuresCan.Height - f_ASPHeight;
 
-                if (f_DistFromBottom < f_modal.Can.Height + 20)
-                {
+                if (f_DistFromBottom < f_modal.Can.Height + 20) {
                     AddColumn();
                 }
                 AddMeasure(f_modal);
 
             }
             public void DeleteMeasure() {
-                
+
                 RemoveMeasure();
 
                 double f_ASPHeight = 0;
-                foreach (FrameworkElement mes in ActiveStackPanel.Children)
-                {
+                foreach (FrameworkElement mes in ActiveStackPanel.Children) {
                     f_ASPHeight += mes.Height;
                 }
 
-                if (f_ASPHeight == 0)
-                {
+                if (f_ASPHeight == 0) {
                     RemoveColumn();
                 }
             }
-            private void AddColumn()
-            {
-                if (ActivePage == null || ActivePage.Children.Count == 4)
-                {
+            private void AddColumn() {
+                if (ActivePage == null || ActivePage.Children.Count == 4) {
                     AddPage();
                 }
                 var f_newstack = new StackPanel() {
@@ -109,39 +104,38 @@ namespace CPSM
                 ActiveStackPanel = f_newstack;
                 ActivePage.Children.Add(f_newstack);
             }
-            private void AddMeasure(MeasureViewModal f_modal)
-            {
+            private void AddMeasure(MeasureViewModal f_modal) {
                 ActiveStackPanel.Children.Add(f_modal.Can);
                 Measures.Add(f_modal);
-                
+
             }
-            private void RemoveColumn()
-            {
+            private void RemoveColumn() {
                 var f_OldStack = MeasureStack.Pop();
                 ActivePage.Children.Remove(f_OldStack);
-                ActiveStackPanel = MeasureStack.Peek();
+                if (MeasureStack.Count != 0) {
+                    ActiveStackPanel = MeasureStack.Peek();
+                }
+                else {
+                    ActiveStackPanel = null;
+                }
 
-                if (ActivePage.Children.Count == 0)
-                {
+                if (ActivePage.Children.Count == 0) {
                     RemovePage();
                 }
             }
-            private void RemoveMeasure()
-            {
+            private void RemoveMeasure() {
                 var f_TempMeasure = Measures.ElementAt(Measures.Count - 1);
                 ActiveStackPanel.Children.Remove(f_TempMeasure.Can);
                 Measures.Remove(f_TempMeasure);
             }
-            private void AddPage()
-            {
+            private void AddPage() {
                 if (Pages.Count != 0) // if there is a page, take it off the canvas
                 {
-                    var f_OldPage = Pages.ElementAt(Pages.Count-1);
+                    var f_OldPage = Pages.ElementAt(Pages.Count - 1);
                     MeasuresCan.Children.Remove(f_OldPage);
-                } 
-                
-                var f_NewPage = new StackPanel()
-                {
+                }
+
+                var f_NewPage = new StackPanel() {
                     Margin = new Thickness(0, 10, 0, 0),
                     Orientation = Orientation.Horizontal
                 };
@@ -150,30 +144,38 @@ namespace CPSM
                 ActivePage = f_NewPage;
                 IncrementPageNumber();
             }
-            private void RemovePage()
-            {
+            private void RemovePage() {
                 var f_OldPage = Pages.ElementAt(Pages.Count - 1);
-                ActivePage = Pages.ElementAt(Pages.Count - 1);
                 MeasuresCan.Children.Remove(f_OldPage);
-                MeasuresCan.Children.Add(ActivePage);
-                DeIncrementPageNumber();
+                Pages.Remove(f_OldPage);
+                if (Pages.Count != 0) {
+                    ActivePage = Pages.ElementAt(Pages.Count - 1);
+                    MeasuresCan.Children.Add(ActivePage);
+                    DeIncrementPageNumber();
+                }
+                else {
+                    ActivePage = null;
+                    DeIncrementPageNumber();
+                }
             }
-            private void IncrementPageNumber()
-            {
-                TotalPages++;
-                CurrentPage = TotalPages;
-                PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+            private void IncrementPageNumber() {
+                if (_ActiveSong != null) {
+                    TotalPages++;
+                    CurrentPage = TotalPages;
+                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+                    _ActiveSong.PageCount = TotalPages;
+                }
             }
-            private void DeIncrementPageNumber()
-            {
-                TotalPages--;
-                CurrentPage = TotalPages;
-                PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+            private void DeIncrementPageNumber() {
+                if (_ActiveSong != null) {
+                    TotalPages--;
+                    CurrentPage = TotalPages;
+                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
+                    _ActiveSong.PageCount = TotalPages;
+                }
             }
-            public void NextPage()
-            {
-                if (CurrentPage < TotalPages)
-                {
+            public void NextPage() {
+                if (CurrentPage < TotalPages) {
                     CurrentPage++;
                     MeasuresCan.Children.Remove(ActivePage);
                     var f_NewPage = Pages.ElementAt(CurrentPage - 1);
@@ -182,10 +184,8 @@ namespace CPSM
                     PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
                 }
             }
-            public void PrevPage()
-            {
-                if (CurrentPage > 1)
-                {
+            public void PrevPage() {
+                if (CurrentPage > 1) {
 
                     CurrentPage--;
                     MeasuresCan.Children.Remove(ActivePage);
@@ -195,14 +195,11 @@ namespace CPSM
                     PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
                 }
             }
-            public void GoToPage(int f_page)
-            {
-                if (f_page == CurrentPage)
-                {
+            public void GoToPage(int f_page) {
+                if (f_page == CurrentPage) {
                     return;
                 }
-                try
-                {
+                try {
                     CurrentPage = f_page;
                     MeasuresCan.Children.Remove(ActivePage);
                     var f_NewPage = Pages.ElementAt(CurrentPage - 1);
@@ -214,8 +211,14 @@ namespace CPSM
                 {
 
                 }
-                    
-                
+
+
+            }
+            public void ClearSong() {
+                while (true) {
+                    if (Measures.Count == 0) { break; }
+                    DeleteMeasure();
+                }
             }
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
@@ -247,7 +250,7 @@ namespace CPSM
             public void EnqueueNote(NoteViewModal f_note) {
                 _Initializer.AddNote(f_note);
             }
-            
+
             public class NoteInitializer
             {
                 private readonly double INTERVAL = 0.0001;
@@ -255,7 +258,7 @@ namespace CPSM
                 public DispatcherTimer Timer { get; set; }
                 public bool SleepMode { get; set; }
                 public NoteImageControl _NoteImageControl { get; set; }
-                
+
                 public NoteInitializer(NoteImageControl f_NoteImageControl) {
                     _NoteImageControl = f_NoteImageControl;
                     NoteQueue = new Queue<NoteViewModal>();
@@ -267,7 +270,7 @@ namespace CPSM
 
                 private void Timer_Tick(object sender, EventArgs e) {
                     //debug
-                    
+
                     if (NoteQueue.Count == 0) {
                         SleepMode = true;
                         Timer.Stop();
@@ -282,7 +285,8 @@ namespace CPSM
                         else {
                             f_note.Initialize();
                         }
-                    }else {
+                    }
+                    else {
                         Timer_Tick(null, null);
                     }
                 }
@@ -308,7 +312,7 @@ namespace CPSM
                 CommonNotesInitialized = false;
                 Cache = new Queue<NoteCache>();
             }
-            
+
             private void InitializeCommonNotes() {
                 CommonNotes = new List<NoteCache>();
                 for (int i = 0; i < 2; i++) {
@@ -336,7 +340,7 @@ namespace CPSM
 
                     // Draws the images into a DrawingVisual component
                     var f_Image = SetImageBits(GetImageBits(f_template));
-                    
+
                     CacheAdd(f_template, f_Image);
                     return f_Image;
                 }
@@ -373,25 +377,22 @@ namespace CPSM
             }
             private void CacheAdd(NoteTemplate f_template, BitmapSource f_image) {
                 if (SearchCache(f_template) != null) { return; }
-                if (Cache.Count >= MAXCACHE) Cache.Dequeue();
+                if (Cache.Count >= MAXCACHE)
+                    Cache.Dequeue();
                 var f_CacheElement = new NoteCache(f_template, f_image);
                 Cache.Enqueue(f_CacheElement);
-                
+
             }
-            private BitmapFrame[] GetImageBits(NoteTemplate f_template)
-            {
+            private BitmapFrame[] GetImageBits(NoteTemplate f_template) {
                 var f_BitImages = new BitmapFrame[16];
-                for (int i=0; i<16; i++)
-                {
+                for (int i = 0; i < 16; i++) {
                     f_BitImages[i] = BitmapFrame.Create(BitImages.GetBitImg(f_template.Positions[i], f_template.Colours[i], f_template.Type));
                 }
                 return f_BitImages;
             }
-            private BitmapSource SetImageBits(BitmapFrame[] f_bits)
-            {
+            private BitmapSource SetImageBits(BitmapFrame[] f_bits) {
                 DrawingVisual drawingVisual = new DrawingVisual();
-                using (DrawingContext drawingContext = drawingVisual.RenderOpen())
-                {
+                using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
                     drawingContext.DrawImage(f_bits[0], new Rect(0, 0, 6, 2));
                     drawingContext.DrawImage(f_bits[1], new Rect(0, 2, 6, 2));
                     drawingContext.DrawImage(f_bits[2], new Rect(0, 4, 6, 2));
@@ -414,7 +415,7 @@ namespace CPSM
                 var f_Image = rtb as BitmapSource;
                 return f_Image;
             }
-            
+
             private class NoteCache
             {
                 public NoteTemplate Template { get; set; }
@@ -648,20 +649,28 @@ namespace CPSM
                             ii = i;
                             oo = o;
                             switch (ii) {
-                                case 0: return new NoteViewModal();
+                                case 0:
+                                return new NoteViewModal();
                                 case 1:
-                                case 2: return BlackNotes[ii - 1, oo];
-                                case 3: return WhiteNotes[ii - 1, oo];
+                                case 2:
+                                return BlackNotes[ii - 1, oo];
+                                case 3:
+                                return WhiteNotes[ii - 1, oo];
                                 case 4:
                                 case 5:
-                                case 6: return BlackNotes[ii - 2, oo];
-                                case 7: return new NoteViewModal();
+                                case 6:
+                                return BlackNotes[ii - 2, oo];
+                                case 7:
+                                return new NoteViewModal();
                                 case 8:
-                                case 9: return BlackNotes[ii - 3, oo];
-                                case 10: return WhiteNotes[ii - 1, oo];
+                                case 9:
+                                return BlackNotes[ii - 3, oo];
+                                case 10:
+                                return WhiteNotes[ii - 1, oo];
                                 case 11:
                                 case 12:
-                                case 13: return BlackNotes[ii - 4, oo];
+                                case 13:
+                                return BlackNotes[ii - 4, oo];
                             }
                         }
                     }
@@ -674,15 +683,19 @@ namespace CPSM
                             oo = o;
                             switch (ii) {
                                 case 0:
-                                case 1: return WhiteNotes[ii, oo];
+                                case 1:
+                                return WhiteNotes[ii, oo];
                                 case 2:
                                 case 3:
-                                case 4: return WhiteNotes[ii + 1, oo];
+                                case 4:
+                                return WhiteNotes[ii + 1, oo];
                                 case 5:
-                                case 6: return WhiteNotes[ii + 2, oo];
+                                case 6:
+                                return WhiteNotes[ii + 2, oo];
                                 case 7:
                                 case 8:
-                                case 9: return WhiteNotes[ii + 3, oo];
+                                case 9:
+                                return WhiteNotes[ii + 3, oo];
                             }
                         }
                     }
@@ -699,20 +712,28 @@ namespace CPSM
                             ii = i;
                             oo = o;
                             switch (ii) {
-                                case 0: 
-                                case 1: return BlackNotes[ii, oo];
-                                case 2: return WhiteNotes[ii + 1, oo];
-                                case 3: 
+                                case 0:
+                                case 1:
+                                return BlackNotes[ii, oo];
+                                case 2:
+                                return WhiteNotes[ii + 1, oo];
+                                case 3:
                                 case 4:
-                                case 5: return BlackNotes[ii - 1, oo];
-                                case 6: return new NoteViewModal();
-                                case 7: 
-                                case 8: return BlackNotes[ii - 2, oo];
-                                case 9: return WhiteNotes[ii + 1, oo];
-                                case 10: 
+                                case 5:
+                                return BlackNotes[ii - 1, oo];
+                                case 6:
+                                return new NoteViewModal();
+                                case 7:
+                                case 8:
+                                return BlackNotes[ii - 2, oo];
+                                case 9:
+                                return WhiteNotes[ii + 1, oo];
+                                case 10:
                                 case 11:
-                                case 12: return BlackNotes[ii - 3, oo];
-                                case 13: return new NoteViewModal();
+                                case 12:
+                                return BlackNotes[ii - 3, oo];
+                                case 13:
+                                return new NoteViewModal();
                             }
                         }
                     }
@@ -725,15 +746,19 @@ namespace CPSM
                             oo = o;
                             switch (ii) {
                                 case 0:
-                                case 1: return WhiteNotes[ii + 1, oo];
+                                case 1:
+                                return WhiteNotes[ii + 1, oo];
                                 case 2:
                                 case 3:
-                                case 4: return WhiteNotes[ii + 2, oo];
+                                case 4:
+                                return WhiteNotes[ii + 2, oo];
                                 case 5:
-                                case 6: return WhiteNotes[ii + 3, oo];
+                                case 6:
+                                return WhiteNotes[ii + 3, oo];
                                 case 7:
                                 case 8:
-                                case 9: return WhiteNotes[ii + 4, oo];
+                                case 9:
+                                return WhiteNotes[ii + 4, oo];
                             }
                         }
                     }
@@ -794,18 +819,17 @@ namespace CPSM
             public virtual void SetPosition(int f_xpos, int f_ypos) { }
 
             public void SetColour(NoteTemplate f_template, BitmapSource f_source) {
-                if (f_template == null)
-                {
+                if (f_template == null) {
                     return;
                 }
 
                 if (!Initialized) { Initialize(); }
-                
+
                 NoteImage.Source = f_source;
                 CounterPart.SetColour(f_template);
                 NoteImage.Opacity = 1;
             }
-            
+
             public NoteViewModal FindNoteBelow() {
                 return Parent.FindNoteBelow(this);
             }
@@ -816,13 +840,15 @@ namespace CPSM
                 if (Parent != null) {
                     return Parent.FindNoteToLeft(this);
                 }
-                else return new NoteViewModal();
+                else
+                    return new NoteViewModal();
             }
             public NoteViewModal FindNoteToRight() {
                 if (Parent != null) {
                     return Parent.FindNoteToRight(this);
                 }
-                else return new NoteViewModal();
+                else
+                    return new NoteViewModal();
             }
         }
 
@@ -864,7 +890,7 @@ namespace CPSM
             }
 
             public override void InitializeClickableGrid() {
-               
+
                 ClickableGrid = new List<Canvas>();
 
                 ClickableGrid.Add(InitGridHelper(0));
@@ -925,7 +951,7 @@ namespace CPSM
                 SetPosition(f_xpos, f_ypos);
                 InitializeClickableGrid();
             }
-            
+
             public override void SetPosition(int f_xpos, int f_ypos) {
                 int xx = 0, yy;
 
@@ -1054,14 +1080,14 @@ namespace CPSM
                 else {
                     switch (f_mousecolour.ActivePatrial) {
                         case PartialNote.Full: {
-                                for (int i = 0; i < 16; i++) {
-                                    Colours[i] = f_mousecolour.ActiveColour;
-                                    Positions[i] = (NoteBitPos)i;
+                            for (int i = 0; i < 16; i++) {
+                                Colours[i] = f_mousecolour.ActiveColour;
+                                Positions[i] = (NoteBitPos)i;
 
-                                }
-                                break;
                             }
-                            //todo:  cases for non-full notes
+                            break;
+                        }
+                        //todo:  cases for non-full notes
                     }
                 }
             }
@@ -1122,19 +1148,19 @@ namespace CPSM
             public void SetHalfColour(Half f_half, OctaveColour f_col) {
                 switch (f_half) {
                     case Half.Left: {
-                            for (int i = 0; i < 8; i++) {
-                                Colours[i] = f_col;
-                                Positions[i] = (NoteBitPos)i;
-                            }
-                            break;
+                        for (int i = 0; i < 8; i++) {
+                            Colours[i] = f_col;
+                            Positions[i] = (NoteBitPos)i;
                         }
+                        break;
+                    }
                     case Half.Right: {
-                            for (int i = 8; i < 16; i++) {
-                                Colours[i] = f_col;
-                                Positions[i] = (NoteBitPos)i;
-                            }
-                            break;
+                        for (int i = 8; i < 16; i++) {
+                            Colours[i] = f_col;
+                            Positions[i] = (NoteBitPos)i;
                         }
+                        break;
+                    }
                 }
             }
             public void SetHalfColour(Half f_half, char f_char) {
@@ -1144,19 +1170,19 @@ namespace CPSM
             public void SetHalfColour(Half f_half, NoteTemplate f_note) {
                 switch (f_half) {
                     case Half.Left: {
-                            for (int i = 0; i < 8; i++) {
-                                Colours[i] = f_note.Colours[i];
-                                Positions[i] = f_note.Positions[i];
-                            }
-                            break;
+                        for (int i = 0; i < 8; i++) {
+                            Colours[i] = f_note.Colours[i];
+                            Positions[i] = f_note.Positions[i];
                         }
+                        break;
+                    }
                     case Half.Right: {
-                            for (int i = 8; i < 16; i++) {
-                                Colours[i] = f_note.Colours[i];
-                                Positions[i] = f_note.Positions[i];
-                            }
-                            break;
+                        for (int i = 8; i < 16; i++) {
+                            Colours[i] = f_note.Colours[i];
+                            Positions[i] = f_note.Positions[i];
                         }
+                        break;
+                    }
                 }
             }
             public void SetColour(OctaveColour f_col) {
@@ -1209,8 +1235,7 @@ namespace CPSM
                         return false;
                     }
                 }
-                if (Type == f_other.Type)
-                {
+                if (Type == f_other.Type) {
                     return true;
                 }
                 return false;
@@ -1229,14 +1254,22 @@ namespace CPSM
 
             private OctaveColour GetColourFromChar(char f_char) {
                 switch (f_char) {
-                    case 'o': return OctaveColour.none;
-                    case 'q': return OctaveColour.Brown;
-                    case 'w': return OctaveColour.Teal;
-                    case 'e': return OctaveColour.Blue;
-                    case 'r': return OctaveColour.Green;
-                    case 't': return OctaveColour.Red;
-                    case 'y': return OctaveColour.Purple;
-                    case 'u': return OctaveColour.Yellow;
+                    case 'o':
+                    return OctaveColour.none;
+                    case 'q':
+                    return OctaveColour.Brown;
+                    case 'w':
+                    return OctaveColour.Teal;
+                    case 'e':
+                    return OctaveColour.Blue;
+                    case 'r':
+                    return OctaveColour.Green;
+                    case 't':
+                    return OctaveColour.Red;
+                    case 'y':
+                    return OctaveColour.Purple;
+                    case 'u':
+                    return OctaveColour.Yellow;
                 }
                 throw new Exception();
             }

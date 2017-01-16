@@ -64,7 +64,7 @@ namespace CPSM
             public void SimulateClickDown(OctaveColour f_col) {
                 CustomRadioButton tempbtn = null;
                 foreach (var btn in RadioButtons) {
-                    if ((OctaveColour)btn.Tag  == f_col) {
+                    if ((OctaveColour)btn.Tag == f_col) {
                         tempbtn = btn;
                         break;
                     }
@@ -89,6 +89,7 @@ namespace CPSM
             }
 
             public void SetFirstButtonIcon(Canvas f_note) {
+                //todo: fix size of icons
                 var f_tempop = f_note.Opacity;
                 f_note.Opacity = 1;
                 f_note.Loaded += delegate {
@@ -127,10 +128,12 @@ namespace CPSM
                 CreateButton = new CustomButton(f_cbtn_create);
                 CreateButton.SetButtonClickEvent(ClickEvent_create);
                 CreateButton.SetImg(ImageControl.IconAnnual);
+                CreateButton.SetTooltip("Create Measure");
 
                 DeleteButton = new CustomButton(f_cbtn_delete);
                 DeleteButton.SetButtonClickEvent(ClickEvent_delete);
                 DeleteButton.SetImg(ImageControl.IconDelete);
+                DeleteButton.SetTooltip("Delete Measure");
             }
 
             public void ClickEvent_create(object sender, MouseButtonEventArgs e) {
@@ -150,34 +153,153 @@ namespace CPSM
             public CustomButton PrevPageBtn { get; set; }
             public SongViewModalCreator _Creator { get; set; }
 
-            public PagesForm(SongViewModalCreator f_creator,Canvas f_Next, Canvas f_prev)
-            {
+            public PagesForm(SongViewModalCreator f_creator, Canvas f_Next, Canvas f_prev) {
                 _Creator = f_creator;
                 NextPageBtn = new CustomButton(f_Next);
                 NextPageBtn.SetButtonClickEvent(NextPage);
                 NextPageBtn.SetImg(ImageControl.Icon1);
+                NextPageBtn.SetTooltip("Next Page");
 
                 PrevPageBtn = new CustomButton(f_prev);
                 PrevPageBtn.SetButtonClickEvent(PrevPage);
                 PrevPageBtn.SetImg(ImageControl.Icon2);
+                PrevPageBtn.SetTooltip("Previous Page");
             }
 
-            public void NextPage(object sender, MouseEventArgs e)
-            {
+            public void NextPage(object sender, MouseEventArgs e) {
                 _Creator.NextPage();
             }
-            public void PrevPage(object sender, MouseEventArgs e)
-            {
+            public void PrevPage(object sender, MouseEventArgs e) {
                 _Creator.PrevPage();
             }
         }
 
-        public class FormSongSelect
+        public class LoadSongSelect
         {
             public MainWindow _Window { get; set; }
+            public Canvas _Form { get; set; }
+            public StackPanel VertiStack { get; set; }
+            public CustomButton _FormBtn { get; set; }
 
-            public FormSongSelect(MainWindow f_wind) {
+            public LoadSongSelect(MainWindow f_wind, Canvas f_Form, Canvas f_cbtn) {
                 _Window = f_wind;
+                _Form = f_Form;
+                VertiStack = new StackPanel();
+                _Form.Children.Add(VertiStack);
+
+                _FormBtn = new CustomButton(f_cbtn);
+                _FormBtn.SetImg(ImageControl.Icon2);
+                _FormBtn.SetTooltip("Load Song");
+                _FormBtn.SetButtonClickEvent(ButtonClickEvent);
+
+
+                HideForm();
+            }
+
+            public void ShowForm() {
+                _Form.Visibility = Visibility.Visible;
+                _Form.IsEnabled = true;
+                LoadSongList();
+            }
+            public void HideForm() {
+                _Form.Visibility = Visibility.Hidden;
+                _Form.IsEnabled = false;
+
+                ClearStacks();
+            }
+            public void LoadSongList() {
+                var f_songloader = new SongLoader(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt");
+                var f_songlist = f_songloader.LoadSongsSmall();
+
+                foreach (var data in f_songlist) {
+                    CreateListItem(data);
+                }
+            }
+            public void CreateListItem(SongDataSmall f_data) {
+                var f_item = new LoadSongItem(this, f_data);
+                VertiStack.Children.Add(f_item);
+                //todo: add stackpanels to vertistack
+            }
+            public void ClearStacks() {
+                while (VertiStack.Children.Count > 0) {
+                    VertiStack.Children.RemoveAt(0);
+                }
+            }
+            public void LoadSong(SongDataSmall f_data) {
+                _Window._GUI._SongCan.LoadSong(f_data.Title, f_data.Source);
+                HideForm();
+            }
+            public void ButtonClickEvent(object sender, MouseButtonEventArgs e) {
+                if (_Form.IsEnabled) {
+                    HideForm();
+                }
+                else {
+                    ShowForm();
+                }
+            }
+        }
+
+        public class LoadSongItem : Canvas
+        {
+            public LoadSongSelect _Parent { get; set; }
+            public SongDataSmall _Data { get; set; }
+            public CustomButton _btn { get; set; }
+
+            public LoadSongItem(LoadSongSelect f_parent, SongDataSmall f_data) {
+                _Parent = f_parent;
+                _Data = f_data;
+                Margin = new Thickness(0, -2, 0, 0);
+                Height = 60;
+                Width = 180;
+                Background = Brushes.AliceBlue;
+                Children.Add(new Label() //Title
+                {
+                    Content = _Data.Title,
+                    Margin = new Thickness(0, 2, 0, 0)
+                });
+                Children.Add(new Label() // Source
+                {
+                    Content = _Data.Source,
+                    Margin = new Thickness(0, 18, 0, 0)
+                });
+                Children.Add(new Label() // Measures
+                {
+                    Content = _Data.MeasureCount.ToString() + " Measures",
+                    Margin = new Thickness(0, 34, 0, 0)
+                });
+                Children.Add(new Border() {
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(2),
+                    Height = Height,
+                    Width = Width
+                });
+                var f_BtnCan = new Canvas() {
+                    Margin = new Thickness(100, 10, 0, 0),
+                    Background = Brushes.Black
+                };
+                Children.Add(f_BtnCan);
+                _btn = new CustomButton(f_BtnCan);
+                _btn.MouseUp += ItemClickEvent;
+                _btn.SetImg(ImageControl.IconAnnual);
+                _btn.SetSize(0.75);
+                _btn.SetButtonClickEvent(ItemClickEvent);
+            }
+
+            public void ItemClickEvent(object sender, MouseButtonEventArgs e) {
+                _Parent.LoadSong(_Data);
+            }
+        }
+
+        public class VersionForm
+        {
+            public Label _Label { get; set; }
+            public Version _Version { get; set; }
+
+            public VersionForm(Label f_Label, Version f_Version) {
+                _Label = f_Label;
+                _Version = f_Version;
+
+                _Label.Content = _Version.CurrentVersion;
             }
         }
     }

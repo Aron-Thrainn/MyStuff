@@ -25,6 +25,8 @@ using CPSM.Forms;
     Add Copy/Paste functions
     Add NotetType to NoteTemplate
     Save/load black notes
+    prettify the load song select
+    fix first button icon size
 
     Bugs:
     Page changing is super slow
@@ -52,13 +54,13 @@ using CPSM.Forms;
 
 namespace CPSM
 {
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window
+    {
         public GUI _GUI { get; set; }
         public SongCanvas _SongCan { get; set; }
-        public FormSongSelect _FormSongSelect { get; set; }
+        public LoadSongSelect _FormSongSelect { get; set; }
         public MouseControl _MouseCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
-        public Version _vers { get; set; }
         private Hotkeycontrol _keyCtrl { get; set; }
 
 
@@ -70,16 +72,17 @@ namespace CPSM
             var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion, lbl_PageNumber, _MouseCtrl._noteCtrl._NoteImageConrtol);
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
-            _FormSongSelect = new FormSongSelect(this);
+            _FormSongSelect = new LoadSongSelect(this, cnv_SongLoadSelect, cbtn_LoadSong);
             _ScreenCap = new ScreenCapturer(cnv_SongCan, _MouseCtrl);
-            _vers = new Version();
             _keyCtrl = new Hotkeycontrol(this);
-            
+
             _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
-    
+
             InitFormNoteColour();
             InitFormMeasureCreator();
+
             _GUI.initPagesForm(cbtn_Page_Next, cbtn_Page_Previous);
+            _GUI.initVersionForm(lbl_SongVersion, new Version());
 
             _MouseCtrl._noteCtrl._Form = _GUI._FormNoteColour;
 
@@ -95,66 +98,66 @@ namespace CPSM
 
             switch (e.Key) {
                 case Key.Q: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Brown);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Brown);
+                    break;
+                }
                 case Key.W: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Teal);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Teal);
+                    break;
+                }
                 case Key.E: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Blue);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Blue);
+                    break;
+                }
                 case Key.R: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Green);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Green);
+                    break;
+                }
                 case Key.T: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Red);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Red);
+                    break;
+                }
                 case Key.Y: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Purple);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Purple);
+                    break;
+                }
                 case Key.U: {
-                        _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Yellow);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickDown(OctaveColour.Yellow);
+                    break;
+                }
             }
         }
         private void HotkeysUp(object sender, KeyEventArgs e) {
 
             switch (e.Key) {
                 case Key.Q: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Brown);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Brown);
+                    break;
+                }
                 case Key.W: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Teal);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Teal);
+                    break;
+                }
                 case Key.E: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Blue);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Blue);
+                    break;
+                }
                 case Key.R: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Green);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Green);
+                    break;
+                }
                 case Key.T: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Red);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Red);
+                    break;
+                }
                 case Key.Y: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Purple);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Purple);
+                    break;
+                }
                 case Key.U: {
-                        _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Yellow);
-                        break;
-                    }
+                    _GUI._FormNoteColour.SimulateClickUp(OctaveColour.Yellow);
+                    break;
+                }
             }
             _MouseCtrl._noteCtrl.UpdatePreview();
         }
@@ -178,8 +181,8 @@ namespace CPSM
             _GUI.initNoteColourForm(f_FormNoteColour, f_tempList);
         }
         private void InitFormMeasureCreator() {
-            var f_measurecreatorform = new MeasureCreatorForm(cnv_MeasureCreatorForm, cbtn_createmeasure ,cbtn_deletemeasure, cbo_measuresizes);
-            _GUI.initMeasureCreatorForm(f_measurecreatorform);            
+            var f_measurecreatorform = new MeasureCreatorForm(cnv_MeasureCreatorForm, cbtn_createmeasure, cbtn_deletemeasure, cbo_measuresizes);
+            _GUI.initMeasureCreatorForm(f_measurecreatorform);
         }
         public void TestModal() {
             var testsong = new SongData() {
@@ -202,7 +205,7 @@ namespace CPSM
                     testmeasure2.WhiteNotes[i, o].SetColour(OctaveColour.none);
                 }
             }
-            
+
             testmeasure.WhiteNotes[0, 0].SetColour(OctaveColour.Brown);
             testmeasure.WhiteNotes[0, 1].SetColour(OctaveColour.Teal);
             testmeasure.WhiteNotes[0, 2].SetColour(OctaveColour.Blue);
@@ -212,13 +215,13 @@ namespace CPSM
             testmeasure.WhiteNotes[0, 6].SetColour(OctaveColour.Yellow);
             testmeasure.WhiteNotes[13, 9].SetColour(OctaveColour.Green);
             testmeasure.WhiteNotes[8, 10].SetColour(OctaveColour.Yellow);
-            
-            for (int i=0; i<14; i++) {
+
+            for (int i = 0; i < 14; i++) {
                 testmeasure.WhiteNotes[i, 11].SetColour(OctaveColour.Purple);
                 testmeasure2.WhiteNotes[i, 3].SetColour(OctaveColour.Purple);
             }
 
-            
+
             var notetemp1 = new NoteTemplate();
             notetemp1.SetHalfColour(Half.Left, OctaveColour.Teal);
             notetemp1.SetHalfColour(Half.Right, OctaveColour.Blue);
@@ -267,7 +270,7 @@ namespace CPSM
             testmeasure.WhiteNotes[8, 8].SetColour(OctaveColour.Brown);
 
 
-            
+
             testsong.Measures.Add(testmeasure);
             testsong.Measures.Add(testmeasure2);
 
@@ -275,14 +278,14 @@ namespace CPSM
             _SongCan.LoadSongFromData(testsong);
 
         }
-        
+
     }
 
 
     public class Hotkeycontrol
     {
         public MainWindow _window { get; set; }
-        
+
         #region Command Objects
         public class SpaceCommand : ICommand
         {
@@ -336,11 +339,10 @@ namespace CPSM
             public void Execute(object parameter) {
                 //hotkey action
                 _window.Close();
-                
             }
         }
 
-       
+
         #endregion
         /*  Uses
          * escape to close app
@@ -353,9 +355,9 @@ namespace CPSM
             EscFunc();
 
 
-            
+
         }
-        
+
         private void SpaceFunc() {
             SpaceCommand Testcommand = new SpaceCommand(_window);
 

@@ -8,67 +8,8 @@ using CPSM.ViewModals;
 
 namespace CPSM
 {
-    /* // Song Saver is elseware
-    public class SongControl {
-        private IniFile SaveFile { get; set; }
-        public SongData ActiveSong { get; set; }
-
-        public SongData LoadSong() {
-            throw new NotImplementedException();
-        }
-        public void SaveSong() {
-
-
-            using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt")) {
-
-                file.Write("N(" + ActiveSong.Name + ")");
-                file.Write("S(" + ActiveSong.Source + ")");
-
-                foreach (var measure in ActiveSong.Measures) {
-                    file.Write('M');
-                    if ((int)measure.Size >= 10) {
-                        file.Write(0);
-                        file.Write(((int)measure.Size));
-                    }
-                    else file.Write((int)measure.Size);
-
-                    file.Write('(');
-                    foreach (var note in measure.WhiteNotes) {
-                        var temp = new NoteTemplate(note);
-                        if (temp.isUsniform() != null) {
-                            file.Write((int)temp.isUsniform().Value);
-                        }
-                    }
-                    foreach (var note in measure.BlackNotes) {
-
-                    }
-                    file.Write(')');
-
-                }
-            }
-        }
-        public void RemoveSong() {
-            throw new NotImplementedException();
-        }
-
-        public void AddMeasure(MeasureSize f_size) {
-            ActiveSong.AddMeasure(f_size);
-        }
-        public void SetName(string f_name) {
-            ActiveSong.Name = f_name;
-        }
-        public void SetSource(string f_source) {
-            ActiveSong.Source = f_source;
-        }
-        public int GetNewID() {
-            throw new NotImplementedException();
-        }
-    }
-    */
-
-
-    public enum NoteBitPos {
+    public enum NoteBitPos
+    {
         a1 = 0,
         a2,
         a3,
@@ -86,7 +27,8 @@ namespace CPSM
         b7,
         b8
     }
-    public enum OctaveColour {
+    public enum OctaveColour
+    {
         none = 0,
         Brown,
         Teal,
@@ -96,7 +38,8 @@ namespace CPSM
         Purple,
         Yellow
     }
-    public enum Half {
+    public enum Half
+    {
         Left,
         Right
     }
@@ -105,7 +48,8 @@ namespace CPSM
         White,
         Black
     }
-    public enum MeasureSize {
+    public enum MeasureSize
+    {
         four = 4,
         six = 6,
         eight = 8,
@@ -115,7 +59,8 @@ namespace CPSM
 
 
 
-    public class SongDataSmall {
+    public class SongDataSmall
+    {
         public string Title { get; set; }
         public string Source { get; set; }
         public int MeasureCount { get; set; }
@@ -126,7 +71,8 @@ namespace CPSM
         }
     }
 
-    public class SongData {
+    public class SongData
+    {
         // name + Source is unique primary key
         public List<MeasureData> Measures { get; set; }
         public string Title { get; set; }
@@ -152,10 +98,11 @@ namespace CPSM
             Measures.Add(f_measure);
         }
         public void DeleteMeasure() {
-            Measures.RemoveAt(Measures.Count-1);
+            Measures.RemoveAt(Measures.Count - 1);
         }
     }
-    public class MeasureData {
+    public class MeasureData
+    {
         public NoteData[,] WhiteNotes { get; set; }
         public NoteData[,] BlackNotes { get; set; }
         public SongData Parent { get; set; }
@@ -182,8 +129,9 @@ namespace CPSM
         }
 
     }
-    
-    public class NoteData {
+
+    public class NoteData
+    {
         public MeasureData Parent { get; set; }
         public OctaveColour[] Colours { get; set; }
         public NoteBitPos[] Positions { get; set; }
@@ -195,7 +143,7 @@ namespace CPSM
                 NoteBitPos.a6, NoteBitPos.a7, NoteBitPos.a8, NoteBitPos.b1, NoteBitPos.b2, NoteBitPos.b3, NoteBitPos.b4,
                 NoteBitPos.b5, NoteBitPos.b6, NoteBitPos.b7, NoteBitPos.b8 };
 
-            
+
             SetColour(OctaveColour.none);
         }
 
@@ -206,7 +154,7 @@ namespace CPSM
             }
         }
         public void SetColour(OctaveColour f_oct) {
-            for (int i=0; i<16; i++) {
+            for (int i = 0; i < 16; i++) {
                 Colours[i] = f_oct;
             }
         }
@@ -229,7 +177,7 @@ namespace CPSM
             }
         }
         public bool IsEmpty() {
-            foreach(var col in Colours) {
+            foreach (var col in Colours) {
                 if (col != OctaveColour.none) {
                     return false;
                 }

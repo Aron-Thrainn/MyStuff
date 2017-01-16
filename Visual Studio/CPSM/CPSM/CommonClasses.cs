@@ -19,7 +19,7 @@ namespace CommonClasses
 {
     using CPSM;
 
-    
+
     namespace CustomButtons
     {
         using Images;
@@ -64,12 +64,10 @@ namespace CommonClasses
 
             #endregion
 
-            public ParentButton(Canvas f_can)
-            {
+            public ParentButton(Canvas f_can) {
                 Init_shared(f_can);
             }
-            protected void Init_shared(Canvas f_can)
-            {
+            protected void Init_shared(Canvas f_can) {
                 MouseLock = false;
                 MouseLeft = false;
                 MouseRight = false;
@@ -79,17 +77,12 @@ namespace CommonClasses
                 Frame = new Image();
                 TagLabel = new Label();
                 Highlight = new Canvas();
-                Icon.Stretch = Stretch.Uniform;
+                Icon.Stretch = Stretch.Fill;
                 Frame.Stretch = Stretch.Fill;
                 Icon.Tag = this;
                 Frame.Tag = this;
                 Highlight.Tag = this;
                 TagLabel.FontWeight = FontWeights.DemiBold;
-
-                Icon.Height = SizeIcon;
-                Icon.Width = SizeIcon;
-
-
 
                 Highlight.Height = SizeIcon;
                 Highlight.Width = SizeIcon;
@@ -101,7 +94,7 @@ namespace CommonClasses
                 Can.Children.Add(TagLabel);
                 Can.Children.Add(Highlight);
                 Can.Background = null;
-                
+
                 Frame.Margin = new Thickness(0, 0, 0, 0);
                 setButtonState(ButtonState.Idle);
 
@@ -110,93 +103,71 @@ namespace CommonClasses
                 Highlight.MouseEnter += ButtonEnter;
                 Highlight.MouseLeave += ButtonLeave;
             }
-            protected void ButtonEvent(object sender, MouseButtonEventArgs e)
-            {
-                try
-                {
+            protected void ButtonEvent(object sender, MouseButtonEventArgs e) {
+                try {
                     Function(sender, e);
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
 
                 }
             }
-            protected void ButtonEventRight(object sender, MouseButtonEventArgs e)
-            {
-                try
-                {
+            protected void ButtonEventRight(object sender, MouseButtonEventArgs e) {
+                try {
                     FunctionRight(sender, e);
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
 
                 }
             }
-            protected void ButtonEnter(object sender, MouseEventArgs e)
-            {
+            protected void ButtonEnter(object sender, MouseEventArgs e) {
                 Highlight.Opacity = 0.65;
             }
-            protected void ButtonLeave(object sender, MouseEventArgs e)
-            {
+            protected void ButtonLeave(object sender, MouseEventArgs e) {
                 Highlight.Opacity = 0;
             }
-            public virtual void SimulateButtonDown() { }
-            public virtual void SimulateButtonUp() { }
-
             #region Set functions
-            public void SetImg(BitmapImage f_img) {
-                Icon.Source = f_img;
-            }
             public void SetImg(BitmapSource f_img) {
                 Icon.Source = f_img;
             }
-            public void setButtonState(ButtonState f_state)
-            {
+            public void setButtonState(ButtonState f_state) {
                 Frame.Source = ImageControl.IconFrame(f_state);
                 State = f_state;
-                switch (f_state)
-                {
-                    case ButtonState.Idle:
-                        {
-                            var f_margin = SizeOffset1 * SizeScale;
-                            Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
-                            Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            break;
-                        }
-                    case ButtonState.Toggled:
-                        {
-                            var f_margin = SizeOffset2 * SizeScale;
-                            Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
-                            Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            break;
-                        }
-                    case ButtonState.Pressed:
-                        {
-                            var f_margin = SizeOffset3 * SizeScale;
-                            Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
-                            Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            break;
-                        }
-                    case ButtonState.PressedFromIdle:
-                        {
-                            var f_margin = SizeOffset3 * SizeScale;
-                            Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
-                            Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
-                            break;
-                        }
+                switch (f_state) {
+                    case ButtonState.Idle: {
+                        var f_margin = SizeOffset1 * SizeScale;
+                        Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
+                        Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        break;
+                    }
+                    case ButtonState.Toggled: {
+                        var f_margin = SizeOffset2 * SizeScale;
+                        Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
+                        Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        break;
+                    }
+                    case ButtonState.Pressed: {
+                        var f_margin = SizeOffset3 * SizeScale;
+                        Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
+                        Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        break;
+                    }
+                    case ButtonState.PressedFromIdle: {
+                        var f_margin = SizeOffset3 * SizeScale;
+                        Icon.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        TagLabel.Margin = new Thickness(f_margin - SizeTextOffsetx, f_margin - SizeTextOffsety, 0, 0);
+                        Highlight.Margin = new Thickness(f_margin, f_margin, 0, 0);
+                        break;
+                    }
                 }
             }
-            public void SetTooltip(string f_tooltip)
-            {
-                Icon.ToolTip = f_tooltip;
+            public void SetTooltip(string f_tooltip) {
+                Highlight.ToolTip = f_tooltip;
                 Frame.ToolTip = f_tooltip;
             }
-            public void SetSize(double f_scale)
-            {
+            public void SetSize(double f_scale) {
                 Icon.Height = (SizeIcon * f_scale);
                 Frame.Height = (SizeFrame * f_scale);
                 Highlight.Height = (SizeIcon * f_scale);
@@ -205,31 +176,29 @@ namespace CommonClasses
                 SizeScale = f_scale;
                 setButtonState(State);
             }
-            public void SetButtonClickEvent(Action<object, MouseButtonEventArgs> f_func)
-            {
+            public void SetButtonClickEvent(Action<object, MouseButtonEventArgs> f_func) {
                 Function = f_func;
             }
-            public void SetButtonRightClickEvent(Action<object, MouseButtonEventArgs> f_func)
-            {
+            public void SetButtonRightClickEvent(Action<object, MouseButtonEventArgs> f_func) {
                 FunctionRight = f_func;
             }
-            public void SetTagLabel(string f_taglabel)
-            {
+            public void SetTagLabel(string f_taglabel) {
                 TagLabel.Content = f_taglabel;
             }
             #endregion
+            public virtual void SimulateButtonDown() { }
+            public virtual void SimulateButtonUp() { }
+
         }
 
         public class CustomButton : ParentButton
         {
 
-            public CustomButton(Canvas f_can) : base(f_can)
-            {
+            public CustomButton(Canvas f_can) : base(f_can) {
                 SetButtonEvents();
             }
             #region Button events
-            private void SetButtonEvents()
-            {
+            private void SetButtonEvents() {
                 Highlight.MouseLeftButtonDown += new MouseButtonEventHandler(ButtonDown);
                 Highlight.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
 
@@ -237,38 +206,29 @@ namespace CommonClasses
                 Frame.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
                 Frame.MouseLeave += new MouseEventHandler(MouseLeaveButton);
             }
-            private void ButtonDown(object sender, MouseButtonEventArgs e)
-            {
+            private void ButtonDown(object sender, MouseButtonEventArgs e) {
                 MouseLock = true;
-                switch (State)
-                {
-                    case ButtonState.Idle:
-                        {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                switch (State) {
+                    case ButtonState.Idle: {
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
-            private void ButtonUp(object sender, MouseButtonEventArgs e)
-            {
-                if (MouseLock)
-                {
-                    switch (State)
-                    {
-                        case ButtonState.Pressed:
-                            {
-                                setButtonState(ButtonState.Idle);
-                                ButtonEvent(this, e);
-                                break;
-                            }
+            private void ButtonUp(object sender, MouseButtonEventArgs e) {
+                if (MouseLock) {
+                    switch (State) {
+                        case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Idle);
+                            ButtonEvent(this, e);
+                            break;
+                        }
                     }
                 }
                 MouseLock = false;
             }
-            private void MouseLeaveButton(object sender, MouseEventArgs e)
-            {
-                if (State == ButtonState.Pressed)
-                {
+            private void MouseLeaveButton(object sender, MouseEventArgs e) {
+                if (State == ButtonState.Pressed) {
                     setButtonState(ButtonState.Idle);
                 }
                 MouseLock = false;
@@ -280,31 +240,25 @@ namespace CommonClasses
         {
             private bool Checked { get; set; }
 
-            public CustomCheckbox(Canvas f_can) : base(f_can)
-            {
+            public CustomCheckbox(Canvas f_can) : base(f_can) {
                 SetButtonEvents();
                 Checked = false;
             }
-            public bool isChecked()
-            {
+            public bool isChecked() {
                 return Checked;
             }
-            public void setChecked(bool f_checked)
-            {
-                if (f_checked)
-                {
+            public void setChecked(bool f_checked) {
+                if (f_checked) {
                     Checked = true;
                     setButtonState(ButtonState.Toggled);
                 }
-                else
-                {
+                else {
                     Checked = false;
                     setButtonState(ButtonState.Idle);
                 }
             }
             #region Button events
-            private void SetButtonEvents()
-            {
+            private void SetButtonEvents() {
                 Highlight.MouseLeftButtonDown += new MouseButtonEventHandler(ButtonDown);
                 Highlight.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
                 Highlight.MouseRightButtonDown += new MouseButtonEventHandler(ButtonDownRight);
@@ -314,94 +268,73 @@ namespace CommonClasses
                 Frame.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
                 Frame.MouseLeave += new MouseEventHandler(MouseLeaveButton);
             }
-            private void ButtonDown(object sender, MouseButtonEventArgs e)
-            {
+            private void ButtonDown(object sender, MouseButtonEventArgs e) {
                 MouseLock = true;
-                switch (State)
-                {
-                    case ButtonState.Idle:
-                        {
-                            setButtonState(ButtonState.PressedFromIdle);
-                            break;
-                        }
-                    case ButtonState.Toggled:
-                        {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                switch (State) {
+                    case ButtonState.Idle: {
+                        setButtonState(ButtonState.PressedFromIdle);
+                        break;
+                    }
+                    case ButtonState.Toggled: {
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
-            private void ButtonUp(object sender, MouseButtonEventArgs e)
-            {
-                if (MouseLock)
-                {
-                    switch (State)
-                    {
-                        case ButtonState.PressedFromIdle:
-                            {
-                                setButtonState(ButtonState.Toggled);
-                                ButtonEvent(this, e);
-                                Checked = true;
-                                break;
-                            }
-                        case ButtonState.Pressed:
-                            {
-                                setButtonState(ButtonState.Idle);
-                                ButtonEvent(this, e);
-                                Checked = false;
-                                break;
-                            }
+            private void ButtonUp(object sender, MouseButtonEventArgs e) {
+                if (MouseLock) {
+                    switch (State) {
+                        case ButtonState.PressedFromIdle: {
+                            setButtonState(ButtonState.Toggled);
+                            ButtonEvent(this, e);
+                            Checked = true;
+                            break;
+                        }
+                        case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Idle);
+                            ButtonEvent(this, e);
+                            Checked = false;
+                            break;
+                        }
                     }
                 }
                 MouseLock = false;
             }
-            private void ButtonDownRight(object sender, MouseButtonEventArgs e)
-            {
+            private void ButtonDownRight(object sender, MouseButtonEventArgs e) {
                 MouseLock = true;
-                switch (State)
-                {
-                    case ButtonState.Idle:
-                        {
-                            setButtonState(ButtonState.PressedFromIdle);
-                            break;
-                        }
-                    case ButtonState.Toggled:
-                        {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                switch (State) {
+                    case ButtonState.Idle: {
+                        setButtonState(ButtonState.PressedFromIdle);
+                        break;
+                    }
+                    case ButtonState.Toggled: {
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
-            private void ButtonUpRight(object sender, MouseButtonEventArgs e)
-            {
-                if (MouseLock)
-                {
-                    switch (State)
-                    {
-                        case ButtonState.PressedFromIdle:
-                            {
-                                setButtonState(ButtonState.Idle);
-                                FunctionRight(this, e);
-                                break;
-                            }
-                        case ButtonState.Pressed:
-                            {
-                                setButtonState(ButtonState.Toggled);
-                                FunctionRight(this, e);
-                                break;
-                            }
+            private void ButtonUpRight(object sender, MouseButtonEventArgs e) {
+                if (MouseLock) {
+                    switch (State) {
+                        case ButtonState.PressedFromIdle: {
+                            setButtonState(ButtonState.Idle);
+                            FunctionRight(this, e);
+                            break;
+                        }
+                        case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Toggled);
+                            FunctionRight(this, e);
+                            break;
+                        }
                     }
                 }
                 MouseLock = false;
             }
-            private void MouseLeaveButton(object sender, MouseEventArgs e)
-            {
-                if (State == ButtonState.Pressed)
-                {
+            private void MouseLeaveButton(object sender, MouseEventArgs e) {
+                if (State == ButtonState.Pressed) {
                     setButtonState(ButtonState.Toggled);
                 }
-                else if (State == ButtonState.PressedFromIdle)
-                {
+                else if (State == ButtonState.PressedFromIdle) {
                     setButtonState(ButtonState.Idle);
                 }
                 MouseLock = false;
@@ -414,47 +347,36 @@ namespace CommonClasses
             public List<CustomRadioButton> RadioButtons { get; set; }
             public string GroupName { get; set; }
 
-            public CustomRadioButtonGroup()
-            {
+            public CustomRadioButtonGroup() {
                 RadioButtons = new List<CustomRadioButton>();
             }
-            public void SetActiveButton(int f_id)
-            {
-                foreach (var btn in RadioButtons)
-                {
-                    if (btn.Id == f_id)
-                    {
+            public void SetActiveButton(int f_id) {
+                foreach (var btn in RadioButtons) {
+                    if (btn.Id == f_id) {
                         btn.SetChecked(true);
                     }
-                    else
-                    {
+                    else {
                         btn.SetChecked(false);
                     }
                 }
             }
-            public void AddButton(CustomRadioButton f_btn)
-            {
+            public void AddButton(CustomRadioButton f_btn) {
                 f_btn.Group = this;
                 f_btn.Id = GenerateNewId();
                 RadioButtons.Add(f_btn);
             }
-            private int GenerateNewId()
-            {
+            private int GenerateNewId() {
                 int f_id = 0;
                 bool f_taken;
-                while (true)
-                {
+                while (true) {
                     f_taken = false;
-                    foreach (var f_btn in RadioButtons)
-                    {
-                        if (f_id == f_btn.Id)
-                        {
+                    foreach (var f_btn in RadioButtons) {
+                        if (f_id == f_btn.Id) {
                             f_taken = true;
                             break;
                         }
                     }
-                    if (!f_taken)
-                    {
+                    if (!f_taken) {
                         return f_id;
                     }
                     f_id++;
@@ -468,35 +390,28 @@ namespace CommonClasses
             public int Id { get; set; }
             private bool Checked { get; set; }
 
-            public CustomRadioButton(Canvas f_can, CustomRadioButtonGroup f_group) : base(f_can)
-            {
+            public CustomRadioButton(Canvas f_can, CustomRadioButtonGroup f_group) : base(f_can) {
                 SetButtonEvents();
                 f_group.AddButton(this);
             }
-            public bool GetChecked()
-            {
+            public bool GetChecked() {
                 return Checked;
             }
-            public void SetChecked(bool f_checked)
-            {
-                if (f_checked)
-                {
+            public void SetChecked(bool f_checked) {
+                if (f_checked) {
                     Checked = true;
                     setButtonState(ButtonState.Toggled);
                 }
-                else
-                {
+                else {
                     Checked = false;
                     setButtonState(ButtonState.Idle);
                 }
             }
-            public void Check()
-            {
+            public void Check() {
                 Group.SetActiveButton(Id);
             }
             #region Button events
-            private void SetButtonEvents()
-            {
+            private void SetButtonEvents() {
                 Highlight.MouseLeftButtonDown += new MouseButtonEventHandler(ButtonDown);
                 Highlight.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
 
@@ -504,92 +419,71 @@ namespace CommonClasses
                 Frame.MouseLeftButtonUp += new MouseButtonEventHandler(ButtonUp);
                 Frame.MouseLeave += new MouseEventHandler(MouseLeaveButton);
             }
-            private void ButtonDown(object sender, MouseButtonEventArgs e)
-            {
+            private void ButtonDown(object sender, MouseButtonEventArgs e) {
                 MouseLock = true;
-                switch (State)
-                {
-                    case ButtonState.Idle:
-                        {
-                            setButtonState(ButtonState.PressedFromIdle);
-                            break;
-                        }
-                    case ButtonState.Toggled:
-                        {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                switch (State) {
+                    case ButtonState.Idle: {
+                        setButtonState(ButtonState.PressedFromIdle);
+                        break;
+                    }
+                    case ButtonState.Toggled: {
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
-            private void ButtonUp(object sender, MouseButtonEventArgs e)
-            {
-                if (MouseLock)
-                {
-                    switch (State)
-                    {
-                        case ButtonState.PressedFromIdle:
-                            {
-                                Check();
-                                ButtonEvent(this, e);
-                                break;
-                            }
-                        case ButtonState.Pressed:
-                            {
-                                setButtonState(ButtonState.Toggled);
-                                ButtonEvent(this, e);
-                                break;
-                            }
+            private void ButtonUp(object sender, MouseButtonEventArgs e) {
+                if (MouseLock) {
+                    switch (State) {
+                        case ButtonState.PressedFromIdle: {
+                            Check();
+                            ButtonEvent(this, e);
+                            break;
+                        }
+                        case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Toggled);
+                            ButtonEvent(this, e);
+                            break;
+                        }
                     }
                 }
                 MouseLock = false;
             }
-            private void ButtonDownRight(object sender, MouseButtonEventArgs e)
-            {
+            private void ButtonDownRight(object sender, MouseButtonEventArgs e) {
                 MouseLock = true;
-                switch (State)
-                {
-                    case ButtonState.Idle:
-                        {
-                            setButtonState(ButtonState.PressedFromIdle);
-                            break;
-                        }
-                    case ButtonState.Toggled:
-                        {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                switch (State) {
+                    case ButtonState.Idle: {
+                        setButtonState(ButtonState.PressedFromIdle);
+                        break;
+                    }
+                    case ButtonState.Toggled: {
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
-            private void ButtonUpRight(object sender, MouseButtonEventArgs e)
-            {
-                if (MouseLock)
-                {
-                    switch (State)
-                    {
-                        case ButtonState.PressedFromIdle:
-                            {
-                                setButtonState(ButtonState.Idle);
-                                FunctionRight(this, e);
-                                break;
-                            }
-                        case ButtonState.Pressed:
-                            {
-                                setButtonState(ButtonState.Toggled);
-                                FunctionRight(this, e);
-                                break;
-                            }
+            private void ButtonUpRight(object sender, MouseButtonEventArgs e) {
+                if (MouseLock) {
+                    switch (State) {
+                        case ButtonState.PressedFromIdle: {
+                            setButtonState(ButtonState.Idle);
+                            FunctionRight(this, e);
+                            break;
+                        }
+                        case ButtonState.Pressed: {
+                            setButtonState(ButtonState.Toggled);
+                            FunctionRight(this, e);
+                            break;
+                        }
                     }
                 }
                 MouseLock = false;
             }
-            private void MouseLeaveButton(object sender, MouseEventArgs e)
-            {
-                if (State == ButtonState.PressedFromIdle)
-                {
+            private void MouseLeaveButton(object sender, MouseEventArgs e) {
+                if (State == ButtonState.PressedFromIdle) {
                     setButtonState(ButtonState.Idle);
                 }
-                else if (State == ButtonState.Pressed)
-                {
+                else if (State == ButtonState.Pressed) {
                     setButtonState(ButtonState.Toggled);
                 }
                 MouseLock = false;
@@ -597,27 +491,27 @@ namespace CommonClasses
             public override void SimulateButtonDown() {
                 switch (State) {
                     case ButtonState.Idle: {
-                            setButtonState(ButtonState.PressedFromIdle);
-                            break;
-                        }
+                        setButtonState(ButtonState.PressedFromIdle);
+                        break;
+                    }
                     case ButtonState.Toggled: {
-                            setButtonState(ButtonState.Pressed);
-                            break;
-                        }
+                        setButtonState(ButtonState.Pressed);
+                        break;
+                    }
                 }
             }
             public override void SimulateButtonUp() {
                 switch (State) {
                     case ButtonState.PressedFromIdle: {
-                            Check();
-                            ButtonEvent(this, null);
-                            break;
-                        }
+                        Check();
+                        ButtonEvent(this, null);
+                        break;
+                    }
                     case ButtonState.Pressed: {
-                            setButtonState(ButtonState.Toggled);
-                            ButtonEvent(this, null);
-                            break;
-                        }
+                        setButtonState(ButtonState.Toggled);
+                        ButtonEvent(this, null);
+                        break;
+                    }
                 }
             }
             #endregion
@@ -626,9 +520,11 @@ namespace CommonClasses
 
 
 
-    namespace Images {
+    namespace Images
+    {
         using CustomButtons;
-        public static class ImageControl {
+        public static class ImageControl
+        {
             #region images
             private static readonly BitmapImage DefaultIcon = new BitmapImage(new Uri("pack://application:,,,/Resources/icons_0.png"));
             private static readonly BitmapImage IconFrameIdle = new BitmapImage(new Uri("pack://application:,,,/Resources/frame_0.png"));
@@ -651,7 +547,7 @@ namespace CommonClasses
             public static readonly BitmapImage IconTest = new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png"));
 
 
-            
+
             private static readonly BitmapImage[] WhiteNotes = new BitmapImage[]{
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a0.png")),
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Note_a1.png")),
@@ -689,7 +585,7 @@ namespace CommonClasses
                 new BitmapImage(new Uri("pack://application:,,,/Resources/Measure_12.png"))
 
             };
-            
+
             private static readonly BitmapImage[] NoteIcons = new BitmapImage[]{
                 new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_0.png")),
                 new BitmapImage(new Uri("pack://application:,,,/Resources/icons_note_1.png")),
@@ -704,12 +600,17 @@ namespace CommonClasses
 
             public static BitmapImage IconFrame(ButtonState f_state) {
                 switch (f_state) {
-                    case ButtonState.Idle: return IconFrameIdle;
-                    case ButtonState.Toggled: return IconFrameToggle;
-                    case ButtonState.Pressed: return IconFramePressed;
-                    case ButtonState.PressedFromIdle: return IconFramePressed;
+                    case ButtonState.Idle:
+                    return IconFrameIdle;
+                    case ButtonState.Toggled:
+                    return IconFrameToggle;
+                    case ButtonState.Pressed:
+                    return IconFramePressed;
+                    case ButtonState.PressedFromIdle:
+                    return IconFramePressed;
 
-                    default: return DefaultIcon;
+                    default:
+                    return DefaultIcon;
                 }
             }
 
@@ -743,56 +644,56 @@ namespace CommonClasses
         }
     }
 
-        #region Inispace
-        namespace IniSpace
+    #region Inispace
+    namespace IniSpace
+    {
+        using System.IO;
+        using System.Reflection;
+        using System.Runtime.InteropServices;
+        using System.Text;
+
+        public class IniFile   // revision 10
         {
-            using System.IO;
-            using System.Reflection;
-            using System.Runtime.InteropServices;
-            using System.Text;
+            string Path;
+            string EXE = Assembly.GetExecutingAssembly().GetName().Name;
 
-            public class IniFile   // revision 10
-            {
-                string Path;
-                string EXE = Assembly.GetExecutingAssembly().GetName().Name;
+            [DllImport("kernel32")]
+            static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
 
-                [DllImport("kernel32")]
-                static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
+            [DllImport("kernel32")]
+            static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
 
-                [DllImport("kernel32")]
-                static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
+            public IniFile(string IniPath = null) {
+                Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
+            }
 
-                public IniFile(string IniPath = null) {
-                    Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
-                }
+            public string Read(string Key, string Section = null) {
+                var RetVal = new StringBuilder(255);
+                GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
+                return RetVal.ToString();
+            }
 
-                public string Read(string Key, string Section = null) {
-                    var RetVal = new StringBuilder(255);
-                    GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
-                    return RetVal.ToString();
-                }
+            public void Write(string Key, string Value, string Section = null) {
+                WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
+            }
 
-                public void Write(string Key, string Value, string Section = null) {
-                    WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
-                }
+            public void DeleteKey(string Key, string Section = null) {
+                Write(Key, null, Section ?? EXE);
+            }
 
-                public void DeleteKey(string Key, string Section = null) {
-                    Write(Key, null, Section ?? EXE);
-                }
+            public void DeleteSection(string Section = null) {
+                Write(null, null, Section ?? EXE);
+            }
 
-                public void DeleteSection(string Section = null) {
-                    Write(null, null, Section ?? EXE);
-                }
-
-                public bool KeyExists(string Key, string Section = null) {
-                    return Read(Key, Section).Length > 0;
-                }
+            public bool KeyExists(string Key, string Section = null) {
+                return Read(Key, Section).Length > 0;
             }
         }
-        #endregion
+    }
+    #endregion
 
 
 
 
-    
+
 }
