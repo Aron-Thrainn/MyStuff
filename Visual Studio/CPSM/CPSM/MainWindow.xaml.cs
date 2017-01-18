@@ -27,9 +27,12 @@ using CPSM.Forms;
     Save/load black notes
     prettify the load song select
     fix first button icon size
+    smooth page turning
 
     Bugs:
     Page changing is super slow
+    gray notes are bieng drawn
+    export all pages doesnt update page number for each image
 */
 /*
     Done:
@@ -73,7 +76,7 @@ namespace CPSM
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
             _FormSongSelect = new LoadSongSelect(this, cnv_SongLoadSelect, cbtn_LoadSong);
-            _ScreenCap = new ScreenCapturer(cnv_SongCan, _MouseCtrl);
+            _ScreenCap = new ScreenCapturer(cnv_SongCan, _MouseCtrl, _SongCan._Creator);
             _keyCtrl = new Hotkeycontrol(this);
 
             _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
@@ -320,7 +323,8 @@ namespace CPSM
 
             public void Execute(object parameter) {
                 //hotkey action
-                _window._ScreenCap.SaveScreenShot();
+                //_window._ScreenCap.SaveScreenShot();
+                _window._ScreenCap.ExportAllPages();
             }
         }
 

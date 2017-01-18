@@ -34,6 +34,7 @@ namespace CPSM
             public int CurrentPage { get; set; }
             public int TotalPages { get; set; }
             public SongData _ActiveSong { get; set; }
+            private PageTurner _PageTurner { get; set; }
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, Label f_Pagenumber, NoteImageControl f_NoteImageControl) {
                 MeasuresCan = f_measurecan;
@@ -175,43 +176,16 @@ namespace CPSM
                 }
             }
             public void NextPage() {
-                if (CurrentPage < TotalPages) {
-                    CurrentPage++;
-                    MeasuresCan.Children.Remove(ActivePage);
-                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
-                    ActivePage = f_NewPage;
-                    MeasuresCan.Children.Add(ActivePage);
-                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
-                }
+                PageTimerActivate(CurrentPage + 1);
             }
             public void PrevPage() {
-                if (CurrentPage > 1) {
-
-                    CurrentPage--;
-                    MeasuresCan.Children.Remove(ActivePage);
-                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
-                    ActivePage = f_NewPage;
-                    MeasuresCan.Children.Add(ActivePage);
-                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
-                }
+                PageTimerActivate(CurrentPage - 1);
             }
             public void GoToPage(int f_page) {
                 if (f_page == CurrentPage) {
                     return;
                 }
-                try {
-                    CurrentPage = f_page;
-                    MeasuresCan.Children.Remove(ActivePage);
-                    var f_NewPage = Pages.ElementAt(CurrentPage - 1);
-                    ActivePage = f_NewPage;
-                    MeasuresCan.Children.Add(ActivePage);
-                    PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
-                }
-                catch // does nothing if the page number does not exist
-                {
-
-                }
-
+                PageTimerActivate(f_page);
 
             }
             public void ClearSong() {
@@ -220,6 +194,23 @@ namespace CPSM
                     DeleteMeasure();
                 }
             }
+            private void PageTimerActivate(int f_page) {
+                if (_PageTurner == null) {
+                    _PageTurner = new PageTurner(f_page, this);
+                }
+                else {
+                    try {
+                        _PageTurner.FinalPageNumber = f_page;
+                    }
+                    catch {
+                        PageTimerActivate(f_page);
+                    }
+                }
+            }
+            private void PageTimerDeactivate() {
+                _PageTurner = null;
+            }
+
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
                 bool f_found = false;
@@ -249,6 +240,74 @@ namespace CPSM
             }
             public void EnqueueNote(NoteViewModal f_note) {
                 _Initializer.AddNote(f_note);
+            }
+
+            public class PageTurner
+            {
+                public DispatcherTimer _Timer { get; set; }
+                public SongViewModalCreator _Parent { get; set; }
+                public StackPanel NewPage { get; set; }
+                public int PageNumber { get; set; }
+                public int Stage { get; set; }
+                public int? FinalPageNumber { get; set; }
+
+                public PageTurner(int f_NewPage, SongViewModalCreator f_Parent) {
+                    _Parent = f_Parent;
+                    PageNumber = f_NewPage;
+                    Stage = 0;
+
+                    _Timer = new DispatcherTimer();
+                    _Timer.Interval = TimeSpan.FromSeconds(0.1);
+                    _Timer.Tick += Timer_Tick;
+                    _Timer.Start();
+
+                    if (PageNumber < _Parent.TotalPages) {
+                        _Parent.PageTimerDeactivate();
+                    }
+                }
+                private void Timer_Tick(object sender, EventArgs e) {
+                    try {
+                        switch (Stage) {
+                            case 0: {
+                                NewPage = _Parent.Pages.ElementAt(PageNumber - 1);
+                                _Parent.MeasuresCan.Children.Remove(_Parent.ActivePage);
+                                Stage = 1;
+                                break;
+                            }
+                            case 1: {
+                                _Parent.MeasuresCan.Children.Add(NewPage);
+                                _Parent.ActivePage = NewPage;
+                                Stage = 2;
+                                break;
+                            }
+                            case 2: {
+                                _Parent.CurrentPage = PageNumber;
+                                _Parent.PageNum.Content = "Page " + _Parent.CurrentPage.ToString() + " / " + _Parent.TotalPages.ToString();
+                                Stage = 3;
+                                break;
+                            }
+                            case 3: {
+                                if (PageNumber == FinalPageNumber) {
+                                    _Timer.Stop();
+                                    _Parent.PageTimerDeactivate();
+                                }
+                                if (FinalPageNumber != null) {
+                                    PageNumber = FinalPageNumber.Value;
+                                    Stage = 0;
+                                }
+                                else {
+                                    _Timer.Stop();
+                                    _Parent.PageTimerDeactivate();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    catch {
+                        _Parent.PageTimerDeactivate();
+                    }
+                    
+                }
             }
 
             public class NoteInitializer

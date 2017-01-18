@@ -1073,9 +1073,13 @@ namespace CPSM
         public Canvas SongCan { get; set; }
         public string FilePath { get; set; }
         public MouseControl _MouseCtrl { get; set; }
+        public SongViewModalCreator _Creator { get; set; }
+        public DispatcherTimer _Timer { get; set; }
+        private readonly double INTERVAL = 0.001;
+        public int Stage { get; set; }
+        public int PagesExported { get; set; }
 
-
-        public ScreenCapturer(Canvas f_SongCan, MouseControl f_mousecontr) {
+        public ScreenCapturer(Canvas f_SongCan, MouseControl f_mousecontr, SongViewModalCreator f_Creator) {
             //Saves in project folder
             //FilePath = new FileInfo("TempImage.png").FullName.ToString();
             //Saves to desktop
@@ -1083,8 +1087,18 @@ namespace CPSM
             //FilePath = "C:\\Users\\Arthas Menethil\\Desktop\\TempImage.png";
             SongCan = f_SongCan;
             _MouseCtrl = f_mousecontr;
+            _Creator = f_Creator;
         }
 
+        public void ExportAllPages() {
+            Stage = 0;
+            PagesExported = 0;
+
+            _Timer = new DispatcherTimer();
+            _Timer.Interval = TimeSpan.FromSeconds(INTERVAL);
+            _Timer.Tick += Timer_Tick;
+            _Timer.Start();
+        }
         public void SaveScreenShot() {
 
             _MouseCtrl._noteCtrl.SuppressPreview();
@@ -1111,8 +1125,38 @@ namespace CPSM
 
             _MouseCtrl._noteCtrl.UnSuppressPreview();
         }
-
+        private void Timer_Tick(object sender, EventArgs e) {
+            switch (Stage) {
+                case 0: {
+                    var f_NextPage = PagesExported + 1;
+                    if (_Creator.TotalPages < f_NextPage) {
+                        Stage = 2;
+                    }
+                    else {
+                        _Creator.GoToPage(f_NextPage);
+                        FilePath = "C:\\Users\\Notandi\\Desktop\\TempImage" + f_NextPage.ToString() + ".png";
+                        Stage = 1;
+                    }
+                    break;
+                }
+                case 1: {
+                    SaveScreenShot();
+                    PagesExported++;
+                    Stage = 0;
+                    break;
+                }
+                case 2: {
+                    Timer_Destroy();
+                    break;
+                }
+            }
+        }
+        private void Timer_Destroy() {
+            _Timer.Stop();
+            _Timer = null;
+        }
     }
+
 
     public class Version
     {
@@ -1122,5 +1166,6 @@ namespace CPSM
             CurrentVersion = "Pre-Alpha";
         }
     }
-    #endregion
 }
+    #endregion
+
