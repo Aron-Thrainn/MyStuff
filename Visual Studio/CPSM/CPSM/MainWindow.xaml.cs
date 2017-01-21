@@ -28,11 +28,10 @@ using CPSM.Forms;
     prettify the load song select
     fix first button icon size
     smooth page turning
+    Name & Source changing
 
     Bugs:
-    Page changing is super slow
-    gray notes are bieng drawn
-    export all pages doesnt update page number for each image
+    Save Song does note recognize notes on measures unless the measure is loaded in
 */
 /*
     Done:
@@ -61,7 +60,6 @@ namespace CPSM
     {
         public GUI _GUI { get; set; }
         public SongCanvas _SongCan { get; set; }
-        public LoadSongSelect _FormSongSelect { get; set; }
         public MouseControl _MouseCtrl { get; set; }
         public ScreenCapturer _ScreenCap { get; set; }
         private Hotkeycontrol _keyCtrl { get; set; }
@@ -75,12 +73,12 @@ namespace CPSM
             var f_tempcreator = new SongViewModalCreator(cnv_Measures, _MouseCtrl._noteCtrl, lbl_SongName, lbl_SongSource, lbl_SongVersion, lbl_PageNumber, _MouseCtrl._noteCtrl._NoteImageConrtol);
             _SongCan = new SongCanvas(this, cnv_SongCan, f_tempcreator);
             _GUI = new GUI(this, Cnv_GUI, _SongCan);
-            _FormSongSelect = new LoadSongSelect(this, cnv_SongLoadSelect, cbtn_LoadSong);
             _ScreenCap = new ScreenCapturer(cnv_SongCan, _MouseCtrl, _SongCan._Creator);
             _keyCtrl = new Hotkeycontrol(this);
 
             _SongCan.InitializeNoteDisplay(cnv_DisplayBox);
 
+            InitFormSaveLoad();
             InitFormNoteColour();
             InitFormMeasureCreator();
 
@@ -187,6 +185,13 @@ namespace CPSM
             var f_measurecreatorform = new MeasureCreatorForm(cnv_MeasureCreatorForm, cbtn_createmeasure, cbtn_deletemeasure, cbo_measuresizes);
             _GUI.initMeasureCreatorForm(f_measurecreatorform);
         }
+
+        private void InitFormSaveLoad() {
+            var f_LoadSongSelect = new LoadSongSelect(cnv_SongLoadSelect, cbtn_LoadSong);
+            _GUI._SaveLoadForm = new SaveAndLoadForm(cbtn_SaveSong, cbtn_LoadSong, f_LoadSongSelect, _GUI._SongCan);
+            f_LoadSongSelect.LinkParent(_GUI._SaveLoadForm);
+        }
+
         public void TestModal() {
             var testsong = new SongData() {
                 Title = "We Stand for Everfree",
@@ -200,28 +205,28 @@ namespace CPSM
 
             for (int i = 0; i < 14; i++) {
                 for (int o = 0; o < (int)MeasureSize.twelve; o++) {
-                    testmeasure.WhiteNotes[i, o].SetColour(OctaveColour.none);
+                    testmeasure.WhiteNotes[i, o].SetNote(OctaveColour.none);
                 }
             }
             for (int i = 0; i < 14; i++) {
                 for (int o = 0; o < (int)MeasureSize.four; o++) {
-                    testmeasure2.WhiteNotes[i, o].SetColour(OctaveColour.none);
+                    testmeasure2.WhiteNotes[i, o].SetNote(OctaveColour.none);
                 }
             }
 
-            testmeasure.WhiteNotes[0, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[0, 1].SetColour(OctaveColour.Teal);
-            testmeasure.WhiteNotes[0, 2].SetColour(OctaveColour.Blue);
-            testmeasure.WhiteNotes[0, 3].SetColour(OctaveColour.Green);
-            testmeasure.WhiteNotes[0, 4].SetColour(OctaveColour.Red);
-            testmeasure.WhiteNotes[0, 5].SetColour(OctaveColour.Yellow);
-            testmeasure.WhiteNotes[0, 6].SetColour(OctaveColour.Yellow);
-            testmeasure.WhiteNotes[13, 9].SetColour(OctaveColour.Green);
-            testmeasure.WhiteNotes[8, 10].SetColour(OctaveColour.Yellow);
+            testmeasure.WhiteNotes[0, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[0, 1].SetNote(OctaveColour.Teal);
+            testmeasure.WhiteNotes[0, 2].SetNote(OctaveColour.Blue);
+            testmeasure.WhiteNotes[0, 3].SetNote(OctaveColour.Green);
+            testmeasure.WhiteNotes[0, 4].SetNote(OctaveColour.Red);
+            testmeasure.WhiteNotes[0, 5].SetNote(OctaveColour.Yellow);
+            testmeasure.WhiteNotes[0, 6].SetNote(OctaveColour.Yellow);
+            testmeasure.WhiteNotes[13, 9].SetNote(OctaveColour.Green);
+            testmeasure.WhiteNotes[8, 10].SetNote(OctaveColour.Yellow);
 
             for (int i = 0; i < 14; i++) {
-                testmeasure.WhiteNotes[i, 11].SetColour(OctaveColour.Purple);
-                testmeasure2.WhiteNotes[i, 3].SetColour(OctaveColour.Purple);
+                testmeasure.WhiteNotes[i, 11].SetNote(OctaveColour.Purple);
+                testmeasure2.WhiteNotes[i, 3].SetNote(OctaveColour.Purple);
             }
 
 
@@ -248,29 +253,29 @@ namespace CPSM
             notetemp3.SetAsExtension();
 
 
-            testmeasure.WhiteNotes[10, 5].SetColour(notetemp1);
-            testmeasure.WhiteNotes[10, 6].SetColour(notetemp2);
+            testmeasure.WhiteNotes[10, 5].SetNote(notetemp1);
+            testmeasure.WhiteNotes[10, 6].SetNote(notetemp2);
 
-            testmeasure.WhiteNotes[10, 7].SetColour(OctaveColour.Purple);
-            testmeasure.WhiteNotes[10, 8].SetColour(notetemp3);
+            testmeasure.WhiteNotes[10, 7].SetNote(OctaveColour.Purple);
+            testmeasure.WhiteNotes[10, 8].SetNote(notetemp3);
 
 
-            testmeasure.WhiteNotes[1, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[2, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[3, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[4, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[5, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[6, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[7, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[8, 0].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[1, 1].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[2, 2].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[3, 3].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[4, 4].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[5, 5].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[6, 6].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[7, 7].SetColour(OctaveColour.Brown);
-            testmeasure.WhiteNotes[8, 8].SetColour(OctaveColour.Brown);
+            testmeasure.WhiteNotes[1, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[2, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[3, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[4, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[5, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[6, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[7, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[8, 0].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[1, 1].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[2, 2].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[3, 3].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[4, 4].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[5, 5].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[6, 6].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[7, 7].SetNote(OctaveColour.Brown);
+            testmeasure.WhiteNotes[8, 8].SetNote(OctaveColour.Brown);
 
 
 

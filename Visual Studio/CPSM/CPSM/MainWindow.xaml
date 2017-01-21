@@ -29,9 +29,10 @@
                 </ComboBox>
                 <Canvas x:Name="cbtn_createmeasure" Height="32" Canvas.Left="10" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_deletemeasure" Height="32" Canvas.Left="172" Canvas.Top="13" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_Page_Next" Height="32" Canvas.Left="328" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_Page_Previous" Height="32" Canvas.Left="291" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_Page_Next" Height="32" Canvas.Left="332" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_Page_Previous" Height="32" Canvas.Left="295" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_LoadSong" Height="32" Canvas.Left="254" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_SaveSong" Height="32" Canvas.Left="217" Canvas.Top="10" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
         <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="White">

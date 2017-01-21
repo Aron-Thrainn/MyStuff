@@ -28,6 +28,7 @@ namespace CPSM
         public SongCanvas _SongCan { get; set; }
         public NoteColourForm _FormNoteColour { get; set; }
         public MeasureCreatorForm _FormMeasureCreator { get; set; }
+        public SaveAndLoadForm _SaveLoadForm { get; set; }
         public PagesForm _FormPages { get; set; }
         public VersionForm _VersionForm { get; set; }
 
@@ -82,7 +83,14 @@ namespace CPSM
             _Creator.LoadSong(f_song);
         }
         public void SaveSong() {
-            var saver = new SongSaver(ActiveSongData);
+            try {
+                var saver = new SongSaver(ActiveSongData);
+            }
+            catch {
+                _Window._GUI._SaveLoadForm.SaveConfirm(false);
+                return;
+            }
+            _Window._GUI._SaveLoadForm.SaveConfirm(true);
         }
         public void CreateNoteDisplay(Canvas f_can) {
             _NoteDisp = new NoteDisplay(f_can);
@@ -173,6 +181,12 @@ namespace CPSM
 
             foreach (var measure in f_Song.Measures) {
                 currMesSize = (int)measure.Size;
+
+                //debug
+                if (currMesSize == 8) {
+
+                }
+
                 _Line.Append(MEASURE);
                 if ((int)measure.Size < 10) {
                     _Line.Append(0);

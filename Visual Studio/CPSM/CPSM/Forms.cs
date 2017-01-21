@@ -12,6 +12,7 @@ using CPSM.ViewModals;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace CPSM
 {
@@ -174,28 +175,82 @@ namespace CPSM
             }
         }
 
+
+        public class SaveAndLoadForm
+        {
+            public CustomButton SaveButton { get; set; }
+            public CustomButton LoadButton { get; set; }
+            public LoadSongSelect SongSelectForm { get; set; }
+            public SongCanvas _SongCan { get; set; }
+            public SaveConfirmed _SaveConfirm { get; set; }
+
+
+            public SaveAndLoadForm(Canvas f_SaveBtn, Canvas f_LoadBtn, LoadSongSelect f_SongSelect, SongCanvas f_SongCan) {
+                SaveButton = new CustomButton(f_SaveBtn);
+                LoadButton = new CustomButton(f_LoadBtn);
+                _SongCan = f_SongCan;
+                SongSelectForm = f_SongSelect;
+
+
+                SaveButton.SetImg(ImageControl.Icon1);
+                SaveButton.SetTooltip("Save Song");
+                SaveButton.SetButtonClickEvent(SaveButtonClickEvent);
+
+                LoadButton.SetImg(ImageControl.Icon2);
+                LoadButton.SetTooltip("Load Song");
+                LoadButton.SetButtonClickEvent(LoadButtonClickEvent);
+
+            }
+
+            public void LoadButtonClickEvent(object sender, MouseButtonEventArgs e) {
+                if (SongSelectForm.IsHidden()) {
+                    SongSelectForm.ShowForm();
+                }
+                else {
+                    SongSelectForm.HideForm();
+                }
+            }
+            public void SaveButtonClickEvent(object sender, MouseButtonEventArgs e) {
+                _SongCan.SaveSong();
+            }
+            public void LoadSong(SongDataSmall f_data) {
+                _SongCan.LoadSong(f_data.Title, f_data.Source);
+            }
+            public void SaveConfirm(bool f_DidSave) {
+                //todo: Implement
+            }
+
+            public class SaveConfirmed
+            {
+                public DispatcherTimer _Timer { get; set; }
+                public Canvas _VisualConfirmation { get; set; }
+                public bool DidSave { get; set; }
+
+                //todo: Implement
+            }
+
+        }
+        
         public class LoadSongSelect
         {
-            public MainWindow _Window { get; set; }
+            public SaveAndLoadForm _Parent { get; set; }
             public Canvas _Form { get; set; }
             public StackPanel VertiStack { get; set; }
-            public CustomButton _FormBtn { get; set; }
 
-            public LoadSongSelect(MainWindow f_wind, Canvas f_Form, Canvas f_cbtn) {
-                _Window = f_wind;
+            public LoadSongSelect(Canvas f_Form, Canvas f_cbtn) {
                 _Form = f_Form;
                 VertiStack = new StackPanel();
                 _Form.Children.Add(VertiStack);
-
-                _FormBtn = new CustomButton(f_cbtn);
-                _FormBtn.SetImg(ImageControl.Icon2);
-                _FormBtn.SetTooltip("Load Song");
-                _FormBtn.SetButtonClickEvent(ButtonClickEvent);
-
-
+                
                 HideForm();
             }
 
+            public void LinkParent(SaveAndLoadForm f_parent) {
+                _Parent = f_parent;
+            }
+            public bool IsHidden() {
+                return _Form.IsEnabled ? false : true;
+            }
             public void ShowForm() {
                 _Form.Visibility = Visibility.Visible;
                 _Form.IsEnabled = true;
@@ -226,16 +281,8 @@ namespace CPSM
                 }
             }
             public void LoadSong(SongDataSmall f_data) {
-                _Window._GUI._SongCan.LoadSong(f_data.Title, f_data.Source);
+                _Parent.LoadSong(f_data);
                 HideForm();
-            }
-            public void ButtonClickEvent(object sender, MouseButtonEventArgs e) {
-                if (_Form.IsEnabled) {
-                    HideForm();
-                }
-                else {
-                    ShowForm();
-                }
             }
         }
 
@@ -288,7 +335,7 @@ namespace CPSM
             public void ItemClickEvent(object sender, MouseButtonEventArgs e) {
                 _Parent.LoadSong(_Data);
             }
-        }
+        }  
 
         public class VersionForm
         {

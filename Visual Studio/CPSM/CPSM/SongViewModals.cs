@@ -83,14 +83,10 @@ namespace CPSM
             }
             public void DeleteMeasure() {
 
+                GoToPage(TotalPages);
                 RemoveMeasure();
 
-                double f_ASPHeight = 0;
-                foreach (FrameworkElement mes in ActiveStackPanel.Children) {
-                    f_ASPHeight += mes.Height;
-                }
-
-                if (f_ASPHeight == 0) {
+                if (ActiveStackPanel.Children.Count == 0) {
                     RemoveColumn();
                 }
             }
@@ -210,6 +206,16 @@ namespace CPSM
             private void PageTimerDeactivate() {
                 _PageTurner = null;
             }
+            private void CheckForEmptyPage() {
+                double f_ASPHeight = 0;
+                foreach (FrameworkElement mes in Pages.ElementAt(Pages.Count-1).Children) {
+                    f_ASPHeight += mes.ActualHeight;
+                }
+
+                if (f_ASPHeight == 0) {
+                    RemoveColumn();
+                }
+            }
 
 
             public MeasureViewModal GetNextMeasure(MeasureViewModal f_measure) {
@@ -287,11 +293,12 @@ namespace CPSM
                                 break;
                             }
                             case 3: {
+                                _Parent.CheckForEmptyPage();
                                 if (PageNumber == FinalPageNumber) {
                                     _Timer.Stop();
                                     _Parent.PageTimerDeactivate();
                                 }
-                                if (FinalPageNumber != null) {
+                                else if (FinalPageNumber != null) {
                                     PageNumber = FinalPageNumber.Value;
                                     Stage = 0;
                                 }
@@ -868,7 +875,7 @@ namespace CPSM
                 NoteCan.Children.Remove(NoteImage);
                 NoteImage = null;
                 Initialized = false;
-                CounterPart.SetColour(OctaveColour.none);
+                CounterPart.SetNote(new NoteTemplate());
             }
             public virtual new NoteType GetType() { return NoteType.White; }
 
@@ -881,11 +888,14 @@ namespace CPSM
                 if (f_template == null) {
                     return;
                 }
+                if (f_template.isUsniform() == OctaveColour.none) {
+                    return;
+                }
 
                 if (!Initialized) { Initialize(); }
 
                 NoteImage.Source = f_source;
-                CounterPart.SetColour(f_template);
+                CounterPart.SetNote(f_template);
                 NoteImage.Opacity = 1;
             }
 

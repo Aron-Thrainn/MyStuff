@@ -89,7 +89,6 @@ namespace CPSM
             PageCount = 0;
             MeasuresPerPage = new List<int>();
         }
-
         public void AddMeasure(MeasureSize f_size) {
             var f_NewMeasure = new MeasureData(this, f_size);
             Measures.Add(f_NewMeasure);
@@ -144,7 +143,7 @@ namespace CPSM
                 NoteBitPos.b5, NoteBitPos.b6, NoteBitPos.b7, NoteBitPos.b8 };
 
 
-            SetColour(OctaveColour.none);
+            SetNote(new NoteTemplate());
         }
 
         public void SetNote(NoteTemplate f_template) {
@@ -153,27 +152,9 @@ namespace CPSM
                 Positions[i] = f_template.Positions[i];
             }
         }
-        public void SetColour(OctaveColour f_oct) {
+        public void SetNote(OctaveColour f_oct) {
             for (int i = 0; i < 16; i++) {
                 Colours[i] = f_oct;
-            }
-        }
-        public void SetColourHalf(OctaveColour f_oct, Half f_half) {
-            if (f_half == Half.Left) {
-                for (int i = 0; i < 8; i++) {
-                    Colours[i] = f_oct;
-                }
-            }
-            else {
-                for (int i = 8; i < 16; i++) {
-                    Colours[i] = f_oct;
-                }
-            }
-        }
-        public void SetColour(NoteTemplate f_template) {
-            for (int i = 0; i < 16; i++) {
-                Colours[i] = f_template.Colours[i];
-                Positions[i] = f_template.Positions[i];
             }
         }
         public bool IsEmpty() {
