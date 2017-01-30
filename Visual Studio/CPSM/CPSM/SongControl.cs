@@ -89,10 +89,10 @@ namespace CPSM
             PageCount = 0;
             MeasuresPerPage = new List<int>();
         }
-        public void AddMeasure(MeasureSize f_size) {
+        /*public void AddMeasure(MeasureSize f_size) {
             var f_NewMeasure = new MeasureData(this, f_size);
             Measures.Add(f_NewMeasure);
-        }
+        }*/
         public void AddMeasure(MeasureData f_measure) {
             Measures.Add(f_measure);
         }

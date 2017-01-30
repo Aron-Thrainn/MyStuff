@@ -29,10 +29,8 @@ using CPSM.Forms;
     Zooming
 
     Bugs:
-    Save Song does note recognize notes on measures unless the measure is loaded in
     preview update when creating note works incorrectly with partial notes
     preview does not update while hovering over it with a partial note
-    loading doesnt always work
     first button icon size is incorrect
 */
 /*

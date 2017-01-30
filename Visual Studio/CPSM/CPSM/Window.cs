@@ -96,8 +96,9 @@ namespace CPSM
             _NoteDisp = new NoteDisplay(f_can);
         }
         public void AddNewMeasure(MeasureSize f_size) {
-            ActiveSongData.AddMeasure(f_size);
+            //ActiveSongData.AddMeasure(f_size);
             var f_tempmes = new MeasureData(ActiveSongData, f_size);
+            ActiveSongData.AddMeasure(f_tempmes);
             _Creator.CreateMeasure(f_tempmes, true);
         }
         public void DeleteMeasure() {
@@ -152,8 +153,7 @@ namespace CPSM
         private static string MEASURE = "M";
         private static string NOTE = "N";
         private static string BIT = "B";
-        private static string DUPLICATE = "X";
-        private static string EXTESNION = "Z";
+        private static string EXTENSION = "X";
         private static string OPEN = "(";
         private static string CLOSE = ")";
         private static string END = ";";
@@ -292,10 +292,13 @@ namespace CPSM
             }
         }
         private string WrittenNote(NoteTemplate f_note) {
-            if (f_note.isUsniform() != null) { // note is simple
+            if (f_note.isUsniform() == OctaveColour.none) { // note is empty
                 return GetNoteKey(f_note.isUsniform().Value);
             }
-            else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null) { // note is Dual-octival
+            if (f_note.isUsniform() != null && f_note.IsFull()) { // note is simple
+                return GetNoteKey(f_note.isUsniform().Value);
+            }
+            else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null && f_note.IsFull()) { // note is Dual-octival
                 return NOTE + OPEN + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + CLOSE;
             }
             else { // note is complex
@@ -318,7 +321,7 @@ namespace CPSM
                     else {
                         if (count != 0) {
                             // writing the duplicate notes
-                            tempstring.Append(DUPLICATE + count);
+                            tempstring.Append(EXTENSION + count);
                             count = 1;
                         }
                         //note bit is not a continuation of previous one
@@ -342,7 +345,7 @@ namespace CPSM
                 return f_char + f_char;
             }
             else {
-                return WrittenNote(f_note) + DUPLICATE + count.ToString();
+                return WrittenNote(f_note) + EXTENSION + count.ToString();
             }
         }
         private string GetNoteKey(OctaveColour f_col) {
@@ -408,8 +411,7 @@ namespace CPSM
         private static string MEASURE = "M";
         private static string NOTE = "N";
         private static string BIT = "B";
-        private static string DUPLICATE = "X";
-        private static string EXTESNION = "Z";
+        private static string EXTENSION = "X";
         private static string OPEN = "(";
         private static string CLOSE = ")";
         private static string END = ";";
@@ -469,10 +471,7 @@ namespace CPSM
                     SetLast(new NoteTemplate(f_Line[count])); // first note
                     count++;
                     while (f_Line[count] != CLOSE[0]) { //read to end of measure
-                        if (f_Line[count] == DUPLICATE[0]) {
-                            HandleDup(f_measure, f_Line);
-                        }
-                        else if (f_Line[count] == EXTESNION[0]) {
+                        if (f_Line[count] == EXTENSION[0]) {
                             HandleExt(f_measure, f_Line);
                         }
                         else if (f_Line[count] == NOTE[0]) {
@@ -506,16 +505,14 @@ namespace CPSM
         }
 
         private void HandleSimple(MeasureData f_measure, string f_Line) {
-            //if (f_Line[count+1] != EXTESNION[0] && f_Line[count + 1] != DUPLICATE[0]) {
             AddNote(f_measure, 1);
-            //}
             SetLast(new NoteTemplate(f_Line[count]));
             count++;
         }
         private void HandleComplex(MeasureData f_measure, string f_Line) {
             AddNote(f_measure, 1);
             var f_temptemp = new NoteTemplate();
-            if (f_Line[count] != BIT[0] && f_Line[count + 1] == OPEN[0]) {
+            if (f_Line[count] == NOTE[0] && f_Line[count + 2] != BIT[0]) { 
                 count++;
                 count++;
                 f_temptemp.SetHalfColour(Half.Left, f_Line[count]);
@@ -526,12 +523,47 @@ namespace CPSM
                 count++;
             }
             else {
-                //TODO:
-                //Complex Notes
-                throw new NotImplementedException();
+                var f_CurrBit = 0;
+                count++;
+                count++;
+                while(f_Line[count] == BIT[0]) {
+                    count++;
+                    count++;
+                    var f_PosString = new StringBuilder();
+                    f_PosString.Append(f_Line[count]);
+                    f_PosString.Append(f_Line[count+1]);
+                    count++;
+                    count++;
+                    var f_ColString = f_Line[count];
+                    count++;
+                    count++;
+                    var f_ExtCount = new StringBuilder();
+                    f_ExtCount.Append("0");
+                    if (f_Line[count] == EXTENSION[0]) {
+                        f_ExtCount = new StringBuilder();
+                        count++;
+                        while(f_Line[count] != BIT[0] && f_Line[count] != CLOSE[0]) {
+                            f_ExtCount.Append(f_Line[count]);
+                            count++;
+                        }
+                    }
+                    var f_TempPos = GetPosFromString(f_PosString.ToString());
+                    var f_TempCol = GetColFromString(f_ColString.ToString());
+                    var f_tempExtCount = int.Parse(f_ExtCount.ToString());
+                    var f_TempCounter = 0;
+
+                    for (int i = 0; i < f_tempExtCount; i++) {
+                        f_temptemp.Positions[f_CurrBit] = (NoteBitPos)(f_TempPos + f_TempCounter);
+                        f_temptemp.Colours[f_CurrBit] = f_TempCol;
+                        f_CurrBit++;
+                        f_TempCounter++;
+                    }
+                }
+                SetLast(f_temptemp);
+                count++;
             }
         }
-        private void HandleDup(MeasureData f_measure, string f_Line) {
+        private void HandleExt(MeasureData f_measure, string f_Line) {
             count++;
             var f_tempstring = new StringBuilder();
             while (char.IsDigit(f_Line[count])) {
@@ -540,9 +572,7 @@ namespace CPSM
             }
             AddNote(f_measure, int.Parse(f_tempstring.ToString()));
 
-        }
-        private void HandleExt(MeasureData f_measure, string f_Line) {
-            throw new NotImplementedException();
+            
         }
 
         private string ReadName(string f_line) {
@@ -621,7 +651,12 @@ namespace CPSM
             for (int c = 0; c < f_notecount; c++) {
                 try {
                     if (LastNote.isUsniform() != OctaveColour.none) {
-                        f_measure.WhiteNotes[i, o].SetNote(LastNote);
+                        if (c == 0) {
+                            f_measure.WhiteNotes[i, o].SetNote(LastNote);
+                        }
+                        else {
+                            f_measure.WhiteNotes[i, o].SetNote(LastNote.GetAsExtension());
+                        }
                     }
                 }
                 catch { }
@@ -636,6 +671,40 @@ namespace CPSM
         private void SetLast(NoteTemplate f_note) {
             LastNote = f_note;
             LastHandled = false;
+        }
+        private NoteBitPos GetPosFromString(string f_str) {
+            switch (f_str) {
+                case "a1": { return NoteBitPos.a1; }
+                case "a2": { return NoteBitPos.a2; }
+                case "a3": { return NoteBitPos.a3; }
+                case "a4": { return NoteBitPos.a4; }
+                case "a5": { return NoteBitPos.a5; }
+                case "a6": { return NoteBitPos.a6; }
+                case "a7": { return NoteBitPos.a7; }
+                case "a8": { return NoteBitPos.a8; }
+                case "b1": { return NoteBitPos.b1; }
+                case "b2": { return NoteBitPos.b2; }
+                case "b3": { return NoteBitPos.b3; }
+                case "b4": { return NoteBitPos.b4; }
+                case "b5": { return NoteBitPos.b5; }
+                case "b6": { return NoteBitPos.b6; }
+                case "b7": { return NoteBitPos.b7; }
+                case "b8": { return NoteBitPos.b8; }
+            }
+            return NoteBitPos.a1;
+        }
+        private OctaveColour GetColFromString(string f_str) {
+            switch (f_str) {
+                case "o": { return OctaveColour.none; }
+                case "q": { return OctaveColour.Brown; }
+                case "w": { return OctaveColour.Teal; }
+                case "e": { return OctaveColour.Blue; }
+                case "r": { return OctaveColour.Green; }
+                case "t": { return OctaveColour.Red; }
+                case "y": { return OctaveColour.Purple; }
+                case "u": { return OctaveColour.Yellow; }
+            }
+            return OctaveColour.none;
         }
     }
     #endregion
