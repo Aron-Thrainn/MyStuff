@@ -38,9 +38,9 @@ namespace CPSM
             _SongCan = f_songcan;
         }
 
-        public void initNoteColourForm(NoteColourForm f_form, List<Canvas> f_cans) {
+        public void initNoteColourForm(NoteColourForm f_form, List<Canvas> f_cans, ComboBox f_NoteSizeBox) {
             _FormNoteColour = f_form;
-            _FormNoteColour.Init(f_cans);
+            _FormNoteColour.Init(f_cans, f_NoteSizeBox);
         }
         public void initMeasureCreatorForm(MeasureCreatorForm f_form) {
             _FormMeasureCreator = f_form;
@@ -652,10 +652,10 @@ namespace CPSM
     }
     public enum PartialNote
     {
-        Full,
-        Half,
-        Quarter,
-        Eighth
+        Full = 0,
+        Half = 1,
+        Quarter = 2,
+        Eighth = 3
     }
     public class MouseNote
     {
@@ -864,7 +864,8 @@ namespace CPSM
                 f_HeldNote.SetAsExtension();
             }
 
-            PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
+            //PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
+            PreviewTemplate = CreatePreview(f_HeldNote, existingnote);
             CreatePreviewImage();
             if (PreviewTemplate.isUsniform() != OctaveColour.none) {
                 Display();
@@ -925,7 +926,7 @@ namespace CPSM
 
             if (f_ExistingNote.isUsniform() == f_HeldNote.isUsniform()) {
                 if (!f_ExistingNote.IsExtension() && !f_HeldNote.IsExtension()) { //both are simple and not extensions
-                    return new NoteTemplate(f_HeldNote);
+                    return new NoteTemplate(f_HeldNote, f_ExistingNote);
                 }
                 else if (f_ExistingNote.IsExtension() && f_HeldNote.IsExtension()) { //both are simple and extensions
                     return new NoteTemplate(f_HeldNote);
@@ -976,6 +977,10 @@ namespace CPSM
             else {
                 return new NoteTemplate(f_HeldNote);
             }
+        }
+
+        private NoteTemplate CreatePreview(NoteTemplate f_heldNote, NoteTemplate f_existingNote) {
+            return new NoteTemplate(f_heldNote, f_existingNote);
         }
 
         private void CreatePreviewImage() {

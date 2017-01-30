@@ -6,10 +6,11 @@
         xmlns:local="clr-namespace:CPSM"
         mc:Ignorable="d"
         Title="MainWindow" Height="987" Width="1093">
+
     <Grid>
         <Canvas x:Name="Cnv_GUI" HorizontalAlignment="Left" Height="141" VerticalAlignment="Top" Width="1073" Background="Gainsboro">
             <Image x:Name="image_Copy" Height="121" Canvas.Left="10" Width="157" Source="Resources/img1.png" Canvas.Top="10"/>
-            <Canvas x:Name="cnv_NoteColourButtons" Height="55" Canvas.Left="403" Canvas.Top="10" Width="370" Background="White">
+            <Canvas x:Name="cnv_NoteColourButtons" Height="55" Canvas.Left="403" Canvas.Top="10" Width="459" Background="White">
                 <Canvas x:Name="cbtn_NoteColour_None" Height="32" Canvas.Left="10" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_NoteColour_Brown" Height="32" Canvas.Left="55" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_NoteColour_Teal" Height="32" Canvas.Left="100" Canvas.Top="10" Width="32" Background="LightGray"/>
@@ -18,9 +19,15 @@
                 <Canvas x:Name="cbtn_NoteColour_Red" Height="32" Canvas.Left="235" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_NoteColour_Purple" Height="32" Canvas.Left="280" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_NoteColour_Yellow" Height="32" Canvas.Left="325" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <ComboBox x:Name="cbo_NoteSize" Canvas.Left="378" Canvas.Top="10" Width="52" SelectedIndex="0">
+                    <ListBoxItem Content="1/1"/>
+                    <ListBoxItem Content="1/2"/>
+                    <ListBoxItem Content="1/4"/>
+                    <ListBoxItem Content="1/8"/>
+                </ComboBox>
             </Canvas>
             <Canvas x:Name="cnv_MeasureCreatorForm" Height="55" Canvas.Left="403" Canvas.Top="70" Width="370" Background="White">
-                <ComboBox x:Name="cbo_measuresizes" Canvas.Left="47" Canvas.Top="10" Width="120" SelectedIndex="0">
+                <ComboBox x:Name="cbo_measuresizes" Canvas.Left="47" Canvas.Top="10" Width="42" SelectedIndex="0">
                     <ComboBoxItem Content="4"/>
                     <ComboBoxItem Content="6"/>
                     <ComboBoxItem Content="8"/>
@@ -28,11 +35,11 @@
                     <ComboBoxItem Content="12"/>
                 </ComboBox>
                 <Canvas x:Name="cbtn_createmeasure" Height="32" Canvas.Left="10" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_deletemeasure" Height="32" Canvas.Left="172" Canvas.Top="13" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_deletemeasure" Height="32" Canvas.Left="94" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_Page_Next" Height="32" Canvas.Left="332" Canvas.Top="10" Width="32" Background="LightGray"/>
                 <Canvas x:Name="cbtn_Page_Previous" Height="32" Canvas.Left="295" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_LoadSong" Height="32" Canvas.Left="254" Canvas.Top="10" Width="32" Background="LightGray"/>
-                <Canvas x:Name="cbtn_SaveSong" Height="32" Canvas.Left="217" Canvas.Top="10" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_LoadSong" Height="32" Canvas.Left="218" Canvas.Top="13" Width="32" Background="LightGray"/>
+                <Canvas x:Name="cbtn_SaveSong" Height="32" Canvas.Left="181" Canvas.Top="13" Width="32" Background="LightGray"/>
             </Canvas>
         </Canvas>
         <Canvas x:Name="cnv_SongCan" HorizontalAlignment="Left" Height="805" Margin="0,141,0,0" VerticalAlignment="Top" Width="1075" Background="White">

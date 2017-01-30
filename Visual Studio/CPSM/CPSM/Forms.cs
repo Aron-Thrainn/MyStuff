@@ -25,6 +25,7 @@ namespace CPSM
             public List<CustomRadioButton> RadioButtons { get; set; }
             public CustomRadioButtonGroup RadioGroup { get; set; }
             public CustomRadioButton FirstButton { get; set; }
+            public ComboBox NoteSizeBox { get; set; }
 
             public NoteColourForm(Canvas f_can, MouseNote f_mousectrl) {
                 MainCan = f_can;
@@ -32,7 +33,7 @@ namespace CPSM
                 RadioButtons = new List<CustomRadioButton>();
             }
 
-            public void Init(List<Canvas> f_buttoncans) {
+            public void Init(List<Canvas> f_buttoncans, ComboBox f_NoteSizeBox) {
                 RadioGroup = new CustomRadioButtonGroup();
                 int count = 0;
                 foreach (var can in f_buttoncans) {
@@ -47,14 +48,19 @@ namespace CPSM
                         tempbtn.SetButtonClickEvent(ClickEvent);
                     }
                     count++;
-
                     RadioButtons.Add(tempbtn);
                 }
+
+                NoteSizeBox = f_NoteSizeBox;
+                NoteSizeBox.DropDownClosed += new EventHandler(NoteSizeBoxEvent);
             }
             public void ClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;
                 _MouseCtrl.SetColour((OctaveColour)btn.Tag);
                 //_MouseCtrl.UpdatePreview((OctaveColour)btn.Tag);
+            }
+            public void NoteSizeBoxEvent(object sender, EventArgs e) {
+                _MouseCtrl.ActivePatrial = (PartialNote)NoteSizeBox.SelectedIndex;
             }
             public void FirstButtonClickEvent(object sender, MouseButtonEventArgs e) {
                 var btn = sender as CustomRadioButton;

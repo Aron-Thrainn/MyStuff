@@ -19,19 +19,21 @@ using CPSM.Forms;
 
 /*
     ToDo:
-    Partial Notes
-    Add Save & load functions - export all pages at a time
     Add Export Dialog funcion
     Add Copy/Paste functions
     Add NotetType to NoteTemplate
-    Save/load black notes
+    Implement Black Notes
     prettify the load song select
-    fix first button icon size
     smooth page turning
     Name & Source changing
+    Zooming
 
     Bugs:
     Save Song does note recognize notes on measures unless the measure is loaded in
+    preview update when creating note works incorrectly with partial notes
+    preview does not update while hovering over it with a partial note
+    loading doesnt always work
+    first button icon size is incorrect
 */
 /*
     Done:
@@ -48,6 +50,8 @@ using CPSM.Forms;
     Rework note images to have only 1 image
     Make measures fill out multiple columns
     Multiple Pages
+    Partial Notes
+    Add Save & load functions - export all pages at a time
 
 */
 
@@ -179,7 +183,7 @@ namespace CPSM
             f_tempList.Add(cbtn_NoteColour_Purple);
             f_tempList.Add(cbtn_NoteColour_Yellow);
 
-            _GUI.initNoteColourForm(f_FormNoteColour, f_tempList);
+            _GUI.initNoteColourForm(f_FormNoteColour, f_tempList, cbo_NoteSize);
         }
         private void InitFormMeasureCreator() {
             var f_measurecreatorform = new MeasureCreatorForm(cnv_MeasureCreatorForm, cbtn_createmeasure, cbtn_deletemeasure, cbo_measuresizes);

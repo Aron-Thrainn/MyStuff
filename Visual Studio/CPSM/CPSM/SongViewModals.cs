@@ -452,7 +452,14 @@ namespace CPSM
             private BitmapFrame[] GetImageBits(NoteTemplate f_template) {
                 var f_BitImages = new BitmapFrame[16];
                 for (int i = 0; i < 16; i++) {
-                    f_BitImages[i] = BitmapFrame.Create(BitImages.GetBitImg(f_template.Positions[i], f_template.Colours[i], f_template.Type));
+                    try {
+                        if (f_template.Colours[i] != OctaveColour.none) {
+                            f_BitImages[i] = BitmapFrame.Create(BitImages.GetBitImg(f_template.Positions[i], f_template.Colours[i], f_template.Type));
+                        }
+                    }
+                    catch(Exception e) {
+
+                    }
                 }
                 return f_BitImages;
             }
@@ -497,6 +504,10 @@ namespace CPSM
         public static class BitImages
         {
             public static CroppedBitmap GetBitImg(NoteBitPos f_pos, OctaveColour f_oct, NoteType f_type) {
+                if (f_oct == OctaveColour.none) {
+                    return new CroppedBitmap();
+                }
+
                 var ImageBit = ImageControl.NoteImg(f_oct, f_type);
 
                 var crpimg = new CroppedBitmap(ImageBit, CreateRect(f_pos, f_type));
@@ -1156,6 +1167,161 @@ namespace CPSM
                             }
                             break;
                         }
+                        case PartialNote.Half: {
+                            int count = 0;
+                            for (int i = 0; i < 16; i++) {
+                                Colours[i] = OctaveColour.none;
+                                Positions[i] = (NoteBitPos)i;
+
+                            }
+                            if (f_mousepoint.Y <= 8) {
+                                for (int i = 0; i < 4; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y > 8) {
+                                for (int i = 4; i < 8; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+
+                            }
+                            break;
+                        }
+                            case PartialNote.Quarter: {
+                            int count = 0;
+                            for (int i = 0; i < 16; i++) {
+                                Colours[i] = OctaveColour.none;
+                                Positions[i] = (NoteBitPos)i;
+
+                            }
+                            if (f_mousepoint.Y <= 4) {
+                                for (int i = 0; i < 2; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 8) {
+                                for (int i = 2; i < 4; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 12) {
+                                for (int i = 4; i < 6; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 16) {
+                                for (int i = 6; i < 8; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            break;
+                        }
+
+                        case PartialNote.Eighth: {
+                            int count = 0;
+                            for (int i = 0; i < 16; i++) {
+                                Colours[i] = OctaveColour.none;
+                                Positions[i] = (NoteBitPos)i;
+
+                            }
+                            if (f_mousepoint.Y <= 2) {
+                                for (int i = 0; i < 1; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 4) {
+                                for (int i = 1; i < 2; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 6) {
+                                for (int i = 2; i < 3; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 8) {
+                                for (int i = 3; i < 4; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 10) {
+                                for (int i = 4; i < 5; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 12) {
+                                for (int i = 5; i < 6; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 14) {
+                                for (int i = 6; i < 7; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            else if (f_mousepoint.Y <= 16) {
+                                for (int i = 7; i < 8; i++) {
+                                    Colours[i] = f_mousecolour.ActiveColour;
+                                    Positions[i] = (NoteBitPos)count;
+                                    Colours[i + 8] = f_mousecolour.ActiveColour;
+                                    Positions[i + 8] = (NoteBitPos)count + 8;
+                                    count++;
+                                }
+                            }
+                            break;
+                        }
                         //todo:  cases for non-full notes
                     }
                 }
@@ -1167,6 +1333,56 @@ namespace CPSM
                     Colours[i] = f_note.Colours[i];
                     Positions[i] = f_note.Positions[i];
                 }
+            }
+            public NoteTemplate(NoteTemplate f_NewNote, NoteTemplate f_ExistingNote) {
+                Init();
+                //todo
+                //rework to be fully functional note combiner for dual-octival notes alwell as partial notes
+
+                for (int i = 0; i < 8; i++) {
+                    if (f_NewNote.Colours[i] == OctaveColour.none) { // if newnote is transparent here
+                        Colours[i] = f_ExistingNote.Colours[i];
+                        Colours[i + 8] = f_ExistingNote.Colours[i + 8];
+                        Positions[i] = f_ExistingNote.Positions[i];
+                        Positions[i+8] = f_ExistingNote.Positions[i+8];
+                    }
+                    else if (f_ExistingNote.Colours[i] != f_ExistingNote.Colours[i+8]) { // catch and override dual-octival note
+                        Colours[i] = f_NewNote.Colours[i];
+                        Colours[i+8] = f_NewNote.Colours[i+8];
+                        Positions[i] = f_NewNote.Positions[i];
+                        Positions[i + 8] = f_NewNote.Positions[i + 8];
+                    }
+                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i]+1) { // new note is to the left
+                        Colours[i] = f_NewNote.Colours[i];
+                        Colours[i + 8] = f_ExistingNote.Colours[i + 8];
+                        Positions[i] = f_NewNote.Positions[i];
+                        Positions[i + 8] = f_ExistingNote.Positions[i + 8];
+                    }
+                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i] - 1) {// new note is to the left
+                        Colours[i] = f_ExistingNote.Colours[i];
+                        Colours[i + 8] = f_NewNote.Colours[i + 8];
+                        Positions[i] = f_ExistingNote.Positions[i];
+                        Positions[i + 8] = f_NewNote.Positions[i + 8];
+                    }
+                    else { // override
+                        Colours[i] = f_NewNote.Colours[i];
+                        Colours[i + 8] = f_NewNote.Colours[i + 8];
+                        Positions[i] = f_NewNote.Positions[i];
+                        Positions[i + 8] = f_NewNote.Positions[i + 8];
+                    }
+                }
+                /*
+                for (int i = 0; i < 16; i++) {
+                    Colours[i] = f_ExistingNote.Colours[i];
+                    Positions[i] = f_ExistingNote.Positions[i];
+                }
+                for (int i = 0; i < 16; i++) {
+                    if (f_NewNote.Colours[i] != OctaveColour.none) {
+                        Colours[i] = f_NewNote.Colours[i];
+                        Positions[i] = f_NewNote.Positions[i];
+                    }
+                    
+                }*/
             }
             public NoteTemplate(char f_char) {
                 Init();
@@ -1191,6 +1407,38 @@ namespace CPSM
                     }
                 }
                 return testcol;
+            }
+            public OctaveColour? isUsniform(PartialNote f_partial, int f_offset) {
+                int f_length = 0;
+                var f_testcol = OctaveColour.none;
+                switch (f_partial) {
+                    case PartialNote.Half: {
+                        f_length = 4;
+                        break;
+                    }
+                    case PartialNote.Quarter: {
+                        f_length = 2;
+                        break;
+                    }
+                    case PartialNote.Eighth: {
+                        f_length = 1;
+                        break;
+                    }
+                }
+                int f_start = f_offset * f_length;
+                int f_end = f_offset * f_length + f_length;
+
+                for (int i = f_start; i < f_end; i++) {
+                    if (f_testcol == OctaveColour.none && Colours[i] != OctaveColour.none) {
+                        f_testcol = Colours[i];
+                    }
+                    if (!(Colours[i] == OctaveColour.none || Colours[i] == f_testcol)) {
+                        return null;
+                    }
+                }
+                return f_testcol;
+
+                throw new NotImplementedException();
             }
             public OctaveColour? HalfColour(Half f_half) {
                 OctaveColour testcol = OctaveColour.none;
@@ -1317,8 +1565,16 @@ namespace CPSM
                 }
                 return true;
             }
+            public bool IsFull() {
+                foreach (var col in Colours) {
+                    if (col == OctaveColour.none) {
+                        return false;
+                    }
+                }
+                return true;
+            }
             public bool IsSimple() {
-                return ((IsStart() || IsExtension()) && isUsniform() != null);
+                return ((IsStart() || IsExtension()) && IsFull() && isUsniform() != null);
             }
 
             private OctaveColour GetColourFromChar(char f_char) {
