@@ -130,8 +130,7 @@ namespace CPSM
 
     }
 
-    public class SongSaver
-    {
+    public class SongSaver {
 
         public int i { get; set; }
         public int o { get; set; }
@@ -181,12 +180,7 @@ namespace CPSM
 
             foreach (var measure in f_Song.Measures) {
                 currMesSize = (int)measure.Size;
-
-                //debug
-                if (currMesSize == 8) {
-
-                }
-
+                
                 _Line.Append(MEASURE);
                 if ((int)measure.Size < 10) {
                     _Line.Append(0);
@@ -248,9 +242,66 @@ namespace CPSM
                         }
                     }
                 }
+
+                i = 0;
+                o = 0;
+                count = 0;
+                state = 0;
+                // 0 = norm, 1 = counting 0s, 2 = counting non-0s
+                while (true) {
+                    if (i >= 10) { // reached end of this measure
+                        _Line.Append(WriteNote(prevNote, count));
+                        break;
+                    }
+                    var temp = new NoteTemplate(measure.BlackNotes[i, o]);
+                    var tempcol = temp.isUsniform();
+                    if (tempcol != OctaveColour.none && i == 0 && o == 0) {
+
+                    }
+
+                    switch (state) {
+                        case 0: {
+                            if (tempcol == OctaveColour.none) { // note is empty
+                                state = 1;
+                            }
+                            else { // note is not empty
+                                state = 2;
+                            }
+                            prevNote = temp;
+                            count = 1;
+                            IncrimentNote();
+                            break;
+                        }
+                        case 1: { // note is empty
+                            if (tempcol == OctaveColour.none) {
+                                count++;
+                                IncrimentNote();
+                                break;
+                            }
+                            else {
+                                _Line.Append(WriteNote(prevNote, count));
+                                state = 0;
+                            }
+                            break;
+                        }
+                        case 2: { // note is not empty
+                            var tempprev = prevNote.GetAsExtension();
+                            if (CompareNotes(temp, tempprev)) {
+                                count++;
+                                IncrimentNote();
+                                break;
+                            }
+                            else {
+                                _Line.Append(WriteNote(prevNote, count));
+                                state = 0;
+                            }
+                            break;
+                        }
+                    }
+                }
                 _Line.Append(CLOSE);
             }
-            _Line.Append(END);
+        _Line.Append(END);
 
             var f_Override = false;
             string[] f_lines = null;
@@ -295,10 +346,10 @@ namespace CPSM
             if (f_note.isUsniform() == OctaveColour.none) { // note is empty
                 return GetNoteKey(f_note.isUsniform().Value);
             }
-            if (f_note.isUsniform() != null && f_note.IsFull()) { // note is simple
+            else if (f_note.IsSimple()) { // note is simple
                 return GetNoteKey(f_note.isUsniform().Value);
             }
-            else if (f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null && f_note.IsFull()) { // note is Dual-octival
+            else if (f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) + 1 || f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) - 1 && f_note.IsFull()) { // note is Dual-octival
                 return NOTE + OPEN + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + CLOSE;
             }
             else { // note is complex
@@ -331,6 +382,11 @@ namespace CPSM
                     f_tempcol = f_note.Colours[i];
                 }
 
+                if (count != 0) {
+                    // writing the duplicate notes
+                    tempstring.Append(EXTENSION + count);
+                    count = 1;
+                }
                 tempstring.Append(CLOSE);
                 return tempstring.ToString();
 
@@ -399,6 +455,7 @@ namespace CPSM
         public string Path { get; set; }
         public int i { get; set; }
         public int o { get; set; }
+        public bool HandlingBlack { get; set; }
         public int count { get; set; }
         public bool LastHandled { get; set; }
         public NoteTemplate LastNote { get; set; }
@@ -468,9 +525,11 @@ namespace CPSM
                     count++;
                     i = 0;
                     o = 0;
+                    HandlingBlack = false;
                     SetLast(new NoteTemplate(f_Line[count])); // first note
                     count++;
                     while (f_Line[count] != CLOSE[0]) { //read to end of measure
+                        var f_char = f_Line[count];
                         if (f_Line[count] == EXTENSION[0]) {
                             HandleExt(f_measure, f_Line);
                         }
@@ -651,16 +710,32 @@ namespace CPSM
             for (int c = 0; c < f_notecount; c++) {
                 try {
                     if (LastNote.isUsniform() != OctaveColour.none) {
-                        if (c == 0) {
-                            f_measure.WhiteNotes[i, o].SetNote(LastNote);
+                        if (!HandlingBlack) {
+                            if (c == 0) {
+                                f_measure.WhiteNotes[i, o].SetNote(LastNote);
+                            }
+                            else {
+                                f_measure.WhiteNotes[i, o].SetNote(LastNote.GetAsExtension());
+                            }
                         }
                         else {
-                            f_measure.WhiteNotes[i, o].SetNote(LastNote.GetAsExtension());
+                            if (c == 0) {
+                                f_measure.BlackNotes[i, o].SetNote(LastNote);
+                            }
+                            else {
+                                f_measure.BlackNotes[i, o].SetNote(LastNote.GetAsExtension());
+                            }
+
                         }
                     }
                 }
                 catch { }
                 o++;
+                if (!HandlingBlack && o >= (int)f_measure.Size && i >= 13) {
+                    HandlingBlack = true;
+                    o = 0;
+                    i = 0;
+                }
                 if (o >= (int)f_measure.Size) {
                     o = 0;
                     i++;
@@ -935,6 +1010,7 @@ namespace CPSM
 
             //PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
             PreviewTemplate = CreatePreview(f_HeldNote, existingnote);
+            PreviewTemplate.Type = Note.GetType();
             CreatePreviewImage();
             if (PreviewTemplate.isUsniform() != OctaveColour.none) {
                 Display();
@@ -960,7 +1036,7 @@ namespace CPSM
         public void Activate() {
             if (PreviewTemplate != null) {
                 Cancel();
-                Note.SetColour(PreviewTemplate, _Control._NoteImageConrtol.GetImage(PreviewTemplate, Note.GetType()));
+                Note.SetColour(PreviewTemplate, _Control._NoteImageConrtol.GetImage(PreviewTemplate));
             }
         }
         public void Cancel() {
@@ -1053,26 +1129,45 @@ namespace CPSM
         }
 
         private void CreatePreviewImage() {
+
             NoteImage = new Canvas() {
                 Height = 16,
                 Width = 12,
                 Opacity = 0.5
             };
-
-            for (var i = 0; i < 16; i++) {
-                int f_num = 6 * i / 8;
-                var f_img = new Image() {
-                    Height = 2,
-                    Width = 6,
-                    Source = BitImages.GetBitImg(PreviewTemplate.Positions[i], PreviewTemplate.Colours[i], NoteType.White),
-                    Margin = new Thickness(6 * (i / 8), i % 8 * 2, 0, 0)
+            if (PreviewTemplate.Type == NoteType.White) {
+                for (var i = 0; i < 16; i++) {
+                    var f_img = new Image() {
+                        Height = 2,
+                        Width = 6,
+                        Source = BitImages.GetBitImg(PreviewTemplate.Positions[i], PreviewTemplate.Colours[i], PreviewTemplate.Type),
+                        Margin = new Thickness(6 * (i / 8), i % 8 * 2, 0, 0),
+                        
                 };
-                NoteImage.Children.Add(f_img);
+                    NoteImage.Children.Add(f_img);
+                    f_img.MouseLeave += new MouseEventHandler(NoteMouseLeave);
+                    f_img.MouseEnter += new MouseEventHandler(NoteMouseBit);
+                }
             }
+            else {
+                for (var i = 0; i < 16; i++) {
+                    var f_img = new Image() {
+                        Height = 2,
+                        Width = 6,
+                        Source = BitImages.GetBitImg(PreviewTemplate.Positions[i], PreviewTemplate.Colours[i], PreviewTemplate.Type),
+                        Margin = new Thickness(4 * (i / 8), i % 8 * 2, 0, 0)
+                    };
+                    NoteImage.Children.Add(f_img);
+                    f_img.MouseLeave += new MouseEventHandler(NoteMouseLeave);
+                    f_img.MouseEnter += new MouseEventHandler(NoteMouseBit);
+                }
+            }
+            
+            //NoteImage.MouseLeave += new MouseEventHandler(NoteMouseLeave);
+            //NoteImage.MouseEnter += new MouseEventHandler(NoteMouseEnter);
             NoteImage.MouseDown += new MouseButtonEventHandler(NoteClickDown);
             NoteImage.MouseUp += new MouseButtonEventHandler(NoteClickUp);
-            NoteImage.MouseLeave += new MouseEventHandler(NoteMouseLeave);
-            NoteImage.MouseEnter += new MouseEventHandler(NoteMouseEnter);
+
         }
         public void NoteClickDown(object sender, MouseButtonEventArgs e) {
             Point MousePos = e.GetPosition(NoteImage);
@@ -1089,12 +1184,16 @@ namespace CPSM
         }
         public void NoteMouseEnter(object sender, MouseEventArgs e) {
             if (Initialized) { // avoids infinite loops when mouseEnter triggers on a new preview
-                Point MousePos = e.GetPosition(NoteImage);
+                Point MousePos = e.GetPosition(null);
                 _Control.NoteMouseEnter(Note, e, MousePos);
             }
             else
                 Initialized = true;
         }
+        public void NoteMouseBit(object sender, MouseEventArgs e) {
+            NoteMouseEnter(NoteImage, e);
+        }
+
     }
 
     public class NoteCreator

@@ -28,10 +28,16 @@ using CPSM.Forms;
     Name & Source changing
     Zooming
 
+    Minor:
+    load brings up page 1
+    dont allow it to load if its already loading a song
+    hotkey partial notes
+
     Bugs:
     preview update when creating note works incorrectly with partial notes
-    preview does not update while hovering over it with a partial note
     first button icon size is incorrect
+    preview flikkers with partial notes
+    loading sometimes doesn't work if that song is already loaded
 */
 /*
     Done:
@@ -196,8 +202,8 @@ namespace CPSM
 
         public void TestModal() {
             var testsong = new SongData() {
-                Title = "We Stand for Everfree",
-                Source = "Legend of Everfree"
+                Title = "TestTitle",
+                Source = "TestSource"
             };
 
             var testmeasure = new MeasureData(testsong, MeasureSize.twelve) {

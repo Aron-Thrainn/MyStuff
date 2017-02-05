@@ -346,7 +346,7 @@ namespace CPSM
                     if (f_note.Parent.Exists && !f_note.Initialized) {
                         if (!f_note._TempVars.empty) {
                             //SetColour handles Initialization
-                            f_note.SetColour(new NoteTemplate(f_note), _NoteImageControl.GetImage(new NoteTemplate(f_note), f_note.GetType()));
+                            f_note.SetColour(new NoteTemplate(f_note), _NoteImageControl.GetImage(new NoteTemplate(f_note)));
                         }
                         else {
                             f_note.Initialize();
@@ -387,7 +387,7 @@ namespace CPSM
                         f_Template.SetColour((OctaveColour)o);
                         f_Template.SetAsExtension();
                         f_Template.Type = (NoteType)i;
-                        var f_Image = SetImageBits(GetImageBits(f_Template));
+                        var f_Image = SetImageBits(f_Template);
 
                         var f_TempCache = new NoteCache(f_Template, f_Image);
                         CommonNotes.Add(f_TempCache);
@@ -396,7 +396,7 @@ namespace CPSM
                 CommonNotesInitialized = true;
             }
 
-            public BitmapSource GetImage(NoteTemplate f_template, NoteType f_type) {
+            public BitmapSource GetImage(NoteTemplate f_template) {
                 if (f_template.IsSimple()) { return GetCommonImage(f_template); }
                 var f_CacheResult = SearchCache(f_template);
                 if (f_CacheResult != null) {
@@ -405,7 +405,7 @@ namespace CPSM
                 else {
 
                     // Draws the images into a DrawingVisual component
-                    var f_Image = SetImageBits(GetImageBits(f_template));
+                    var f_Image = SetImageBits(f_template);
 
                     CacheAdd(f_template, f_Image);
                     return f_Image;
@@ -463,27 +463,33 @@ namespace CPSM
                 }
                 return f_BitImages;
             }
-            private BitmapSource SetImageBits(BitmapFrame[] f_bits) {
+            private BitmapSource SetImageBits(NoteTemplate f_template) {
+                BitmapFrame[] f_bits = GetImageBits(f_template);
                 DrawingVisual drawingVisual = new DrawingVisual();
-                using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
-                    drawingContext.DrawImage(f_bits[0], new Rect(0, 0, 6, 2));
-                    drawingContext.DrawImage(f_bits[1], new Rect(0, 2, 6, 2));
-                    drawingContext.DrawImage(f_bits[2], new Rect(0, 4, 6, 2));
-                    drawingContext.DrawImage(f_bits[3], new Rect(0, 6, 6, 2));
-                    drawingContext.DrawImage(f_bits[4], new Rect(0, 8, 6, 2));
-                    drawingContext.DrawImage(f_bits[5], new Rect(0, 10, 6, 2));
-                    drawingContext.DrawImage(f_bits[6], new Rect(0, 12, 6, 2));
-                    drawingContext.DrawImage(f_bits[7], new Rect(0, 14, 6, 2));
-                    drawingContext.DrawImage(f_bits[8], new Rect(6, 0, 6, 2));
-                    drawingContext.DrawImage(f_bits[9], new Rect(6, 2, 6, 2));
-                    drawingContext.DrawImage(f_bits[10], new Rect(6, 4, 6, 2));
-                    drawingContext.DrawImage(f_bits[11], new Rect(6, 6, 6, 2));
-                    drawingContext.DrawImage(f_bits[12], new Rect(6, 8, 6, 2));
-                    drawingContext.DrawImage(f_bits[13], new Rect(6, 10, 6, 2));
-                    drawingContext.DrawImage(f_bits[14], new Rect(6, 12, 6, 2));
-                    drawingContext.DrawImage(f_bits[15], new Rect(6, 14, 6, 2));
+                int f_width = 5;
+                if (f_template.Type == NoteType.White) {
+                    f_width = 6;
                 }
-                RenderTargetBitmap rtb = new RenderTargetBitmap(12, 16, 96, 96, PixelFormats.Pbgra32);
+
+                using (DrawingContext drawingContext = drawingVisual.RenderOpen()) {
+                    drawingContext.DrawImage(f_bits[0], new Rect(0, 0, f_width, 2));
+                    drawingContext.DrawImage(f_bits[1], new Rect(0, 2, f_width, 2));
+                    drawingContext.DrawImage(f_bits[2], new Rect(0, 4, f_width, 2));
+                    drawingContext.DrawImage(f_bits[3], new Rect(0, 6, f_width, 2));
+                    drawingContext.DrawImage(f_bits[4], new Rect(0, 8, f_width, 2));
+                    drawingContext.DrawImage(f_bits[5], new Rect(0, 10, f_width, 2));
+                    drawingContext.DrawImage(f_bits[6], new Rect(0, 12, f_width, 2));
+                    drawingContext.DrawImage(f_bits[7], new Rect(0, 14, f_width, 2));
+                    drawingContext.DrawImage(f_bits[8], new Rect(f_width, 0, f_width, 2));
+                    drawingContext.DrawImage(f_bits[9], new Rect(f_width, 2, f_width, 2));
+                    drawingContext.DrawImage(f_bits[10], new Rect(f_width, 4, f_width, 2));
+                    drawingContext.DrawImage(f_bits[11], new Rect(f_width, 6, f_width, 2));
+                    drawingContext.DrawImage(f_bits[12], new Rect(f_width, 8, f_width, 2));
+                    drawingContext.DrawImage(f_bits[13], new Rect(f_width, 10, f_width, 2));
+                    drawingContext.DrawImage(f_bits[14], new Rect(f_width, 12, f_width, 2));
+                    drawingContext.DrawImage(f_bits[15], new Rect(f_width, 14, f_width, 2));
+                }
+                RenderTargetBitmap rtb = new RenderTargetBitmap(f_width*2, 16, 96, 96, PixelFormats.Pbgra32);
                 rtb.Render(drawingVisual);
                 var f_Image = rtb as BitmapSource;
                 return f_Image;
@@ -535,7 +541,7 @@ namespace CPSM
                     }
                 }
                 else {
-                    switch (f_pos) {
+                     switch (f_pos) {
                         case NoteBitPos.a1: { return new Int32Rect(0, 0, 5, 2); }
                         case NoteBitPos.a2: { return new Int32Rect(0, 2, 5, 2); }
                         case NoteBitPos.a3: { return new Int32Rect(0, 4, 5, 2); }
@@ -896,10 +902,7 @@ namespace CPSM
             public virtual void SetPosition(int f_xpos, int f_ypos) { }
 
             public void SetColour(NoteTemplate f_template, BitmapSource f_source) {
-                if (f_template == null) {
-                    return;
-                }
-                if (f_template.isUsniform() == OctaveColour.none) {
+                if (f_template == null || f_template.isUsniform() == OctaveColour.none) {
                     return;
                 }
 
@@ -1025,7 +1028,7 @@ namespace CPSM
             public BlackNoteViewModal(NoteData f_note, Canvas f_measureCan, MouseNoteControl f_mouse, MeasureViewModal f_parent, int f_xpos, int f_ypos) : base(f_note, f_measureCan, f_mouse, f_parent, f_xpos, f_ypos) {
                 NoteCan = new Canvas() {
                     Height = 16,
-                    Width = 12
+                    Width = 8
                 };
                 f_parent.Can.Children.Add(NoteCan);
                 SetPosition(f_xpos, f_ypos);
@@ -1079,7 +1082,8 @@ namespace CPSM
                 return new Canvas() {
                     Width = 8,
                     Height = 2,
-                    Margin = new Thickness(2, f_ypos, 0, 0)
+                    Margin = new Thickness(2, f_ypos, 0, 0),
+                    Background = Brushes.Transparent
                 };
             }
             public override void Initialize() {
@@ -1133,20 +1137,12 @@ namespace CPSM
                     Colours[i] = f_note.CounterPart.Colours[i];
                     Positions[i] = f_note.CounterPart.Positions[i];
                 }
-
-                /*
-                int count = 0;
-                foreach (var bit in f_note.Halves.Item1.Bits) {
-                    Colours[count] = bit.Oct;
-                    Positions[count] = bit.Pos;
-                    count++;
+                if (f_note is WhiteNoteViewModal) {
+                    Type = NoteType.White;
                 }
-                foreach (var bit in f_note.Halves.Item2.Bits) {
-                    Colours[count] = bit.Oct;
-                    Positions[count] = bit.Pos;
-                    count++;
+                else {
+                    Type = NoteType.Black;
                 }
-                */
             }
             public NoteTemplate(MouseNote f_mousecolour, Point f_mousepoint) {
                 Init();
@@ -1340,7 +1336,14 @@ namespace CPSM
                 //rework to be fully functional note combiner for dual-octival notes alwell as partial notes
 
                 for (int i = 0; i < 8; i++) {
-                    if (f_NewNote.Colours[i] == OctaveColour.none) { // if newnote is transparent here
+                    if (f_ExistingNote.Colours[i] == OctaveColour.none) { // if existingnote is transparent here
+                        Colours[i] = f_NewNote.Colours[i];
+                        Colours[i + 8] = f_NewNote.Colours[i + 8];
+                        Positions[i] = f_NewNote.Positions[i];
+                        Positions[i + 8] = f_NewNote.Positions[i + 8];
+
+                    }
+                    else if (f_NewNote.Colours[i] == OctaveColour.none) { // if newnote is transparent here
                         Colours[i] = f_ExistingNote.Colours[i];
                         Colours[i + 8] = f_ExistingNote.Colours[i + 8];
                         Positions[i] = f_ExistingNote.Positions[i];
@@ -1352,13 +1355,13 @@ namespace CPSM
                         Positions[i] = f_NewNote.Positions[i];
                         Positions[i + 8] = f_NewNote.Positions[i + 8];
                     }
-                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i]+1) { // new note is to the left
+                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i] + 1) { // new note is to the left
                         Colours[i] = f_NewNote.Colours[i];
                         Colours[i + 8] = f_ExistingNote.Colours[i + 8];
                         Positions[i] = f_NewNote.Positions[i];
                         Positions[i + 8] = f_ExistingNote.Positions[i + 8];
                     }
-                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i] - 1) {// new note is to the left
+                    else if ((int)f_ExistingNote.Colours[i] == (int)f_NewNote.Colours[i] - 1){// new note is to the right
                         Colours[i] = f_ExistingNote.Colours[i];
                         Colours[i + 8] = f_NewNote.Colours[i + 8];
                         Positions[i] = f_ExistingNote.Positions[i];
