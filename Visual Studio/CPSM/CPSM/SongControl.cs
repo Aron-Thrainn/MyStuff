@@ -65,7 +65,6 @@ namespace CPSM
         public string Source { get; set; }
         public int MeasureCount { get; set; }
         public int PageCount { get; set; }
-        public DateTime Date { get; set; }
 
         public SongDataSmall() {
 

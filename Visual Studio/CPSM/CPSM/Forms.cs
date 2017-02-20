@@ -224,9 +224,6 @@ namespace CPSM
             }
             public void SaveConfirm(bool f_DidSave) {
                 //todo: Implement
-                if (!f_DidSave) {
-                    throw new Exception();
-                }
             }
 
             public class SaveConfirmed
@@ -318,9 +315,9 @@ namespace CPSM
                     Content = _Data.Source,
                     Margin = new Thickness(0, 18, 0, 0)
                 });
-                Children.Add(new Label() // Measures & date
+                Children.Add(new Label() // Measures
                 {
-                    Content = _Data.MeasureCount.ToString() + " Measures"  + "  " + _Data.Date.ToShortDateString(),
+                    Content = _Data.MeasureCount.ToString() + " Measures",
                     Margin = new Thickness(0, 34, 0, 0)
                 });
                 Children.Add(new Border() {
@@ -330,7 +327,7 @@ namespace CPSM
                     Width = Width
                 });
                 var f_BtnCan = new Canvas() {
-                    Margin = new Thickness(140, 10, 0, 0),
+                    Margin = new Thickness(100, 10, 0, 0),
                     Background = Brushes.Black
                 };
                 Children.Add(f_BtnCan);

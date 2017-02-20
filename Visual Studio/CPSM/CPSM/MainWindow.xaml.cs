@@ -19,9 +19,10 @@ using CPSM.Forms;
 
 /*
     ToDo:
-    Drawing long partial notes
     Add Export Dialog funcion
     Add Copy/Paste functions
+    Add NotetType to NoteTemplate
+    Implement Black Notes
     prettify the load song select
     smooth page turning
     Name & Source changing
@@ -55,7 +56,6 @@ using CPSM.Forms;
     Multiple Pages
     Partial Notes
     Add Save & load functions - export all pages at a time
-    Add dates to saves
 
 */
 
