@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CPSM.SongControl" Collapsed="true">
+    <Position X="6.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIAAAgAAAAEAAAABAAAAAAAAAAAAAAhAAAQAAAgAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.Song" Collapsed="true">
+    <Position X="6.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAkAAAAAAAAAQAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.Measure" Collapsed="true">
+    <Position X="6.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAQAAAAABAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.Note" Collapsed="true">
+    <Position X="6.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAAAQAAAABAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.NoteHalf" Collapsed="true">
+    <Position X="6.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAIAAAAAAAAAAQAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.NoteBit" Collapsed="true">
+    <Position X="6.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQIAAABAAAgAAAAAAAAAAAAE=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.GUI" Collapsed="true">
+    <Position X="0.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.SongCanvas" Collapsed="true">
+    <Position X="2.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.MouseControl" Collapsed="true">
+    <Position X="4.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.MouseNoteColour" Collapsed="true">
+    <Position X="4.25" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.HotkeyControl" Collapsed="true">
+    <Position X="6.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPSM.ScreenCapturer" Collapsed="true">
+    <Position X="8.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Window.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.ParentButton" Collapsed="true">
+    <Position X="12.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCQABgAAABQBCAAAgEAITAKAAAAAgEEIgAoABAUIAQE=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomButton" Collapsed="true">
+    <Position X="12.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAIAAAAAAACCAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomCheckbox" Collapsed="true">
+    <Position X="10" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAIAAAAAAAAACAAIABAAgAACCCAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomRadioButtonGroup" Collapsed="true">
+    <Position X="14.5" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAoAABAE=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.CustomButtons.CustomRadioButton" Collapsed="true">
+    <Position X="14.5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAICAEgAIAAAAACAAIABAAgAACCAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CommonClasses.Images.ImageControl" Collapsed="true">
+    <Position X="18.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAIQABDYBgAAEAAEIAAAAAIIBRBAAAIAQAAAkAAACE=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="CPSM.NoteBitPos" Collapsed="true">
+    <Position X="5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kAAAAAAAAAAACQAAAAAAAAAAkIBEAgAASAAgAQAAJAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CPSM.OctaveColour" Collapsed="true">
+    <Position X="5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQACAAAAAAAAIgAAAAAAAAAAAAAAAAAACAAAADAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CPSM.Half" Collapsed="true">
+    <Position X="5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACACAAAAAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CPSM.MeasureSize" Collapsed="true">
+    <Position X="5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAQAAIAAAAAAAAAAAAAAAQAAAACAAAA=</HashCode>
+      <FileName>SongControl.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CommonClasses.CustomButtons.ButtonState" Collapsed="true">
+    <Position X="14" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAABAQAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>CommonClasses.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
