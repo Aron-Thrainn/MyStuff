@@ -31,6 +31,8 @@ using CPSM.Forms;
     load brings up page 1
     dont allow it to load if its already loading a song
     hotkey partial notes
+    make extending complex notes extend the colours at the bottom of the note
+
 
     Bugs:
     preview update when creating note works incorrectly with partial notes

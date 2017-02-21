@@ -130,7 +130,8 @@ namespace CPSM
 
     }
 
-    public class SongSaver {
+    public class SongSaver
+    {
 
         public int i { get; set; }
         public int o { get; set; }
@@ -149,6 +150,7 @@ namespace CPSM
         private static string SOURCE = "S";
         private static string MEASCOUNT = "C";
         private static string PAGECOUNT = "V";
+        private static string DATE = "D";
         private static string MEASURE = "M";
         private static string NOTE = "N";
         private static string BIT = "B";
@@ -177,10 +179,11 @@ namespace CPSM
             _Line.Append(SOURCE + OPEN + f_Song.Source + CLOSE);
             _Line.Append(MEASCOUNT + OPEN + f_Song.Measures.Count + CLOSE);
             _Line.Append(PAGECOUNT + OPEN + f_Song.PageCount + CLOSE);
+            _Line.Append(DATE + OPEN + DateTime.Now.ToShortDateString() + CLOSE);
 
             foreach (var measure in f_Song.Measures) {
                 currMesSize = (int)measure.Size;
-                
+
                 _Line.Append(MEASURE);
                 if ((int)measure.Size < 10) {
                     _Line.Append(0);
@@ -301,7 +304,7 @@ namespace CPSM
                 }
                 _Line.Append(CLOSE);
             }
-        _Line.Append(END);
+            _Line.Append(END);
 
             var f_Override = false;
             string[] f_lines = null;
@@ -346,10 +349,11 @@ namespace CPSM
             if (f_note.isUsniform() == OctaveColour.none) { // note is empty
                 return GetNoteKey(f_note.isUsniform().Value);
             }
-            else if (f_note.IsSimple()) { // note is simple
+            else if (f_note.IsSimple() && f_note.IsStart()) { // note is simple
                 return GetNoteKey(f_note.isUsniform().Value);
             }
-            else if (f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) + 1 || f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) - 1 && f_note.IsFull()) { // note is Dual-octival
+            else if (f_note.IsFull() && f_note.HalfColour(Half.Left) != null && f_note.HalfColour(Half.Right) != null && f_note.IsStart() &&
+                (f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) + 1 || f_note.HalfColour(Half.Left) == f_note.HalfColour(Half.Right) - 1)) { // note is Dual-octival
                 return NOTE + OPEN + GetNoteKey(f_note.HalfColour(Half.Left).Value) + GetNoteKey(f_note.HalfColour(Half.Right).Value) + CLOSE;
             }
             else { // note is complex
@@ -465,6 +469,7 @@ namespace CPSM
         private static string SOURCE = "S";
         private static string MEASCOUNT = "C";
         private static string PAGECOUNT = "V";
+        private static string DATE = "D";
         private static string MEASURE = "M";
         private static string NOTE = "N";
         private static string BIT = "B";
@@ -496,9 +501,6 @@ namespace CPSM
             string f_Line = "";
 
             foreach (var line in f_Lines) {
-                //var f_temp1 = ReadName(line);
-                //var f_temp2 = ReadSource(line);
-
 
                 if (ReadName(line) == f_title && ReadSource(line) == f_source) {
                     f_Line = line;
@@ -557,6 +559,8 @@ namespace CPSM
                 f_SmallData.Source = ReadSource(line);
                 f_SmallData.MeasureCount = ReadMeasureCount(line);
                 f_SmallData.PageCount = ReadPageCount(line);
+                f_SmallData.Date = DateTime.Parse(ReadDate(line));
+
 
                 f_SongDataSmall.Add(f_SmallData);
             }
@@ -571,7 +575,7 @@ namespace CPSM
         private void HandleComplex(MeasureData f_measure, string f_Line) {
             AddNote(f_measure, 1);
             var f_temptemp = new NoteTemplate();
-            if (f_Line[count] == NOTE[0] && f_Line[count + 2] != BIT[0]) { 
+            if (f_Line[count] == NOTE[0] && f_Line[count + 2] != BIT[0]) {
                 count++;
                 count++;
                 f_temptemp.SetHalfColour(Half.Left, f_Line[count]);
@@ -585,12 +589,12 @@ namespace CPSM
                 var f_CurrBit = 0;
                 count++;
                 count++;
-                while(f_Line[count] == BIT[0]) {
+                while (f_Line[count] == BIT[0]) {
                     count++;
                     count++;
                     var f_PosString = new StringBuilder();
                     f_PosString.Append(f_Line[count]);
-                    f_PosString.Append(f_Line[count+1]);
+                    f_PosString.Append(f_Line[count + 1]);
                     count++;
                     count++;
                     var f_ColString = f_Line[count];
@@ -601,7 +605,7 @@ namespace CPSM
                     if (f_Line[count] == EXTENSION[0]) {
                         f_ExtCount = new StringBuilder();
                         count++;
-                        while(f_Line[count] != BIT[0] && f_Line[count] != CLOSE[0]) {
+                        while (f_Line[count] != BIT[0] && f_Line[count] != CLOSE[0]) {
                             f_ExtCount.Append(f_Line[count]);
                             count++;
                         }
@@ -631,7 +635,7 @@ namespace CPSM
             }
             AddNote(f_measure, int.Parse(f_tempstring.ToString()));
 
-            
+
         }
 
         private string ReadName(string f_line) {
@@ -650,8 +654,50 @@ namespace CPSM
         }
         private string ReadSource(string f_line) {
             int count = 0;
-            StringBuilder f_name = new StringBuilder();
+            StringBuilder f_Source = new StringBuilder();
             while (!(f_line[count] == SOURCE[0] && f_line[count + 1] == OPEN[0])) {
+                count++;
+            }
+            count++;
+            count++;
+            while (f_line[count] != CLOSE[0]) {
+                f_Source.Append(f_line[count]);
+                count++;
+            }
+            return f_Source.ToString();
+        }
+        private int ReadMeasureCount(string f_line) {
+            int count = 0;
+            StringBuilder f_MesCount = new StringBuilder();
+            while (!(f_line[count] == MEASCOUNT[0] && f_line[count + 1] == OPEN[0])) {
+                count++;
+            }
+            count++;
+            count++;
+            while (f_line[count] != CLOSE[0]) {
+                f_MesCount.Append(f_line[count]);
+                count++;
+            }
+            return int.Parse(f_MesCount.ToString());
+        }
+        private int ReadPageCount(string f_line) {
+            int count = 0;
+            StringBuilder f_PageCount = new StringBuilder();
+            while (!(f_line[count] == PAGECOUNT[0] && f_line[count + 1] == OPEN[0])) {
+                count++;
+            }
+            count++;
+            count++;
+            while (f_line[count] != CLOSE[0]) {
+                f_PageCount.Append(f_line[count]);
+                count++;
+            }
+            return int.Parse(f_PageCount.ToString());
+        }
+        private string ReadDate(string f_line) {
+            int count = 0;
+            StringBuilder f_name = new StringBuilder();
+            while (!(f_line[count] == DATE[0] && f_line[count + 1] == OPEN[0])) {
                 count++;
             }
             count++;
@@ -661,34 +707,6 @@ namespace CPSM
                 count++;
             }
             return f_name.ToString();
-        }
-        private int ReadMeasureCount(string f_line) {
-            int count = 0;
-            StringBuilder f_name = new StringBuilder();
-            while (!(f_line[count] == MEASCOUNT[0] && f_line[count + 1] == OPEN[0])) {
-                count++;
-            }
-            count++;
-            count++;
-            while (f_line[count] != CLOSE[0]) {
-                f_name.Append(f_line[count]);
-                count++;
-            }
-            return int.Parse(f_name.ToString());
-        }
-        private int ReadPageCount(string f_line) {
-            int count = 0;
-            StringBuilder f_name = new StringBuilder();
-            while (!(f_line[count] == PAGECOUNT[0] && f_line[count + 1] == OPEN[0])) {
-                count++;
-            }
-            count++;
-            count++;
-            while (f_line[count] != CLOSE[0]) {
-                f_name.Append(f_line[count]);
-                count++;
-            }
-            return int.Parse(f_name.ToString());
         }
         private MeasureSize GetMeasureSize(string f_str) {
             switch (f_str) {
@@ -1350,7 +1368,7 @@ namespace CPSM
         public string CurrentVersion { get; set; }
 
         public Version() {
-            CurrentVersion = "Pre-Alpha";
+            CurrentVersion = "Stable Build 1.0";
         }
     }
 }
