@@ -574,7 +574,6 @@ namespace CPSM
                     f_temptemp.SetHalfColour(Half.Right, f_Line[count]);
                     count++;
                     SetLast(f_temptemp);
-                    //count++;
                 }
                 else {
                     var f_CurrBit = 0;
@@ -1422,7 +1421,7 @@ namespace CPSM
         public string CurrentVersion { get; set; }
 
         public Version() {
-            CurrentVersion = "Stable Build 1.1";
+            CurrentVersion = "Stable Build 1.2";
         }
     }
 }
