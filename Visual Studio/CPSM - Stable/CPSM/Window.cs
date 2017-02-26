@@ -400,10 +400,6 @@ namespace CPSM
             if (f_count == 1) {
                 return WrittenNote(f_note);
             }
-            else if (f_count == 2) {
-                string f_char = WrittenNote(f_note);
-                return f_char + f_char;
-            }
             else {
                 return WrittenNote(f_note) + EXTENSION + count.ToString();
             }
@@ -528,8 +524,7 @@ namespace CPSM
                     i = 0;
                     o = 0;
                     HandlingBlack = false;
-                    SetLast(new NoteTemplate(f_Line[count])); // first note
-                    count++;
+                    ReadFirstNore(f_Line); // first note
                     while (f_Line[count] != CLOSE[0]) { //read to end of measure
                         var f_char = f_Line[count];
                         if (f_Line[count] == EXTENSION[0]) {
@@ -567,6 +562,65 @@ namespace CPSM
             return f_SongDataSmall;
         }
 
+
+        private void ReadFirstNore(string f_Line) {
+            if (f_Line[count] == NOTE[0]) { // note is complex
+                var f_temptemp = new NoteTemplate();
+                if (f_Line[count] == NOTE[0] && f_Line[count + 2] != BIT[0]) {
+                    count++;
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Left, f_Line[count]);
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Right, f_Line[count]);
+                    count++;
+                    SetLast(f_temptemp);
+                    //count++;
+                }
+                else {
+                    var f_CurrBit = 0;
+                    count++;
+                    count++;
+                    while (f_Line[count] == BIT[0]) {
+                        count++;
+                        count++;
+                        var f_PosString = new StringBuilder();
+                        f_PosString.Append(f_Line[count]);
+                        f_PosString.Append(f_Line[count + 1]);
+                        count++;
+                        count++;
+                        var f_ColString = f_Line[count];
+                        count++;
+                        count++;
+                        var f_ExtCount = new StringBuilder();
+                        f_ExtCount.Append("0");
+                        if (f_Line[count] == EXTENSION[0]) {
+                            f_ExtCount = new StringBuilder();
+                            count++;
+                            while (f_Line[count] != BIT[0] && f_Line[count] != CLOSE[0]) {
+                                f_ExtCount.Append(f_Line[count]);
+                                count++;
+                            }
+                        }
+                        var f_TempPos = GetPosFromString(f_PosString.ToString());
+                        var f_TempCol = GetColFromString(f_ColString.ToString());
+                        var f_tempExtCount = int.Parse(f_ExtCount.ToString());
+                        var f_TempCounter = 0;
+
+                        for (int i = 0; i < f_tempExtCount; i++) {
+                            f_temptemp.Positions[f_CurrBit] = (NoteBitPos)(f_TempPos + f_TempCounter);
+                            f_temptemp.Colours[f_CurrBit] = f_TempCol;
+                            f_CurrBit++;
+                            f_TempCounter++;
+                        }
+                    }
+                    SetLast(f_temptemp);
+                }
+            }
+            else {  //simple note
+                SetLast(new NoteTemplate(f_Line[count]));
+            }
+            count++;
+        }
         private void HandleSimple(MeasureData f_measure, string f_Line) {
             AddNote(f_measure, 1);
             SetLast(new NoteTemplate(f_Line[count]));
@@ -1368,7 +1422,7 @@ namespace CPSM
         public string CurrentVersion { get; set; }
 
         public Version() {
-            CurrentVersion = "Stable Build 1.0";
+            CurrentVersion = "Stable Build 1.1";
         }
     }
 }

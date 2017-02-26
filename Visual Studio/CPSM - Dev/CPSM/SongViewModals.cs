@@ -12,6 +12,7 @@ using CommonClasses.Images;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Drawing;
+using System.Media;
 
 namespace CPSM
 {
@@ -1390,6 +1391,11 @@ namespace CPSM
                 var f_startpoint = f_start * (int)f_partial;
                 var f_EndPoint = f_end * (int)f_partial;
 
+                //debug
+                if (f_start != 0) {
+                    SystemSounds.Beep.Play();
+                }
+
                 for (int i = f_startpoint; i < f_EndPoint; i++) {
                     Colours[i] = f_col;
                     Colours[i + 8] = f_col;
@@ -1534,12 +1540,16 @@ namespace CPSM
             }
             public NoteTemplate GetAsExtension() {
                 //returns a extension equivalent of this note
+                var f_col1 = Colours[7];
+                var f_col2 = Colours[15];
                 var f_newnote = new NoteTemplate(this);
                 for (int i = 0; i < 8; i++) {
                     f_newnote.Positions[i] = NoteBitPos.a8;
+                    f_newnote.Colours[i] = f_col1;
                 }
                 for (int i = 8; i < 16; i++) {
                     f_newnote.Positions[i] = NoteBitPos.b8;
+                    f_newnote.Colours[i] = f_col2;
                 }
                 return f_newnote;
             }
@@ -1618,6 +1628,31 @@ namespace CPSM
                     return OctaveColour.Yellow;
                 }
                 throw new Exception();
+            }
+            public NoteTemplate GetFull() {
+                //returns a full equivalent of this note
+                var f_newnote = new NoteTemplate(this);
+                OctaveColour f_col = OctaveColour.none;
+                int o = 0;
+                for (int i = 0; i < 8; i++) {
+                    if (Colours[i] == OctaveColour.none) {
+                        try {
+                            f_col = Colours[i - 1];
+                            o = i;
+                            break;
+                        }
+                        catch { }
+                    }
+                }
+                if (f_col == OctaveColour.none) {
+                    return f_newnote;
+                }
+                for (int i = o; i < 8; i++) {
+                    f_newnote.Colours[i] = f_col;
+                    f_newnote.Colours[i + 8] = f_col;
+                }
+
+                return f_newnote;
             }
 
             public static class NoteTemplates

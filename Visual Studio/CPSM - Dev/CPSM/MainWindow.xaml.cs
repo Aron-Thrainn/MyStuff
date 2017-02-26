@@ -26,20 +26,18 @@ using CPSM.Forms;
     smooth page turning
     Name & Source changing
     Zooming
+    Ctrl and Shift modifiers
 
     Minor:
     load brings up page 1
     dont allow it to load if its already loading a song
     hotkey partial notes
-    make extending complex notes extend the colours at the bottom of the note
 
 
     Bugs:
-    preview update when creating note works incorrectly with partial notes
     first button icon size is incorrect
     preview flikkers with partial notes
     loading sometimes doesn't work if that song is already loaded
-    Saving/soading extensions as starters
     dragging a note above its start makes the start an extension... feature??
 */
 /*

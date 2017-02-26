@@ -399,10 +399,6 @@ namespace CPSM
             if (f_count == 1) {
                 return WrittenNote(f_note);
             }
-            else if (f_count == 2) {
-                string f_char = WrittenNote(f_note);
-                return f_char + f_char;
-            }
             else {
                 return WrittenNote(f_note) + EXTENSION + count.ToString();
             }
@@ -527,8 +523,7 @@ namespace CPSM
                     i = 0;
                     o = 0;
                     HandlingBlack = false;
-                    SetLast(new NoteTemplate(f_Line[count])); // first note
-                    count++;
+                    ReadFirstNore(f_Line); // first note
                     while (f_Line[count] != CLOSE[0]) { //read to end of measure
                         var f_char = f_Line[count];
                         if (f_Line[count] == EXTENSION[0]) {
@@ -565,7 +560,63 @@ namespace CPSM
             }
             return f_SongDataSmall;
         }
+        private void ReadFirstNore(string f_Line) {
+            if (f_Line[count] == NOTE[0]) { // note is complex
+                var f_temptemp = new NoteTemplate();
+                if (f_Line[count] == NOTE[0] && f_Line[count + 2] != BIT[0]) {
+                    count++;
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Left, f_Line[count]);
+                    count++;
+                    f_temptemp.SetHalfColour(Half.Right, f_Line[count]);
+                    count++;
+                    SetLast(f_temptemp);
+                }
+                else {
+                    var f_CurrBit = 0;
+                    count++;
+                    count++;
+                    while (f_Line[count] == BIT[0]) {
+                        count++;
+                        count++;
+                        var f_PosString = new StringBuilder();
+                        f_PosString.Append(f_Line[count]);
+                        f_PosString.Append(f_Line[count + 1]);
+                        count++;
+                        count++;
+                        var f_ColString = f_Line[count];
+                        count++;
+                        count++;
+                        var f_ExtCount = new StringBuilder();
+                        f_ExtCount.Append("0");
+                        if (f_Line[count] == EXTENSION[0]) {
+                            f_ExtCount = new StringBuilder();
+                            count++;
+                            while (f_Line[count] != BIT[0] && f_Line[count] != CLOSE[0]) {
+                                f_ExtCount.Append(f_Line[count]);
+                                count++;
+                            }
+                        }
+                        var f_TempPos = GetPosFromString(f_PosString.ToString());
+                        var f_TempCol = GetColFromString(f_ColString.ToString());
+                        var f_tempExtCount = int.Parse(f_ExtCount.ToString());
+                        var f_TempCounter = 0;
 
+                        for (int i = 0; i < f_tempExtCount; i++) {
+                            f_temptemp.Positions[f_CurrBit] = (NoteBitPos)(f_TempPos + f_TempCounter);
+                            f_temptemp.Colours[f_CurrBit] = f_TempCol;
+                            f_CurrBit++;
+                            f_TempCounter++;
+                        }
+                    }
+                    SetLast(f_temptemp);
+                }
+            }
+            else {  //simple note
+                SetLast(new NoteTemplate(f_Line[count]));
+            }
+            count++;
+        }
         private void HandleSimple(MeasureData f_measure, string f_Line) {
             AddNote(f_measure, 1);
             SetLast(new NoteTemplate(f_Line[count]));
@@ -908,11 +959,14 @@ namespace CPSM
 
         public void NoteLeftClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             ResetPreview();
-            var f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+            var f_HeldNote = new NoteTemplate(_colourctrl, _Preview.GetMousePos()); // f_mousepos is unreliable
             _Creator = new NoteCreator(f_HeldNote, sender, false, this);
             Creating = true;
         }
         public void NoteLeftClickedUp(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
+            if (Creating) {
+                FinishCreate();
+            }
             MakePreview(sender, f_mousepos);
         }
         public void NoteRightClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
@@ -980,10 +1034,8 @@ namespace CPSM
                     f_temptemplate = new NoteTemplate(_colourctrl.Template);
                 }
                 else {
-                    f_temptemplate = new NoteTemplate();
-                    f_temptemplate.SetColour(_colourctrl.ActiveColour);
+                    f_temptemplate = new NoteTemplate(_colourctrl, _Preview.GetMousePos());
                 }
-                // sets the heldnote to f_oct colour full note, does not currently work for partial notes
 
                 ResetPreview();
                 _Preview = new NotePreview(f_tempnote, f_temptemplate, false, true, this);
@@ -998,9 +1050,7 @@ namespace CPSM
         }
         public void GlobalMouseUp() {
             if (Creating) {
-                _Creator.Activate();
-                _Creator = null;
-                Creating = false;
+                FinishCreate();
             }
             else {
             }
@@ -1014,6 +1064,11 @@ namespace CPSM
 
         }
 
+        public void FinishCreate() {
+            _Creator.Activate();
+            _Creator = null;
+            Creating = false;
+        }
 
         public void SuppressPreview() {
             Suppressed = true;
@@ -1034,6 +1089,7 @@ namespace CPSM
         public MouseNoteControl _Control { get; set; }
         public bool Initialized { get; set; }
         public int PartialNoteStart { get; set; }
+        public bool IsFull { get; set; }
 
         public NotePreview(NoteViewModal f_note, NoteTemplate f_HeldNote, bool f_override, bool f_startpoint, MouseNoteControl f_control) {
             _Control = f_control;
@@ -1051,6 +1107,7 @@ namespace CPSM
             //PreviewTemplate = CreatePreview(f_override, f_HeldNote, existingnote);
             PreviewTemplate = CreatePreview(f_HeldNote, existingnote);
             PreviewTemplate.Type = Note.GetType();
+            IsFull = PreviewTemplate.IsFull();
             CreatePreviewImage();
             if (PreviewTemplate.isUsniform() != OctaveColour.none) {
                 Display();
@@ -1090,6 +1147,9 @@ namespace CPSM
                 Note.Parent.Can.Children.Remove(NoteImage);
             };
 
+        }
+        public Point GetMousePos() {
+            return Mouse.GetPosition(NoteImage);
         }
 
         public bool HasTemplate() {
@@ -1266,27 +1326,38 @@ namespace CPSM
                 f_note.FindNoteToRight() != NewNotes.Peek().Note) {
                 return; // if note is not the "right" one
             }
-
-
-
-
-
-
-
+            
             var f_OldNote = NewNotes.Peek();
             int f_BitNum = (int)f_point.Y / 2;
             int f_PartialCount = (f_BitNum / (int)f_partial) + 1;
 
-            if (f_PartialCount * (int)f_partial <= 8) {
-
-                var f_NewNote = new NoteTemplate(f_partial, f_col, f_PartialCount, f_OldNote.PartialNoteStart, f_OldNote.StartPoint);
-                var f_NoteModal = NewNotes.Peek().Note;
-
+            if (f_PartialCount * (int)f_partial <= 8) { // out of range check
                 var f_OldPreview = NewNotes.Pop();
+                var f_NoteModal = f_OldPreview.Note;
+                var f_OldStartPoint = f_OldPreview.StartPoint;
+
+                var f_notestart = f_OldNote.PartialNoteStart;
+                if (f_OldPreview.IsFull || f_OldPreview.PreviewTemplate.isUsniform() == OctaveColour.none) { f_notestart = f_BitNum; }
+
+                var f_NewNote = new NoteTemplate(f_partial, f_col, f_PartialCount, f_notestart, f_OldNote.StartPoint);
+                
+
+
                 f_OldPreview.Cancel();
-                var f_NewPreview = new NotePreview(f_NoteModal, f_NewNote, false, f_OldPreview.StartPoint, _Control);
+                var f_NewPreview = new NotePreview(f_NoteModal, f_NewNote, false, f_OldStartPoint, _Control);
+                f_NewPreview.PartialNoteStart = f_notestart;
                 NewNotes.Push(f_NewPreview);
             }
+
+        }
+        public void ReplaceTopNote(NoteTemplate f_template) {
+            var f_OldPreview = NewNotes.Pop();
+            var f_NoteModal = f_OldPreview.Note;
+            var f_start = f_OldPreview.StartPoint;
+            
+            f_OldPreview.Cancel();
+            var f_NewPreview = new NotePreview(f_NoteModal, f_template, true, f_start, _Control);
+            NewNotes.Push(f_NewPreview);
 
         }
         public void AddNote(NoteViewModal f_existingnote) {
@@ -1313,6 +1384,13 @@ namespace CPSM
         }
         public void PushNote(NoteViewModal f_existingnote) {
             var f_startpoint = (NewNotes.Count == 0);
+            if (!f_startpoint) {
+                var f_oldnote = NewNotes.Peek();
+                if (!f_oldnote.IsFull) {
+                    ReplaceTopNote(f_oldnote.PreviewTemplate.GetFull());
+                }
+            }
+
             NewNotes.Push(new NotePreview(f_existingnote, HeldNote, Override, f_startpoint, _Control));
         }
         public void PopNote() {
@@ -1428,7 +1506,7 @@ namespace CPSM
         public string CurrentVersion { get; set; }
 
         public Version() {
-            CurrentVersion = "Pre-Alpha";
+            CurrentVersion = "Alpha Build 1.0";
         }
     }
 }
