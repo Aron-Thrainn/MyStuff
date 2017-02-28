@@ -275,6 +275,8 @@ namespace CPSM
                 var f_songloader = new SongLoader(@"C:\\Users\\Notandi\\Desktop\\temptxt.txt");
                 var f_songlist = f_songloader.LoadSongsSmall();
 
+                f_songlist.Sort(CompareDates);
+
                 foreach (var data in f_songlist) {
                     CreateListItem(data);
                 }
@@ -292,6 +294,21 @@ namespace CPSM
             public void LoadSong(SongDataSmall f_data) {
                 _Parent.LoadSong(f_data);
                 HideForm();
+            }
+            private static int CompareDates(SongDataSmall x, SongDataSmall y) {
+                var xx = x.Date.Ticks;
+                var yy = y.Date.Ticks;
+
+                if (xx == yy) {
+                    return string.Compare(x.Title, y.Title);
+                }
+                else if (xx > yy) {
+                    return -1;
+                }
+                else {
+                    return 1;
+                }
+
             }
         }
 
