@@ -1,0 +1,1 @@
+o_owner = global.g_Player;
