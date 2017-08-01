@@ -1421,7 +1421,7 @@ namespace CPSM
         public string CurrentVersion { get; set; }
 
         public Version() {
-            CurrentVersion = "Stable Build 1.2";
+            CurrentVersion = "Stable Build 1.3";
         }
     }
 }

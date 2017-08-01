@@ -363,6 +363,8 @@ namespace CPSM
         #endregion
         /*  Uses
          * escape to close app
+         * Enter exports to png
+         * Space saves song
          */
 
         public Hotkeycontrol(MainWindow f_wind) {

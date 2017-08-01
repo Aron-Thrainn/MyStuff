@@ -959,7 +959,13 @@ namespace CPSM
 
         public void NoteLeftClickedDown(NoteViewModal sender, MouseButtonEventArgs e, Point f_mousepos) {
             ResetPreview();
-            var f_HeldNote = new NoteTemplate(_colourctrl, _Preview.GetMousePos()); // f_mousepos is unreliable
+            NoteTemplate f_HeldNote;
+            try {
+                f_HeldNote = new NoteTemplate(_colourctrl, _Preview.GetMousePos()); // f_mousepos is unreliable
+            }
+            catch {
+                f_HeldNote = new NoteTemplate(_colourctrl, f_mousepos);
+            }
             _Creator = new NoteCreator(f_HeldNote, sender, false, this);
             Creating = true;
         }
