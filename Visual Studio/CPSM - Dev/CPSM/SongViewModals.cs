@@ -35,7 +35,6 @@ namespace CPSM
             public int CurrentPage { get; set; }
             public int TotalPages { get; set; }
             public SongData _ActiveSong { get; set; }
-            private PageTurner _PageTurner { get; set; }
 
             public SongViewModalCreator(Canvas f_measurecan, MouseNoteControl f_mousectrl, Label f_titlebox, Label f_sourcebox, Label f_versionbox, Label f_Pagenumber, NoteImageControl f_NoteImageControl) {
                 MeasuresCan = f_measurecan;
@@ -127,19 +126,16 @@ namespace CPSM
                 Measures.Remove(f_TempMeasure);
             }
             private void AddPage() {
-                if (Pages.Count != 0) // if there is a page, take it off the canvas
-                {
-                    var f_OldPage = Pages.ElementAt(Pages.Count - 1);
-                    MeasuresCan.Children.Remove(f_OldPage);
-                }
-
                 var f_NewPage = new StackPanel() {
                     Margin = new Thickness(0, 10, 0, 0),
                     Orientation = Orientation.Horizontal
                 };
                 MeasuresCan.Children.Add(f_NewPage);
                 Pages.Add(f_NewPage);
-                ActivePage = f_NewPage;
+                SetPage(f_NewPage);
+
+                TotalPages++;
+                _ActiveSong.PageCount = TotalPages;
                 IncrementPageNumber();
             }
             private void RemovePage() {
@@ -147,65 +143,61 @@ namespace CPSM
                 MeasuresCan.Children.Remove(f_OldPage);
                 Pages.Remove(f_OldPage);
                 if (Pages.Count != 0) {
-                    ActivePage = Pages.ElementAt(Pages.Count - 1);
-                    MeasuresCan.Children.Add(ActivePage);
-                    DeIncrementPageNumber();
+                    SetPage(Pages.ElementAt(Pages.Count - 1));
                 }
                 else {
                     ActivePage = null;
-                    DeIncrementPageNumber();
                 }
+                TotalPages--;
+                DeIncrementPageNumber();
+                _ActiveSong.PageCount = TotalPages;
             }
             private void IncrementPageNumber() {
                 if (_ActiveSong != null) {
-                    TotalPages++;
-                    CurrentPage = TotalPages;
+                    CurrentPage++;
                     PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
-                    _ActiveSong.PageCount = TotalPages;
                 }
             }
             private void DeIncrementPageNumber() {
                 if (_ActiveSong != null) {
-                    TotalPages--;
-                    CurrentPage = TotalPages;
+                    CurrentPage--;
                     PageNum.Content = "Page " + CurrentPage.ToString() + " / " + TotalPages.ToString();
-                    _ActiveSong.PageCount = TotalPages;
                 }
             }
             public void NextPage() {
-                PageTimerActivate(CurrentPage + 1);
+                if (CurrentPage < TotalPages) {
+                    SetPage(Pages.ElementAt(CurrentPage + 1 - 1)); //-1 for offset
+                    IncrementPageNumber();
+                }
+                else { }
             }
             public void PrevPage() {
-                PageTimerActivate(CurrentPage - 1);
+                if (CurrentPage > 1) {
+                    SetPage(Pages.ElementAt(CurrentPage - 1 - 1)); //1- for offset
+                    DeIncrementPageNumber();
+                }
+                else { }
             }
             public void GoToPage(int f_page) {
                 if (f_page == CurrentPage) {
                     return;
                 }
-                PageTimerActivate(f_page);
-
+                SetPage(Pages.ElementAt(f_page));
+            }
+            public void SetPage(StackPanel f_page) {
+                if (ActivePage != null) {
+                    ActivePage.Visibility = Visibility.Hidden;
+                    ActivePage.IsEnabled = false;
+                }
+                ActivePage = f_page;
+                ActivePage.Visibility = Visibility.Visible;
+                ActivePage.IsEnabled = true;
             }
             public void ClearSong() {
                 while (true) {
                     if (Measures.Count == 0) { break; }
                     DeleteMeasure();
                 }
-            }
-            private void PageTimerActivate(int f_page) {
-                if (_PageTurner == null) {
-                    _PageTurner = new PageTurner(f_page, this);
-                }
-                else {
-                    try {
-                        _PageTurner.FinalPageNumber = f_page;
-                    }
-                    catch {
-                        PageTimerActivate(f_page);
-                    }
-                }
-            }
-            private void PageTimerDeactivate() {
-                _PageTurner = null;
             }
             private void CheckForEmptyPage() {
                 double f_ASPHeight = 0;
@@ -248,76 +240,7 @@ namespace CPSM
             public void EnqueueNote(NoteViewModal f_note) {
                 _Initializer.AddNote(f_note);
             }
-
-            public class PageTurner
-            {
-                public DispatcherTimer _Timer { get; set; }
-                public SongViewModalCreator _Parent { get; set; }
-                public StackPanel NewPage { get; set; }
-                public int PageNumber { get; set; }
-                public int Stage { get; set; }
-                public int? FinalPageNumber { get; set; }
-
-                public PageTurner(int f_NewPage, SongViewModalCreator f_Parent) {
-                    _Parent = f_Parent;
-                    PageNumber = f_NewPage;
-                    Stage = 0;
-
-                    _Timer = new DispatcherTimer();
-                    _Timer.Interval = TimeSpan.FromSeconds(0.1);
-                    _Timer.Tick += Timer_Tick;
-                    _Timer.Start();
-
-                    if (PageNumber < _Parent.TotalPages) {
-                        _Parent.PageTimerDeactivate();
-                    }
-                }
-                private void Timer_Tick(object sender, EventArgs e) {
-                    try {
-                        switch (Stage) {
-                            case 0: {
-                                NewPage = _Parent.Pages.ElementAt(PageNumber - 1);
-                                _Parent.MeasuresCan.Children.Remove(_Parent.ActivePage);
-                                Stage = 1;
-                                break;
-                            }
-                            case 1: {
-                                _Parent.MeasuresCan.Children.Add(NewPage);
-                                _Parent.ActivePage = NewPage;
-                                Stage = 2;
-                                break;
-                            }
-                            case 2: {
-                                _Parent.CurrentPage = PageNumber;
-                                _Parent.PageNum.Content = "Page " + _Parent.CurrentPage.ToString() + " / " + _Parent.TotalPages.ToString();
-                                Stage = 3;
-                                break;
-                            }
-                            case 3: {
-                                _Parent.CheckForEmptyPage();
-                                if (PageNumber == FinalPageNumber) {
-                                    _Timer.Stop();
-                                    _Parent.PageTimerDeactivate();
-                                }
-                                else if (FinalPageNumber != null) {
-                                    PageNumber = FinalPageNumber.Value;
-                                    Stage = 0;
-                                }
-                                else {
-                                    _Timer.Stop();
-                                    _Parent.PageTimerDeactivate();
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    catch {
-                        _Parent.PageTimerDeactivate();
-                    }
-                    
-                }
-            }
-
+            
             public class NoteInitializer
             {
                 private readonly double INTERVAL = 0.0001;

@@ -23,13 +23,11 @@ using CPSM.Forms;
     Add Export Dialog funcion
     Add Copy/Paste functions
     prettify the load song select
-    smooth page turning
     Name & Source changing
     Zooming
     Ctrl and Shift modifiers
 
     Minor:
-    load brings up page 1
     dont allow it to load if its already loading a song
     hotkey partial notes
 
@@ -42,6 +40,7 @@ using CPSM.Forms;
 */
 /*
     Done:
+    smooth page turning
     change songdata data structure
     Add numbers to measures
     global mouse event handler
